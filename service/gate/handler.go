@@ -4,12 +4,14 @@ import (
 	"Server/service/datapack"
 	"Server/service/logger"
 	"Server/service/proto"
-	"go.uber.org/zap"
+	"Server/service/session"
 	"time"
+
+	"go.uber.org/zap"
 )
 
 // heartHandler 心跳处理
-func (g *Gate) heartHandler(session *Session) *proto.Resp {
+func (g *Gate) heartHandler(session *session.Session) *proto.Resp {
 	t := time.Now()
 	session.pingTime = t
 	return proto.Response1(&pb_gate.HeartResp{
@@ -20,7 +22,7 @@ func (g *Gate) heartHandler(session *Session) *proto.Resp {
 }
 
 // loginHandler 登录
-func (g *Gate) loginHandler(session *Session, message *datapack.Message) (pb_protocol.ErrorCode, []byte) {
+func (g *Gate) loginHandler(session *session.Session, message *datapack.Message) (pb_protocol.ErrorCode, []byte) {
 	cliReq := &pb_gate.LoginReq{}
 	if err := proto.Unmarshal(message.Body, cliReq); err != nil {
 		return proto.UnmarshalFailed(err)
@@ -51,7 +53,7 @@ func (g *Gate) loginHandler(session *Session, message *datapack.Message) (pb_pro
 	// TODO 验证区服开放时间，状态，白名单
 
 	// 3. 绑定数据
-	player := playerPool.Get()
+	player := session.playerPool.Get()
 	player.set(cliReq.GetUuid(), cliReq.GetServerId())
 	session.player = player
 

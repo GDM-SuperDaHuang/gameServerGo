@@ -4,10 +4,11 @@ import (
 	"Server/service/datapack"
 	"Server/service/proto"
 	"Server/service/rpc"
+	"Server/service/session"
 )
 
 // 数据转发
-func (g *Gate) forward(session *Session, message *datapack.Message) *proto.Resp {
+func (g *Gate) forward(session *session.Session, message *datapack.Message) *proto.Resp {
 	protocol := int32(message.Head.Protocol)
 	// 按照协议号 protocol 转发到对应的服务
 	// protocol 范围: 0 ~ 65535
@@ -72,7 +73,7 @@ func (g *Gate) forward(session *Session, message *datapack.Message) *proto.Resp 
 	//return proto.Errorf(pb_protocol.ErrorCode_ProtocolNotFound, "协议号: %d", protocol)
 }
 
-func (g *Gate) forwardLocal(session *Session, message *datapack.Message) *proto.Resp {
+func (g *Gate) forwardLocal(session *session.Session, message *datapack.Message) *proto.Resp {
 	switch message.Head.Protocol {
 	case proto.MessageID_Heart:
 		return g.heartHandler(session)
@@ -86,19 +87,21 @@ func (g *Gate) forwardLocal(session *Session, message *datapack.Message) *proto.
 	return proto.Errorf1(proto.ErrorCode_ProtocolNotFound)
 }
 
-func (g *Gate) rpcForward(session *Session, message *datapack.Message) *proto.Resp {
-	return g.forwardTarget(0, session, message, accountrpc.RPCClients())
+func (g *Gate) rpcForward(session *session.Session, message *datapack.Message) *proto.Resp {
+	//return g.forwardTarget (session, message, nil)
+	var rpcClient rpc.ClientInterface = nil // todo
+	return rpc.ForwardTarget1(session, message, rpcClient)
 }
 
-func (g *Gate) forwardTarget(targetID uint32, session *Session, message *datapack.Message, rpcclient pkgrpc.Client) (pb_protocol.ErrorCode, []byte) {
-	forwardReq := rpc.BuildForwardReq(
-		session.RealServerID(),
-		session.serverID(),
-		session.roleID(),
-		pb_protocol.MessageID(message.Head.Protocol),
-		message.Body,
-	)
-	defer internalrpc.ReleaseForwardReq(forwardReq)
-
-	return internalrpc.ForwardTarget(targetID, forwardReq, rpcclient, session.version.GameVersionMin, session.version.GameVersionMax)
-}
+//func (g *Gate) forwardTarget(targetID uint32, session *session.Session, message *datapack.Message, rpcclient pkgrpc.Client) (pb_protocol.ErrorCode, []byte) {
+//	forwardReq := rpc.BuildForwardReq(
+//		session.RealServerID(),
+//		session.serverID(),
+//		session.roleID(),
+//		message.Head.Protocol,
+//		message.Body,
+//	)
+//	defer internalrpc.ReleaseForwardReq(forwardReq)
+//
+//	return internalrpc.ForwardTarget(targetID, forwardReq, rpcclient, session.version.GameVersionMin, session.version.GameVersionMax)
+//}

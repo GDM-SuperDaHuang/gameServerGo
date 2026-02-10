@@ -3,6 +3,7 @@ package gate
 import (
 	"Server/service/logger"
 	"Server/service/proto"
+	"Server/service/session"
 	"sync"
 	"sync/atomic"
 	//"server/api/pb/pb_protocol"
@@ -145,7 +146,7 @@ func (ts *tcpServer) OnTraffic(c gnet.Conn) (action gnet.Action) {
 
 // -------------------------------------- 内部 --------------------------------------
 
-func (ts *tcpServer) session(c gnet.Conn) *Session {
+func (ts *tcpServer) session(c gnet.Conn) *session.Session {
 	if c.RemoteAddr() == nil {
 		return nil
 	}
@@ -156,10 +157,10 @@ func (ts *tcpServer) session(c gnet.Conn) *Session {
 		return nil
 	}
 
-	return v.(*Session)
+	return v.(*session.Session)
 }
 
-func (ts *tcpServer) findSession(roleID uint64) *Session {
+func (ts *tcpServer) findSession(roleID uint64) *session.Session {
 	if roleID == 0 {
 		return nil
 	}
@@ -169,7 +170,7 @@ func (ts *tcpServer) findSession(roleID uint64) *Session {
 		return nil
 	}
 
-	return v.(*Session)
+	return v.(*session.Session)
 }
 
 func (ts *tcpServer) delete(address string) {
@@ -177,7 +178,7 @@ func (ts *tcpServer) delete(address string) {
 	if !found {
 		return
 	}
-	session := sessionI.(*Session)
+	session := sessionI.(*session.Session)
 	if session.player != nil && session.player.roleID > 0 {
 		ts.roles.Delete(session.player.roleID)
 	}
@@ -200,7 +201,7 @@ func (ts *tcpServer) initPool(poolSize int) error {
 }
 
 // Create response handler closure
-func (ts *tcpServer) handleMessage(session *Session, message *datapack.Message) {
+func (ts *tcpServer) handleMessage(session *session.Session, message *datapack.Message) {
 	//if ts.isTest {
 	//	logger.Get().Info(
 	//		"req <----",
@@ -217,7 +218,7 @@ func (ts *tcpServer) handleMessage(session *Session, message *datapack.Message) 
 }
 
 // write 写入数据，发送到客户端
-func (ts *tcpServer) write(session *Session, resp *proto.Resp, message *datapack.Message) error {
+func (ts *tcpServer) write(session *session.Session, resp *proto.Resp, message *datapack.Message) error {
 	respMessage := datapack.NewMessageResp(resp, message)
 	defer datapack.FreeMessage(respMessage)
 

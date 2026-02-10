@@ -1,8 +1,9 @@
-package gate
+package session
 
 import (
 	"Server/service/common"
 	"Server/service/config"
+	"Server/service/logger"
 	"net"
 	"strconv"
 	"sync"
@@ -39,7 +40,7 @@ type Session struct {
 	// shareKey rc4 加密密钥
 	shareKey string
 	// player 绑定的玩家信息
-	player *player
+	Player *Player
 	// 请求指定版本号范围
 	//version *pb_gate.Version
 
@@ -47,7 +48,7 @@ type Session struct {
 	lock      sync.RWMutex
 }
 
-type player struct {
+type Player struct {
 	accountID    uint64
 	realServerID uint32 // 角色当前所在的区服 id
 	serverID     uint32 // 角色归属区服 id

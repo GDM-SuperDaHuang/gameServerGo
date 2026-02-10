@@ -1,6 +1,7 @@
 package datapack
 
 import (
+	"Server/service/session"
 	"errors"
 )
 
@@ -60,6 +61,11 @@ type Crypto interface {
 type Message struct {
 	Head *MessageHead
 	Body []byte
+}
+
+type RpcMessage struct {
+	Data   *Message
+	Player *session.Player
 }
 
 // MessageHead 消息头
