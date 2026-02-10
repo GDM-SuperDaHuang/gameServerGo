@@ -1,16 +1,17 @@
 package gate
 
 import (
+	"Server/service/logger"
+	"Server/service/proto"
 	"sync"
 	"sync/atomic"
-	"time"
-
 	//"server/api/pb/pb_protocol"
 	//"server/internal/engine"
 	//"server/pkg/datapack"
 	//"server/pkg/logger"
 
 	"Server/service/datapack"
+
 	"github.com/panjf2000/ants/v2"
 	"github.com/panjf2000/gnet/v2"
 	"go.uber.org/zap"
@@ -33,29 +34,6 @@ type tcpServer struct {
 	sessionCount atomic.Int32
 
 	isTest bool
-}
-
-// Session 客户端会话
-type Session struct {
-	//engine     engine.Engine
-	conn       gnet.Conn
-	remoteAddr string
-
-	pingTime  time.Time
-	readChan  chan struct{}
-	closeChan chan struct{}
-
-	// ready 是否准备好
-	ready atomic.Bool
-	// shareKey rc4 加密密钥
-	shareKey string
-	// player 绑定的玩家信息
-	player *player
-	// 请求指定版本号范围
-	version *pb_gate.Version
-
-	closeOnce sync.Once
-	lock      sync.RWMutex
 }
 
 // -------------------------------------- 外部 --------------------------------------
@@ -153,7 +131,7 @@ func (ts *tcpServer) OnTraffic(c gnet.Conn) (action gnet.Action) {
 	err = ts.pool.Submit(func() {
 		for _, message := range messages {
 			ts.handleMessage(session, message)
-			datapack.FreeMessage(message)
+			datapack.FreeMessage(message) //释放回内存池
 		}
 	})
 	if err != nil {
@@ -233,51 +211,45 @@ func (ts *tcpServer) handleMessage(session *Session, message *datapack.Message) 
 	//}
 
 	// 返回结果
-	respCode, respBody := ts.gate.forward(session, message)
+	resp := ts.gate.forward(session, message)
 	// request->response 模式
-	_ = ts.write(session, message.Head.SN, uint16(respCode), message.Head.Protocol, respBody)
+	_ = ts.write(session, resp, message)
 }
 
 // write 写入数据，发送到客户端
-func (ts *tcpServer) write(session *Session, sn uint32, code uint16, protocol uint16, body []byte) error {
-	resp := datapack.NewMessage(
-		0,
-		sn,
-		code,
-		protocol,
-		body,
-	)
-	defer datapack.FreeMessage(resp)
+func (ts *tcpServer) write(session *Session, resp *proto.Resp, message *datapack.Message) error {
+	respMessage := datapack.NewMessageResp(resp, message)
+	defer datapack.FreeMessage(respMessage)
 
 	// 分享秘钥时不加密，也不验证校验值
-	if protocol == pb_protocol.MessageID_SecretSharePubKey {
-		resp.Head.Flag = resp.Head.Flag &^ datapack.MessageFlagEncrypt //按位清除
-	}
+	//if protocol == pb_protocol.MessageID_SecretSharePubKey {
+	//	resp.Head.Flag = resp.Head.Flag &^ datapack.MessageFlagEncrypt //按位清除
+	//}
 
-	cb, b, err := ts.datapack.Pack(resp, nil)
+	cb, b, err := ts.datapack.Pack(respMessage, nil)
 	if err != nil {
-		logger.Get().Error("[gate.tcpServer.OnTraffic] pack message failed",
-			zap.String("session", session.String()),
-			zap.Error(err))
+		//logger.Get().Error("[gate.tcpServer.OnTraffic] pack message failed",
+		//	zap.String("session", session.String()),
+		//	zap.Error(err))
 		return err
 	}
 
 	if len(b) > 0 {
 		if ts.isTest {
-			logger.Get().Info(
-				"resp ---->",
-				zap.Uint64("role", session.RoleID()),
-				zap.Uint16("protocol", uint16(protocol)),
-				zap.Uint32("sn", sn),
-				zap.Int32("code", int32(code)),
-				zap.Int("size", len(b)),
-			)
+			//logger.Get().Info(
+			//	"resp ---->",
+			//	zap.Uint64("role", session.RoleID()),
+			//	zap.Uint16("protocol", uint16(protocol)),
+			//	zap.Uint32("sn", sn),
+			//	zap.Int32("code", int32(code)),
+			//	zap.Int("size", len(b)),
+			//)
 		}
 
 		if err := session.WriteCb(b, cb); err != nil {
-			logger.Get().Error("[gate.tcpServer.OnTraffic] session write failed",
-				zap.String("session", session.String()),
-				zap.Error(err))
+			//logger.Get().Error("[gate.tcpServer.OnTraffic] session write failed",
+			//	zap.String("session", session.String()),
+			//	zap.Error(err))
 			return err
 		}
 	}

@@ -2,20 +2,21 @@ package gate
 
 import (
 	"Server/service/datapack"
-	"time"
-
+	"Server/service/logger"
+	"Server/service/proto"
 	"go.uber.org/zap"
+	"time"
 )
 
 // heartHandler 心跳处理
-func (g *Gate) heartHandler(session *Session) (pb_protocol.ErrorCode, []byte) {
+func (g *Gate) heartHandler(session *Session) *proto.Resp {
 	t := time.Now()
 	session.pingTime = t
-
-	return proto.Response(&pb_gate.HeartResp{
+	return proto.Response1(&pb_gate.HeartResp{
 		Time:     t.Unix(),
 		Location: t.Location().String(),
 	})
+
 }
 
 // loginHandler 登录

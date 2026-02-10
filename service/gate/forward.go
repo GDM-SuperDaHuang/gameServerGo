@@ -1,15 +1,14 @@
 package gate
 
 import (
-	"Server/service/config"
 	"Server/service/datapack"
+	"Server/service/proto"
 	"Server/service/rpc"
 )
 
-// forward 数据转发
-func (g *Gate) forward(session *Session, message *datapack.Message) (pb_protocol.ErrorCode, []byte) {
+// 数据转发
+func (g *Gate) forward(session *Session, message *datapack.Message) *proto.Resp {
 	protocol := int32(message.Head.Protocol)
-
 	// 按照协议号 protocol 转发到对应的服务
 	// protocol 范围: 0 ~ 65535
 
@@ -73,24 +72,21 @@ func (g *Gate) forward(session *Session, message *datapack.Message) (pb_protocol
 	//return proto.Errorf(pb_protocol.ErrorCode_ProtocolNotFound, "协议号: %d", protocol)
 }
 
-func (g *Gate) forwardLocal(session *Session, message *datapack.Message) (pb_protocol.ErrorCode, []byte) {
-	protocol := int32(message.Head.Protocol)
-
-	switch protocol {
-	case int32(pb_protocol.MessageID_Heart):
+func (g *Gate) forwardLocal(session *Session, message *datapack.Message) *proto.Resp {
+	switch message.Head.Protocol {
+	case proto.MessageID_Heart:
 		return g.heartHandler(session)
-	case int32(pb_protocol.MessageID_SecretSharePubKey):
-		return g.secretSharePubKeyHandler(session, message)
-	case int32(pb_protocol.MessageID_SecretShareTest):
-		return g.secretShareTestHandler(session, message)
-	case int32(pb_protocol.MessageID_Login):
-		return g.loginHandler(session, message)
+		//case proto.MessageID_SecretSharePubKey:
+		//	return g.secretSharePubKeyHandler(session, message)
+		//case proto.MessageID_SecretShareTest:
+		//	return g.secretShareTestHandler(session, message)
+		//case proto.MessageID_Login:
+		//	return g.loginHandler(session, message)
 	}
-
-	return proto.Errorf(pb_protocol.ErrorCode_ProtocolNotFound, "gate 协议号: %d", protocol)
+	return proto.Errorf1(proto.ErrorCode_ProtocolNotFound)
 }
 
-func (g *Gate) rpcForward(session *Session, message *datapack.Message) (pb_protocol.ErrorCode, []byte) {
+func (g *Gate) rpcForward(session *Session, message *datapack.Message) *proto.Resp {
 	return g.forwardTarget(0, session, message, accountrpc.RPCClients())
 }
 

@@ -2,7 +2,10 @@ package datapack
 
 import (
 	"Server/service/common"
-	"crypto"
+	"Server/service/compress"
+	"Server/service/proto"
+
+	//"crypto"
 	"encoding/binary"
 	"fmt"
 
@@ -19,7 +22,7 @@ type deEnCode struct {
 	// compressThreshold 压缩的阈值，当消息负载 payload 长度不小于该值时才会压缩
 	//compressThreshold int
 
-	// compress 压缩与解压器，默认 zip
+	// compress 压缩与解压器，默认 zip todo
 	compress compress.Compress
 
 	// whetherCrypto 是否需要对消息负载 payload 进行加密
@@ -38,33 +41,21 @@ type deEnCode struct {
 	//emptyChecksum [ChecksumLength]byte
 }
 
-func NewLTD(
-	whetherCompress bool,
-	compressThreshold int,
-	compress compress.Compress,
-	whetherCrypto bool,
-	whetherChecksum bool,
-	logger *zap.Logger,
-) Datapack {
-	return &ltd{
-		headLen:           calcHeadLen(whetherChecksum),
-		whetherCompress:   whetherCompress,
-		compressThreshold: compressThreshold,
-		compress:          compress,
-		whetherCrypto:     whetherCrypto,
-		whetherChecksum:   whetherChecksum,
-		order:             binary.BigEndian, // 默认使用大端,实例化
-		logger:            logger,
-		emptyChecksum:     [ChecksumLength]byte{},
+func NewLTD(compress compress.Compress, logger *zap.Logger) Datapack {
+	return &deEnCode{
+		compress: compress,
+		order:    binary.BigEndian, // 默认使用大端,实例化
+		logger:   logger,
+		//emptyChecksum:     [ChecksumLength]byte{},
 	}
 }
 
 // HeadLen 消息头长度
-func (l *deEnCode) HeadLen() int {
-	return l.headLen
-}
+//func (l *deEnCode) HeadLen() int {
+//	return l.headLen
+//}
 
-// Pack 封包
+// 封包
 func (l *deEnCode) Pack(message *Message, cryptoHandler Crypto) (Callback, []byte, error) {
 	body, flag, err := l.packBody(message, cryptoHandler)
 	if err != nil {
@@ -76,7 +67,7 @@ func (l *deEnCode) Pack(message *Message, cryptoHandler Crypto) (Callback, []byt
 		estimatedSize += len(body)
 	}
 
-	// 固定大小的，可复用
+	// 固定大小的，可复用 ，todo 可能不安全？？？
 	buffer := common.Get().Buffer(defaultBufferSize)
 
 	if buffer.Cap() < estimatedSize {
@@ -163,6 +154,7 @@ func (l *deEnCode) Unpack(reader Reader) ([]*Message, error) {
 	return messages, nil
 }
 
+// 封包
 func (l *deEnCode) packBody(message *Message, cryptoHandler Crypto) ([]byte, uint16, error) {
 	// 负载
 	body := message.Body
@@ -175,26 +167,26 @@ func (l *deEnCode) packBody(message *Message, cryptoHandler Crypto) ([]byte, uin
 	flag := message.Head.Flag
 
 	// 压缩
-	if l.whetherCompress && l.compress != nil && len(body) >= l.compressThreshold {
+	if len(body) > 1024 { //是否压缩
 		compressed, err := l.compress.Compress(body)
-		if err != nil {
-			l.logger.Error("[pkg.datapack.packBody] compress failed",
-				zap.String("message", message.String()),
-				zap.String("err", err.Error()))
-			return nil, 0, fmt.Errorf("compress failed: %w", err)
+		if err != nil { // 不处理压缩
+			//l.logger.Error("[pkg.datapack.packBody] compress failed",
+			//	zap.String("message", message.String()),
+			//	returnzap.String("err", err.Error()))
+			//nil, 0, fmt.Errorf("compress failed: %w", err)
+		} else { //成功则修改
+			flag |= MessageFlagCompress
+			body = compressed
 		}
-		body = compressed
-		flag |= MessageFlagCompress
 	}
 
 	// 加密
-	if l.whetherCrypto && cryptoHandler != nil {
+	if flag|MessageFlagEncrypt == 1 && cryptoHandler != nil {
 		body, err = cryptoHandler.Encrypt(body)
 		if err != nil {
-			l.logger.Error("[pkg.datapack.packBody] encrypt failed", zap.String("message", message.String()), zap.String("err", err.Error()))
+			//l.logger.Error("[pkg.datapack.packBody] encrypt failed", zap.String("message", message.String()), zap.String("err", err.Error()))
 			return nil, 0, err
 		}
-
 		flag |= MessageFlagEncrypt
 	}
 
@@ -263,29 +255,29 @@ func (l *deEnCode) parseMessageHead(allBytes []byte) (*MessageHead, int, error) 
 
 // 解析消息体，解密,解压缩
 func (l *deEnCode) processMessageBody(payload []byte, flag uint16, cryptoHandler Crypto, sn uint32) ([]byte, error) {
-	var err error
+	var err error = nil
 
 	// 解密
-	if flag&MessageFlagEncrypt != 0 && cryptoHandler != nil {
-		if payload, err = cryptoHandler.Decrypt(payload); err != nil {
-			l.logger.Error("[pkg.datapack.Unpack] decrypt failed",
-				zap.Uint32("sn", sn),
-				zap.Error(err))
-			return nil, ErrDecryptPayload
-		}
-	}
+	//if flag&MessageFlagEncrypt != 0 && cryptoHandler != nil {
+	//	if payload, err = cryptoHandler.Decrypt(payload); err != nil {
+	//		l.logger.Error("[pkg.datapack.Unpack] decrypt failed",
+	//			zap.Uint32("sn", sn),
+	//			zap.Error(err))
+	//		return nil, ErrDecryptPayload
+	//	}
+	//}
+	//
+	//// 解压
+	//if flag&MessageFlagCompress != 0 && l.compress != nil {
+	//	if payload, err = l.compress.Uncompress(payload); err != nil {
+	//		l.logger.Error("[pkg.datapack.Unpack] decompress failed",
+	//			zap.Uint32("sn", sn),
+	//			zap.Error(err))
+	//		return nil, ErrDecompressPayload
+	//	}
+	//}
 
-	// 解压
-	if flag&MessageFlagCompress != 0 && l.compress != nil {
-		if payload, err = l.compress.Uncompress(payload); err != nil {
-			l.logger.Error("[pkg.datapack.Unpack] decompress failed",
-				zap.Uint32("sn", sn),
-				zap.Error(err))
-			return nil, ErrDecompressPayload
-		}
-	}
-
-	return payload, nil
+	return payload, err
 }
 
 // NewMessage 创建消息
@@ -297,6 +289,22 @@ func NewMessage(flag uint16, sn uint32, code uint16, protocol uint16, payload []
 	m.Head.Code = code
 	m.Head.Protocol = protocol
 	m.Body = payload
+	return m
+}
+
+func NewMessageResp(resp *proto.Resp, message *Message) *Message {
+	m := messagePool.Get()
+	m.Head = &MessageHead{
+		Len:      uint16(len(message.Body)),
+		Flag:     resp.Flag,
+		SN:       message.Head.SN,
+		Code:     resp.Code,
+		Protocol: message.Head.Protocol,
+	}
+	if resp.Body != nil {
+		m.Body = *resp.Body
+	}
+
 	return m
 }
 

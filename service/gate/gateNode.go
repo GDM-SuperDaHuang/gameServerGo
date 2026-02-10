@@ -1,9 +1,10 @@
 package gate
 
 import (
+	"Server/service/compress"
 	"Server/service/config"
 	"Server/service/datapack"
-	"compress/zlib"
+	"Server/service/logger"
 
 	"github.com/panjf2000/gnet/v2"
 	"go.uber.org/zap"
@@ -94,27 +95,21 @@ func (g *Gate) gnetStart() error {
 		//whetherChecksum   = c.Service().GetBool("whetherchecksum")
 		//poolSize          = c.Service().GetInt("poolsize")
 
-		address           = "127.0.0.1"
-		whetherCompress   = c.Service().GetBool("whethercompress")
-		compressThreshold = c.Service().GetInt("compressthreshold")
-		whetherCrypto     = c.Service().GetBool("whethercrypto")
-		whetherChecksum   = c.Service().GetBool("whetherchecksum")
-		poolSize          = c.Service().GetInt("poolsize")
+		address = "127.0.0.1"
+		//whetherCompress   = c.Service().GetBool("whethercompress")
+		//compressThreshold = c.Service().GetInt("compressthreshold")
+		//whetherCrypto     = c.Service().GetBool("whethercrypto")
+		//whetherChecksum   = c.Service().GetBool("whetherchecksum")
+		//poolSize = c.Service().GetInt("poolsize")
+		poolSize = 10000
 	)
 
 	s := &tcpServer{
 		//engine:  g.engine,
-		gate:    g,
-		address: address,
-		datapack: datapack.NewLTD(
-			whetherCompress,
-			compressThreshold,
-			zlib.NewZlib(),
-			whetherCrypto,
-			whetherChecksum,
-			logger.Get(),
-		),
-		isTest: c.IsDevelop(),
+		gate:     g,
+		address:  address,
+		datapack: datapack.NewLTD(compress.NewZlib(), logger.Get()),
+		isTest:   c.IsDevelop(),
 	}
 
 	if err := s.InitPool(poolSize); err != nil {

@@ -6,7 +6,7 @@ import (
 
 type Datapack interface {
 	// HeadLen 消息头长度
-	HeadLen() int
+	//HeadLen() int
 
 	//  封包
 	Pack(message *Message, cryptoHandler Crypto) (Callback, []byte, error)
