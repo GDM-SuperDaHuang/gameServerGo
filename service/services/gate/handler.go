@@ -1,9 +1,9 @@
 package gate
 
 import (
-	"Server/service/datapack"
 	"Server/service/logger"
 	"Server/service/proto"
+	"Server/service/services/gate/datapack"
 	"Server/service/session"
 	"time"
 
@@ -18,7 +18,6 @@ func (g *Gate) heartHandler(session *session.Session) *proto.Resp {
 		Time:     t.Unix(),
 		Location: t.Location().String(),
 	})
-
 }
 
 // loginHandler 登录

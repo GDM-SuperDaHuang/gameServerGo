@@ -1,12 +1,7 @@
 package services
 
-import (
-	"Server/service/config"
-	"Server/service/gate"
-)
-
 // Service 对外服务
-type Service interface {
+type ServiceInterface interface {
 	// ID 服务唯一 id
 	ID() uint32
 	// Name 服务名称
@@ -23,33 +18,43 @@ type Service interface {
 	Close() error
 }
 
+// 节点服务器
+//type nodeServer struct {
+//	engine  *engine.Engine
+//	id      uint32
+//	name    string
+//	version uint32
+//
+//	rpcServer pkgrpc.Server
+//}
+
 // New 创建一个网格服务
-func NewGate() (Service, error) {
-	c := config.Get()
-
-	g := &gate.Gate{
-		id:      c.NodeID(),
-		name:    c.NodeName(),
-		version: c.NodeVersion(),
-	}
-	//if err := g.parse(); err != nil {
-	//	return nil, err
-	//}
-
-	//logger.Get().Info("[gate] create success", zap.Uint32("id", g.id), zap.String("node", g.name), zap.Uint32("version", g.version))
-	return g, nil
-}
+//func NewGate() (ServiceInterface, error) {
+//	c := config.Get()
+//
+//	g := &Gate{
+//		id:      c.NodeID(),
+//		name:    c.NodeName(),
+//		version: c.NodeVersion(),
+//	}
+//	//if err := g.parse(); err != nil {
+//	//	return nil, err
+//	//}
+//
+//	//logger.Get().Info("[gate] create success", zap.Uint32("id", g.id), zap.String("node", g.name), zap.Uint32("version", g.version))
+//	return g, nil
+//}
 
 // New 创建一个节点服务
-func NewNode() (Service, error) {
-	c := config.Get()
-	a := &nodeServer{
-		//engine:  engine,
-		id:      c.NodeID(),
-		name:    c.NodeName(),
-		version: c.NodeVersion(),
-	}
-
-	//logger.Get().Info("[account] create success", zap.Uint32("id", a.id), zap.String("node", a.name), zap.Uint32("version", a.version))
-	return a, nil
-}
+//func NewNode() (ServiceInterface, error) {
+//	c := config.Get()
+//	a := &nodeServer{
+//		//engine:  engine,
+//		id:      c.NodeID(),
+//		name:    c.NodeName(),
+//		version: c.NodeVersion(),
+//	}
+//
+//	//logger.Get().Info("[account] create success", zap.Uint32("id", a.id), zap.String("node", a.name), zap.Uint32("version", a.version))
+//	return a, nil
+//}

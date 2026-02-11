@@ -4,88 +4,114 @@ import (
 	"Server/service/compress"
 	"Server/service/config"
 	"Server/service/logger"
-	gate2 "Server/service/services/gate"
+	"Server/service/rpc"
+	"Server/service/services"
 	"Server/service/services/gate/datapack"
 
+	rpcxServer "Server/service/rpc/server"
 	"github.com/panjf2000/gnet/v2"
 	"go.uber.org/zap"
 )
 
-//// gate 网关服务
-//type Gate struct {
-//	//engine  *engine.Engine
-//	id      uint32
-//	name    string
-//	version uint32
-//
-//	loginJWT jwt.JWT
-//
-//	tcpServer *tcpServer
-//	rpcServer pkgrpc.Server
-//}
+// gate 实现接口
+type Gate struct {
+	//engine  *engine.Engine
+	id      uint32
+	name    string
+	version uint32
 
-// ID 返回服务唯一 ID
-func (a *Gate) ID() uint32 {
-	return a.id
+	//loginJWT jwt.JWT
+
+	tcpServer *gNetServer
+	rpcServer rpc.ServerInterface
 }
 
-// Name 返回服务名称
-func (a *Gate) Name() string {
-	return a.name
+// New 创建一个网格服务
+func NewServer() (services.ServiceInterface, error) {
+	c := config.Get()
+
+	g := &Gate{
+		id:      c.NodeID(),
+		name:    c.NodeName(),
+		version: c.NodeVersion(),
+	}
+	if err := g.parse(); err != nil {
+		return nil, err
+	}
+
+	logger.Get().Info("[gate] create success", zap.Uint32("id", g.id), zap.String("node", g.name), zap.Uint32("version", g.version))
+	return g, nil
 }
 
-// Version 返回服务版本号
-func (a *Gate) Version() uint32 {
-	return a.version
+func (g *Gate) ID() uint32 {
+	return g.id
 }
 
-// Init 初始化服务
-//func (a *Gate) Init() error {
-//	if err := database.InitFromConfig(); err != nil {
-//		return err
-//	}
-//
-//	if err := cache.InitFromConfig(); err != nil {
-//		return err
-//	}
-//
-//	if err := entity.Init(); err != nil {
-//		return err
-//	}
-//
-//	if err := a.initRPC(); err != nil {
-//		return err
-//	}
-//
-//	logger.Get().Info("[account] initialized")
-//	return nil
-//}
+func (g *Gate) Name() string {
+	return g.name
+}
 
-// Start 启动服务
+func (g *Gate) Version() uint32 {
+	return g.version
+}
+
+// Init 进行初始化，当尚未启动对外服务
+func (g *Gate) Init() error {
+	// 1. jwt 验证
+	return g.initJWT()
+}
+
 func (g *Gate) Start() error {
 	// 启动网络监听
-	if err := g.gnetStart(); err != nil {
+	if err := g.gNetStart(); err != nil {
 		return err
 	}
+
 	if err := g.initRPC(); err != nil {
 		return err
 	}
-	//logger.Get().Info("[gate] service started")
+
+	logger.Get().Info("[gate] service started")
+
 	return nil
 }
 
-// Close 关闭服务
-func (a *Gate) Close() error {
-	if err := a.rpcServer.Stop(); err != nil {
-		logger.Get().Error("[account] close failed", zap.Error(err))
+func (g *Gate) Close() error {
+	// 清理 JWT 资源
+	//g.loginJWT = nil
+
+	logger.Get().Info("[gate] service closed")
+	return nil
+}
+
+// -------------------------------------- 内部 --------------------------------------
+
+func (g *Gate) parse() error {
+	c := config.Get()
+
+	if err := c.CheckService(
+		"whethercompress",
+		"compressthreshold",
+		"whethercrypto",
+		"whetherchecksum",
+		"poolsize",
+	); err != nil {
 		return err
 	}
 
-	logger.Get().Info("[account] closed")
+	return c.CheckNode("id", "version", "address")
+}
+
+func (g *Gate) initJWT() error {
+	c := config.Get()
+
+	g.loginJWT = jwt.New(&jwt.Option{
+		Secret: []byte(c.Secret()),
+	})
 	return nil
 }
 
-func (g *Gate) gnetStart() error {
+func (g *Gate) gNetStart() error {
 	c := config.Get()
 
 	var (
@@ -105,7 +131,7 @@ func (g *Gate) gnetStart() error {
 		poolSize = 10000
 	)
 
-	s := &gate2.tcpServer{
+	s := &gNetServer{
 		//engine:  g.engine,
 		gate:     g,
 		address:  address,
@@ -136,7 +162,7 @@ func (g *Gate) gnetStart() error {
 }
 
 func (g *Gate) initRPC() error {
-	s, err := pkgrpc.NewServer(internalrpc.BuildServerConfig())
+	s, err := rpcxServer.NewServer(rpcxServer.BuildServerConfig())
 	if err != nil {
 		return err
 	}

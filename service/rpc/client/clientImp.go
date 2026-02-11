@@ -1,6 +1,8 @@
-package rpc
+package client
 
 import (
+	"Server/service/common"
+	"Server/service/rpc"
 	"context"
 	"fmt"
 	"strconv"
@@ -12,51 +14,18 @@ import (
 	"github.com/smallnest/rpcx/share"
 )
 
-// Config rpcx 配置
-type Config struct {
-	// etcd 心跳间隔
-	HeartbeatInterval time.Duration
-	// etcd 服务器地址列表
-	EtcdEndpoints []string
-	// etcd 服务注册基础路径，相当于缓存前缀，避免不同项目使用同一个 etcd 造成混乱，例如 MODOU_LDL
-	BasePath string
-	// 服务名称，例如 gate, game, battle
-	ServiceName string
-	// 服务对象名称，例如 Forward
-	ServicePath string
-
-	// 客户端连接池数量
-	PoolSize int
-	// 客户端调用失败处理，见 https://doc.rpcx.io/part3/failmode.html#%E5%A4%B1%E8%B4%A5%E6%A8%A1%E5%BC%8F
-	FailMode xclient.FailMode
-	// 客户端路由方式，见 https://doc.rpcx.io/part3/selector.html#%E8%B7%AF%E7%94%B1
-	SelectMode xclient.SelectMode
-	// 当路由方式为自定义时，此处传入自定义的路由选择器
-	Selector xclient.Selector
-}
-
-// Client rpcx 客户端
-type Client struct {
-	// 配置信息
-	config *Config
-	// rpcx 客户端
-	pool *xclient.XClientPool
-	// etcd 服务发现
-	discovery xclient.ServiceDiscovery
-}
-
 // New 创建客户端
-func New(config *Config) (*Client, error) {
+func NewClient(config *Config) (rpc.ClientInterface, error) {
 	c := &Client{
 		config: config,
 	}
 
 	// 创建服务发现
 	discovery, err := etcdClient.NewEtcdV3Discovery(
-		config.BasePath,
-		config.ServicePath,
+		config.BasePath,    //基本路径
+		config.ServicePath, //具体分支路径的服务，相同则是集群
 		config.EtcdEndpoints,
-		true,
+		true, //监听节点上下线变化
 		nil,
 	)
 	if err != nil {
@@ -77,7 +46,7 @@ func New(config *Config) (*Client, error) {
 	// 创建客户端
 	var (
 		poolSize   = 8
-		failMode   = xclient.Failover   // 使用故障转移模式
+		failMode   = xclient.Failover   // 使用故障转移模式,挑选好的服务节点
 		selectMode = xclient.RoundRobin // 使用轮询负载均衡
 	)
 	if config.FailMode > 0 {
@@ -87,12 +56,12 @@ func New(config *Config) (*Client, error) {
 		selectMode = config.SelectMode
 	}
 	if config.PoolSize > 0 {
-		poolSize = utils.F2(config.PoolSize)
+		poolSize = config.PoolSize
 	}
 
 	pool := xclient.NewXClientPool(
 		poolSize,
-		config.ServicePath,
+		config.ServicePath, //必须和保持和etcd一致
 		failMode,
 		selectMode,
 		discovery,
@@ -111,7 +80,7 @@ func New(config *Config) (*Client, error) {
 }
 
 // Wrap 指定 id 调用
-func (c *Client) Wrap(id, versionMin, versionMax uint32) WrapClient {
+func (c *Client) Wrap(id, versionMin, versionMax uint32) rpc.WrapClient {
 	wc := wrapClientPool.Get()
 	wc.reset(c, id, versionMin, versionMax)
 	return wc
@@ -140,14 +109,14 @@ func (c *Client) Name() string {
 	return c.config.ServiceName
 }
 
-// WrapClient 指定额外参数调用
-type WrapClient interface {
-	// Call 同步调用
-	Call(ctx context.Context, serviceMethod string, args any, reply any) error
-
-	// Go 异步调用
-	Go(ctx context.Context, serviceMethod string, args any, reply any, done chan *xclient.Call) (*xclient.Call, error)
-}
+//// WrapClient 指定额外参数调用
+//type WrapClient interface {
+//	// Call 同步调用
+//	Call(ctx context.Context, serviceMethod string, args any, reply any) error
+//
+//	// Go 异步调用
+//	Go(ctx context.Context, serviceMethod string, args any, reply any, done chan *xclient.Call) (*xclient.Call, error)
+//}
 
 type wrapClient struct {
 	c          *Client
@@ -164,7 +133,7 @@ func (w *wrapClient) Reset() {
 	w.versionMax = 0
 }
 
-var wrapClientPool = bytes.NewPool(func() *wrapClient {
+var wrapClientPool = common.NewPool(func() *wrapClient {
 	return &wrapClient{}
 })
 

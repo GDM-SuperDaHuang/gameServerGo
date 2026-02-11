@@ -1,14 +1,14 @@
-package services
+package node
 
 import (
-	"Server/service/engine"
+	"Server/service/logger"
 
 	"go.uber.org/zap"
 )
 
-// 节点服务器
+// 节点服务器 接口实现
 type nodeServer struct {
-	engine  *engine.Engine
+	//engine  *engine.Engine
 	id      uint32
 	name    string
 	version uint32

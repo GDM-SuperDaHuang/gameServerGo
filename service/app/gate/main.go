@@ -1,7 +1,8 @@
-package main
+package gate
 
 import (
 	"Server/service/services"
+	"Server/service/services/gate"
 	"fmt"
 )
 
@@ -47,10 +48,14 @@ func main() {
 	//}()
 
 	// 添加服务
-	service, err := services.NewGate()
+	// 启动gnet服务
+	service, err := gate.NewServer()
 	if err != nil {
 		panic(err)
 	}
+	//启动 rpcx
+
+	// 注册etcd
 
 	// 似乎没有什么用
 	//if err := engine.Add(service); err != nil {

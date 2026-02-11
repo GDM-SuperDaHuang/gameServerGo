@@ -3,15 +3,10 @@ package gate
 import (
 	"Server/service/logger"
 	"Server/service/proto"
+	datapack2 "Server/service/services/gate/datapack"
 	"Server/service/session"
 	"sync"
 	"sync/atomic"
-	//"server/api/pb/pb_protocol"
-	//"server/internal/engine"
-	//"server/pkg/datapack"
-	//"server/pkg/logger"
-
-	"Server/service/datapack"
 
 	"github.com/panjf2000/ants/v2"
 	"github.com/panjf2000/gnet/v2"
@@ -20,13 +15,14 @@ import (
 
 // -------------------------------------- 变量 --------------------------------------
 
-type tcpServer struct {
+// gnet 实现
+type gNetServer struct {
 	*gnet.BuiltinEventEngine // 默认接口实现
 	gate                     *Gate
 	//engine                   Engine
 	address   string
 	multicore bool
-	datapack  datapack.Datapack
+	datapack  datapack2.Datapack
 
 	pool *ants.Pool //协程池
 
@@ -41,14 +37,14 @@ type tcpServer struct {
 // OnBoot 服务器启动时触发
 // OnBoot fires when the engine is ready for accepting connections.
 // The parameter engine has information and various utilities.
-func (ts *tcpServer) OnBoot(_ gnet.Engine) (action gnet.Action) {
+func (ts *gNetServer) OnBoot(_ gnet.Engine) (action gnet.Action) {
 	//logger.Get().Info("[gate] tcp start", zap.String("address", ts.address), zap.Bool("multicore", ts.multicore))
 	return
 }
 
 // OnShutdown fires when the engine is being shut down, it is called right after
 // all event-loops and connections are closed.
-func (ts *tcpServer) OnShutdown(_ gnet.Engine) {
+func (ts *gNetServer) OnShutdown(_ gnet.Engine) {
 	//logger.Get().Info("[gate] tcp close", zap.String("address", ts.address))
 	ts.pool.Release()
 }
@@ -56,7 +52,7 @@ func (ts *tcpServer) OnShutdown(_ gnet.Engine) {
 // OnOpen 新连接建立时触发
 // OnOpen fires when a new connection has been opened.
 // The parameter out is the return value which is going to be sent back to the remote.
-func (ts *tcpServer) OnOpen(c gnet.Conn) (out []byte, action gnet.Action) {
+func (ts *gNetServer) OnOpen(c gnet.Conn) (out []byte, action gnet.Action) {
 	remoteAddress := c.RemoteAddr().String()
 	if _, exists := ts.sessions.Load(remoteAddress); exists {
 		return
@@ -77,7 +73,7 @@ func (ts *tcpServer) OnOpen(c gnet.Conn) (out []byte, action gnet.Action) {
 
 // OnClose fires when a connection has been closed.
 // The parameter err is the last known connection error.
-func (ts *tcpServer) OnClose(c gnet.Conn, err error) (action gnet.Action) {
+func (ts *gNetServer) OnClose(c gnet.Conn, err error) (action gnet.Action) {
 	//n := ts.sessionCount.Add(-1)
 	//logger.Get().Debug("[gate.OnOpen] disconnect",
 	//	zap.Int32("remain", n),
@@ -111,7 +107,7 @@ func (ts *tcpServer) OnClose(c gnet.Conn, err error) (action gnet.Action) {
 
 // 有数据可读时触发（核心处理逻辑）
 // OnTraffic fires when a local socket receives data from the remote.
-func (ts *tcpServer) OnTraffic(c gnet.Conn) (action gnet.Action) {
+func (ts *gNetServer) OnTraffic(c gnet.Conn) (action gnet.Action) {
 	session := ts.session(c)
 	if session == nil {
 		//logger.Get().Error("[gate.tcpServer.OnTraffic] session not found",
@@ -132,7 +128,7 @@ func (ts *tcpServer) OnTraffic(c gnet.Conn) (action gnet.Action) {
 	err = ts.pool.Submit(func() {
 		for _, message := range messages {
 			ts.handleMessage(session, message)
-			datapack.FreeMessage(message) //释放回内存池
+			datapack2.FreeMessage(message) //释放回内存池
 		}
 	})
 	if err != nil {
@@ -146,7 +142,7 @@ func (ts *tcpServer) OnTraffic(c gnet.Conn) (action gnet.Action) {
 
 // -------------------------------------- 内部 --------------------------------------
 
-func (ts *tcpServer) session(c gnet.Conn) *session.Session {
+func (ts *gNetServer) session(c gnet.Conn) *session.Session {
 	if c.RemoteAddr() == nil {
 		return nil
 	}
@@ -160,7 +156,7 @@ func (ts *tcpServer) session(c gnet.Conn) *session.Session {
 	return v.(*session.Session)
 }
 
-func (ts *tcpServer) findSession(roleID uint64) *session.Session {
+func (ts *gNetServer) findSession(roleID uint64) *session.Session {
 	if roleID == 0 {
 		return nil
 	}
@@ -173,7 +169,7 @@ func (ts *tcpServer) findSession(roleID uint64) *session.Session {
 	return v.(*session.Session)
 }
 
-func (ts *tcpServer) delete(address string) {
+func (ts *gNetServer) delete(address string) {
 	sessionI, found := ts.sessions.Load(address)
 	if !found {
 		return
@@ -185,7 +181,7 @@ func (ts *tcpServer) delete(address string) {
 	ts.sessions.Delete(address)
 }
 
-func (ts *tcpServer) initPool(poolSize int) error {
+func (ts *gNetServer) initPool(poolSize int) error {
 	pool, err := ants.NewPool(
 		poolSize,
 		ants.WithPanicHandler(func(i any) {
@@ -201,7 +197,7 @@ func (ts *tcpServer) initPool(poolSize int) error {
 }
 
 // Create response handler closure
-func (ts *tcpServer) handleMessage(session *session.Session, message *datapack.Message) {
+func (ts *gNetServer) handleMessage(session *session.Session, message *datapack2.Message) {
 	//if ts.isTest {
 	//	logger.Get().Info(
 	//		"req <----",
@@ -218,9 +214,9 @@ func (ts *tcpServer) handleMessage(session *session.Session, message *datapack.M
 }
 
 // write 写入数据，发送到客户端
-func (ts *tcpServer) write(session *session.Session, resp *proto.Resp, message *datapack.Message) error {
-	respMessage := datapack.NewMessageResp(resp, message)
-	defer datapack.FreeMessage(respMessage)
+func (ts *gNetServer) write(session *session.Session, resp *proto.Resp, message *datapack2.Message) error {
+	respMessage := datapack2.NewMessageResp(resp, message)
+	defer datapack2.FreeMessage(respMessage)
 
 	// 分享秘钥时不加密，也不验证校验值
 	//if protocol == pb_protocol.MessageID_SecretSharePubKey {
@@ -258,7 +254,7 @@ func (ts *tcpServer) write(session *session.Session, resp *proto.Resp, message *
 	return nil
 }
 
-func (ts *tcpServer) InitPool(poolSize int) error {
+func (ts *gNetServer) InitPool(poolSize int) error {
 	pool, err := ants.NewPool(
 		poolSize,
 		ants.WithPanicHandler(func(i any) {

@@ -1,13 +1,12 @@
 package rpc
 
 import (
-	"Server/service/datapack"
 	"Server/service/logger"
 	"Server/service/proto"
+	"Server/service/services/gate/datapack"
 	"Server/service/session"
 	"context"
-	"errors"
-	"fmt"
+
 	"go.uber.org/zap"
 )
 
@@ -104,37 +103,37 @@ func ForwardTarget1(session *session.Session, message *datapack.Message, rpcClie
 //   - targetID: 目标ID，如果是唯一服务，填 0。如果是多服务，填目标服务的ID，例如调用 game-1 的填 1
 //   - versionMin: 最小版本号，填 0 表示不限制
 //   - versionMax: 最大版本号，填 0 表示不限制
-func ProtocolTarget(protocol pb_protocol.MessageID, req, resp gproto.Message, rpcclient pkgrpc.Client, targetID, versionMin, versionMax, realServerID, serverID uint32, roleID uint64) (pb_protocol.ErrorCode, error) {
-	// 组装消息，模拟调用
-	b, err := proto.Marshal(req)
-	if err != nil {
-		return 0, err
-	}
-
-	forwardReq := BuildForwardReq(realServerID, serverID, roleID, protocol, b)
-	defer ReleaseForwardReq(forwardReq)
-
-	code, data := ForwardTarget(targetID, forwardReq, rpcclient, versionMin, versionMax)
-
-	// data 是 pb_gate.Response 编码后的数据
-	gateResp := proto.GateResp()
-	defer proto.GateRespRelease(gateResp)
-	err = proto.Unmarshal(data, gateResp)
-	if err != nil {
-		return pb_protocol.ErrorCode_ProtoUnarshalFailed, fmt.Errorf("protocolTarget: proto.Unmarshal failed, protocol: %d, err: %v", protocol, err)
-	}
-
-	if code != pb_protocol.ErrorCode_Success {
-		return code, errors.New(gateResp.Devmsg)
-	}
-
-	if resp != nil && data != nil {
-		// gateResp.Payload 是 resp 编码后的数据
-		err = proto.Unmarshal(gateResp.Payload, resp)
-		if err != nil {
-			return code, err
-		}
-	}
-
-	return code, nil
-}
+//func ProtocolTarget(protocol pb_protocol.MessageID, req, resp gproto.Message, rpcclient pkgrpc.Client, targetID, versionMin, versionMax, realServerID, serverID uint32, roleID uint64) (pb_protocol.ErrorCode, error) {
+//	// 组装消息，模拟调用
+//	b, err := proto.Marshal(req)
+//	if err != nil {
+//		return 0, err
+//	}
+//
+//	forwardReq := BuildForwardReq(realServerID, serverID, roleID, protocol, b)
+//	defer ReleaseForwardReq(forwardReq)
+//
+//	code, data := ForwardTarget(targetID, forwardReq, rpcclient, versionMin, versionMax)
+//
+//	// data 是 pb_gate.Response 编码后的数据
+//	gateResp := proto.GateResp()
+//	defer proto.GateRespRelease(gateResp)
+//	err = proto.Unmarshal(data, gateResp)
+//	if err != nil {
+//		return pb_protocol.ErrorCode_ProtoUnarshalFailed, fmt.Errorf("protocolTarget: proto.Unmarshal failed, protocol: %d, err: %v", protocol, err)
+//	}
+//
+//	if code != pb_protocol.ErrorCode_Success {
+//		return code, errors.New(gateResp.Devmsg)
+//	}
+//
+//	if resp != nil && data != nil {
+//		// gateResp.Payload 是 resp 编码后的数据
+//		err = proto.Unmarshal(gateResp.Payload, resp)
+//		if err != nil {
+//			return code, err
+//		}
+//	}
+//
+//	return code, nil
+//}

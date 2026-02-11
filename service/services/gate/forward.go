@@ -1,9 +1,9 @@
 package gate
 
 import (
-	"Server/service/datapack"
 	"Server/service/proto"
 	"Server/service/rpc"
+	"Server/service/services/gate/datapack"
 	"Server/service/session"
 )
 
@@ -90,6 +90,9 @@ func (g *Gate) forwardLocal(session *session.Session, message *datapack.Message)
 func (g *Gate) rpcForward(session *session.Session, message *datapack.Message) *proto.Resp {
 	//return g.forwardTarget (session, message, nil)
 	var rpcClient rpc.ClientInterface = nil // todo
+
+	// 根据etcd创建客户端，进行调用
+
 	return rpc.ForwardTarget1(session, message, rpcClient)
 }
 
