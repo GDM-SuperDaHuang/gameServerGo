@@ -1,0 +1,80 @@
+services:
+  etcd1:
+    image: quay.io/coreos/etcd:v3.5.16
+    container_name: ldl.etcd1
+    environment:
+      - ETCD_NAME=etcd1
+      - ETCD_INITIAL_ADVERTISE_PEER_URLS=http://etcd1:2380
+      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd1:2379
+      - ETCD_LISTEN_PEER_URLS=http://8.138.93.59:2380
+      - ETCD_LISTEN_CLIENT_URLS=http://8.138.93.59:2379
+      - ETCD_INITIAL_CLUSTER=etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380
+      - ETCD_INITIAL_CLUSTER_STATE=new
+      - ETCD_INITIAL_CLUSTER_TOKEN=etcd-cluster
+    volumes:
+      - ./data/etcd1:/etcd-data
+    ports:
+      - "12379:2379"
+      - "12380:2380"
+    networks:
+      - ldl_network
+
+  etcd2:
+    image: quay.io/coreos/etcd:v3.5.16
+    container_name: ldl.etcd2
+    environment:
+      - ETCD_NAME=etcd2
+      - ETCD_INITIAL_ADVERTISE_PEER_URLS=http://etcd2:2380
+      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd2:2379
+      - ETCD_LISTEN_PEER_URLS=http://8.138.93.59:2380
+      - ETCD_LISTEN_CLIENT_URLS=http://8.138.93.59:2379
+      - ETCD_INITIAL_CLUSTER=etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380
+      - ETCD_INITIAL_CLUSTER_STATE=new
+      - ETCD_INITIAL_CLUSTER_TOKEN=etcd-cluster
+    volumes:
+      - ./data/etcd2:/etcd-data
+    ports:
+      - "22379:2379"
+      - "22380:2380"
+    networks:
+      - ldl_network
+
+  etcd3:
+    image: quay.io/coreos/etcd:v3.5.16
+    container_name: ldl.etcd3
+    environment:
+      - ETCD_NAME=etcd3
+      - ETCD_INITIAL_ADVERTISE_PEER_URLS=http://etcd3:2380
+      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd3:2379
+      - ETCD_LISTEN_PEER_URLS=http://8.138.93.59:2380
+      - ETCD_LISTEN_CLIENT_URLS=http://8.138.93.59:2379
+      - ETCD_INITIAL_CLUSTER=etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380
+      - ETCD_INITIAL_CLUSTER_STATE=new
+      - ETCD_INITIAL_CLUSTER_TOKEN=etcd-cluster
+    volumes:
+      - ./data/etcd3:/etcd-data
+    ports:
+      - "32379:2379"
+      - "32380:2380"
+    networks:
+      - ldl_network
+  node-room-1:
+    build:
+      context: .
+      dockerfile: service/app/node/Dockerfile
+    container_name: node-room-1
+    ports:
+      - "7081:7081"
+    volumes:
+      - ./config:/app/config
+      - ./logs:/app/logs
+    depends_on:
+      - etcd1
+      - etcd2
+      - etcd3
+    networks:
+      - ldl_network
+      
+networks:
+  ldl_network:
+    driver: bridge

@@ -1,0 +1,81 @@
+[common]
+# 本专服 id
+id = 1
+# 本专服名称
+name = "local-dev"
+# 本专服登录秘钥
+secret = "p5KJRYz777mBd559"
+# 本专服充值秘钥
+paymentsecret = "pUawkHg1EWxprV8h"
+# 本专服充值透传参数秘钥
+paymentpayloadsecretkey = "uWAGGdu2bhqsEocu"
+# 是否开发模式
+isdevelop = true
+
+# redis 公共前缀
+cacheprefix = "test"
+# redis 地址
+cacheaddress = ":16379"
+# redis 数据库
+cachedb = 0
+# redis 密码
+cachepassword = "123456"
+# redis 最小空闲连接数
+cacheminidle = 1
+# redis 最大激活连接数
+cachemaxactive = 10
+
+# jaeger agent 地址
+jaegeraddress = ":6831"
+
+# etcd 地址
+# etcdaddress = "etcd1:2379;etcd2:2379;etcd3:2379"
+etcdaddress = ":12379;:22329;:32329"
+# etcd 前缀，如果未设置，则使用 common.name
+etcdprefix = "node"
+# rpc 心跳间隔，秒
+rpcheart = 10
+
+# 游戏配置文件路径
+# 本地开发
+gameconfigpath = "internal/gameconfig/json/gameconfig.json"
+# docker 镜像
+# gameconfigpath = "/app/gameconfig/gameconfig.json"
+
+# 节点: 网关
+[gate]
+# 是否开启消息压缩
+whethercompress = true
+# 压缩的阈值，当消息负载 payload 长度不小于该值时才会压缩
+compressthreshold = 1024
+# 是否需要对消息负载 payload 进行加密
+whethercrypto = false
+# 是否启用校验值功能
+whetherchecksum = false
+# 线程池容量
+poolsize = 999
+
+
+[gate-1]
+# 节点编号，所有节点中唯一 范围1~999
+id = 1
+# 名称
+name = "gate-1"
+# 版本号
+version = 0
+# 监听地址
+address = ":7001"
+# 性能监控地址
+pprofaddr = ":7051"
+
+[gate-2]
+# 节点编号，所有节点中唯一
+id = 2
+# 名称
+name = "gate-2"
+# 版本号
+version = 0
+# 监听地址
+address = ":7002"
+# 性能监控地址
+pprofaddr = ":7052"
