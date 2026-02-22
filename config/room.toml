@@ -22,7 +22,7 @@ rpcheart = 10
 
 [room]
 [room-1]
-# 区服编号
+# 区服编号 1000~1999
 id = 1000
 # 名称
 name = "room-1"
@@ -32,7 +32,7 @@ version = 0
 pprofaddr = ":7081"
 
 [room-2]
-# 区服编号
+# 区服编号 1000~1999
 id = 1001
 # 名称
 name = "room-2"

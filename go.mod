@@ -3,6 +3,7 @@ module gameServer
 go 1.24.10
 
 require (
+	github.com/fsnotify/fsnotify v1.9.0
 	github.com/panjf2000/ants/v2 v2.11.5
 	github.com/panjf2000/gnet/v2 v2.9.7
 	github.com/rpcxio/rpcx-etcd v0.5.0
@@ -25,7 +26,6 @@ require (
 	github.com/edwingeng/doublejump v1.0.1 // indirect
 	github.com/facebookgo/clock v0.0.0-20150410010913-600d898af40a // indirect
 	github.com/fatih/color v1.18.0 // indirect
-	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/go-ping/ping v1.2.0 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect

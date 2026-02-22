@@ -14,7 +14,7 @@ func GetGroupIdByServerId(serverId uint32) uint32 {
 * serverId: GroupId
 * (0~999):1 （1000~1999):2 (2000~2999):3
  */
-func GetServerIdByServerId(groupId uint32, serverIds []uint32) int {
+func GetServerId(groupId uint32, serverIds []uint32) int {
 	maxValue := groupId*baseValue - 1
 	minValue := maxValue - baseValue + 1
 	for _, target := range serverIds {

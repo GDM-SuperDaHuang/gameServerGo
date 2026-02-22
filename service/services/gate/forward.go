@@ -118,12 +118,12 @@ func ForwardTarget(session *common.Session, message *common.Message, rpcClient r
 	ctx := context.Background()
 	protocolId := message.Head.Protocol
 	groupId := utils.GetGroupIdByPb(int(protocolId))
-	id := utils.GetServerIdByServerId(groupId, session.Player.ServerIds) //本网关可能没有
+	id := utils.GetServerId(groupId, session.Player.ServerIds) //本网关可能没有
 	flagRoom := false
 	if id == 0 {
 		if protocolId >= 1000 && protocolId < 2000 { //room类型，可能正在进行游戏
 			flagRoom = true
-			id = 10 //todo 如果缓存没有，从 redis/mysql 获取房间服务器信息
+			id = 1000 //todo 如果缓存没有，从 redis/mysql 获取房间服务器信息
 		}
 	}
 
