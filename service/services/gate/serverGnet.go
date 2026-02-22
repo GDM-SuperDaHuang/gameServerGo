@@ -80,6 +80,7 @@ func (ts *gNetServer) OnOpen(c gnet.Conn) (out []byte, action gnet.Action) {
 
 // OnClose fires when a connection has been closed.
 // The parameter err is the last known connection error.
+// 无论怎么样退出都清除玩家的 session 数据
 func (gn *gNetServer) OnClose(c gnet.Conn, err error) (action gnet.Action) {
 	n := gn.sessionCount.Add(-1)
 	logger.Get().Debug("[gate.OnOpen] disconnect",

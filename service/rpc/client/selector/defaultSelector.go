@@ -3,12 +3,13 @@ package selector
 import (
 	"context"
 	"fmt"
-	"github.com/smallnest/rpcx/share"
 	"strconv"
 	"strings"
+
+	"github.com/smallnest/rpcx/share"
 )
 
-// DefaultSelector 用户回选择旧的版本，如果退出登录再次请求，回选择最新的版本
+// DefaultSelector 选择特定版本，如果没有选择最新的版本，（如果退出登录再次请求，回选择最新的版本,否则用户选择旧的版本）
 type DefaultSelector struct {
 	servers []*serverInfo
 }
@@ -65,9 +66,21 @@ func (s *DefaultSelector) Select(ctx context.Context, servicePath, serviceMethod
 		//	(metadata.versionMax == 0 || server.version >= metadata.versionMin && server.version <= metadata.versionMax) {
 		//	return server.address
 		//}
-		if server.id == oneServer.id {
-			return server.address
+		if oneServer.id == 0 { //没有数据
+			if server.groupId == oneServer.groupId && server.curVersion == server.maxVersion { //没有则返回最大版本
+				// 写入返回数据
+				ctx = context.WithValue(ctx, share.ResMetaDataKey, map[string]string{
+					"id": strconv.Itoa(int(server.id)),
+				})
+				return server.address
+			}
+
+		} else {
+			if server.id == oneServer.id {
+				return server.address
+			}
 		}
+
 	}
 
 	return address
@@ -88,8 +101,8 @@ func (s *DefaultSelector) UpdateServer(servers map[string]string) {
 func getServerInfo(metadata map[string]string) *serverInfo {
 	var (
 		id, _         = strconv.Atoi(metadata["id"])
-		versionMin, _ = strconv.Atoi(metadata["versionMin"])
-		versionMax, _ = strconv.Atoi(metadata["versionMax"])
+		curVersion, _ = strconv.Atoi(metadata["curVersion"])
+		//versionMax, _ = strconv.Atoi(metadata["versionMax"])
 		roomStatus, _ = strconv.Atoi(metadata["roomStatus"])
 	)
 
@@ -97,8 +110,8 @@ func getServerInfo(metadata map[string]string) *serverInfo {
 	//v := clientMetadataPool.Get()
 	return &serverInfo{
 		id:         uint32(id),
-		curVersion: uint32(versionMin),
-		maxVersion: uint32(versionMax),
+		curVersion: uint32(curVersion),
+		//maxVersion: uint32(versionMax),
 		roomStatus: uint8(roomStatus),
 	}
 }
@@ -118,9 +131,9 @@ func parseServerMetadata(metadata, address string) *serverInfo {
 		case "groupId":
 			t, _ := strconv.Atoi(value)
 			out.groupId = uint32(t)
-		case "maxVersion":
-			t, _ := strconv.Atoi(value)
-			out.curVersion = uint32(t)
+		//case "maxVersion":
+		//	t, _ := strconv.Atoi(value)
+		//	out.curVersion = uint32(t)
 		case "curVersion":
 			t, _ := strconv.Atoi(value)
 			out.groupId = uint32(t)
@@ -129,6 +142,12 @@ func parseServerMetadata(metadata, address string) *serverInfo {
 			out.groupId = uint32(t)
 		}
 	}
+
+	//if {
+	//
+	//	t, _ := strconv.Atoi(value)
+	//	out.curVersion = uint32(t)
+	//}
 
 	return out
 }

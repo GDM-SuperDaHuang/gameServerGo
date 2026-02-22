@@ -10,6 +10,7 @@ import (
 	"gameServer/service/common/proto"
 	"gameServer/service/logger"
 	"gameServer/service/rpc"
+
 	"github.com/smallnest/rpcx/share"
 	"go.uber.org/zap"
 )
@@ -116,31 +117,20 @@ func ForwardTarget(session *common.Session, message *common.Message, rpcClient r
 	//}
 	ctx := context.Background()
 	protocolId := message.Head.Protocol
-	if protocolId >= 101 {
-		groupId := utils.GetGroupIdByPb(int(protocolId))
-
-		session.Player.ServerIds
-		if protocolId >= 101 && protocolId <= 1000 {
-			// todo
-			ctx = context.WithValue(ctx, share.ResMetaDataKey, map[string]string{
-				"id":      strconv.Itoa(10),
-				"groupId": strconv.Itoa(groupId),
-			})
+	groupId := utils.GetGroupIdByPb(int(protocolId))
+	id := utils.GetServerIdByServerId(groupId, session.Player.ServerIds) //本网关可能没有
+	flagRoom := false
+	if id == 0 {
+		if protocolId >= 1000 && protocolId < 2000 { //room类型，可能正在进行游戏
+			flagRoom = true
+			id = 10 //todo 如果缓存没有，从 redis/mysql 获取房间服务器信息
 		}
-
-		// todo
-		ctx = context.WithValue(ctx, share.ResMetaDataKey, map[string]string{
-			"id": strconv.Itoa(10),
-		})
-		//固定
-		//ctx = context.WithValue(ctx, "groupId", "1")
-		//ctx = context.WithValue(ctx, "id", 10)
-	} else if message.Head.Protocol > 1000 {
-		ctx = context.WithValue(ctx, "groupId", "2")
-	} else if message.Head.Protocol > 2001 {
-		ctx = context.WithValue(ctx, "groupId", "3")
 	}
 
+	ctx = context.WithValue(ctx, share.ResMetaDataKey, map[string]string{
+		"id":      strconv.Itoa(id),
+		"groupId": strconv.Itoa(int(groupId)),
+	})
 	// 调用远程的Dispatch方法
 	err = rpcClient.Call(ctx, "Dispatch", rpcReq, rpcResp)
 	//err = rpcClient.Go(context.Background(), "Dispatch", rpcReq, rpcResp)
@@ -155,7 +145,24 @@ func ForwardTarget(session *common.Session, message *common.Message, rpcClient r
 		//	zap.Uint16("protocol", uint16(req.Protocol)),
 		//	zap.Error(err),
 		//)
+		//todo 如果失败，也更新session,删除id
+		for index, fid := range session.Player.ServerIds {
+			if fid == uint32(id) {
+				session.Player.ServerIds = append(session.Player.ServerIds[:index], session.Player.ServerIds[index+1:]...)
+			}
+		}
 		return proto.Errorf1(proto.ErrorCode_RemoteCallFailed)
+	}
+
+	// 更新 session
+	if id == 0 || flagRoom {
+		if !flagRoom { //非房间类型
+			m, ok := ctx.Value(share.ResMetaDataKey).(map[string]string)
+			if ok {
+				id, _ = strconv.Atoi(m["id"])
+			}
+		}
+		session.Player.ServerIds = append(session.Player.ServerIds, uint32(id))
 	}
 
 	//if resp.Code == pb_protocol.ErrorCode_Success && len(resp.Data) == 0 {
