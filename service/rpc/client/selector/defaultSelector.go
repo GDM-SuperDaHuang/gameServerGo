@@ -21,6 +21,7 @@ type serverInfo struct {
 	maxVersion uint32
 	curVersion uint32
 	roomStatus uint8
+	open       bool
 }
 
 // NewRandomSelector 创建随机选择器
@@ -43,16 +44,10 @@ func (s *DefaultSelector) Select(ctx context.Context, servicePath, serviceMethod
 	}
 	// 选择一台目标机器
 	oneServer := getServerInfo(m)
+	if oneServer.groupId == 1 && oneServer.id == 0 { //远程到来的，空网关直接返回
+		return ""
+	}
 	address := ""
-	// 如果是房间类型，未结束之前选择的都是旧服务器，
-	//if servicePath == "room" {
-	//	if oneServer.RoomStatus == 1 {
-	//		return address
-	//	} else { //返回最新版本
-	//		return address
-	//	}
-	//}
-	//version := uint32(0)
 	for _, server := range s.servers {
 		// 假设 game-1 存在两个版本的进程
 		// v1: 线上版本
@@ -67,6 +62,7 @@ func (s *DefaultSelector) Select(ctx context.Context, servicePath, serviceMethod
 		//	return server.address
 		//}
 		if oneServer.id == 0 { //没有数据
+
 			if server.groupId == oneServer.groupId && server.curVersion == server.maxVersion { //没有则返回最大版本
 				// 写入返回数据
 				ctx = context.WithValue(ctx, share.ResMetaDataKey, map[string]string{

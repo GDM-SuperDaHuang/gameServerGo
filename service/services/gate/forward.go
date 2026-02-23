@@ -31,8 +31,8 @@ func (g *Gate) forward(session *common.Session, message *common.Message) *common
 	//	}()
 	//}
 
-	// 本地处理: < 100
-	if protocol < 100 {
+	// 本地处理: < 1000
+	if protocol < 1000 {
 		return g.forwardLocal(session, message)
 	}
 
@@ -83,13 +83,13 @@ func (g *Gate) forward(session *common.Session, message *common.Message) *common
 
 func (g *Gate) forwardLocal(session *common.Session, message *common.Message) *common.Resp {
 	switch message.Head.Protocol {
-	//case proto2.MessageID_Heart:
-	//return g.heartHandler(session)
+	case 1:
+		return g.heartHandler(session, message)
 	//case proto.MessageID_SecretSharePubKey:
 	//	return g.secretSharePubKeyHandler(session, message)
 	//case proto.MessageID_SecretShareTest:
 	//	return g.secretShareTestHandler(session, message)
-	case 1:
+	case 4:
 		return g.loginHandler(session, message)
 	}
 	return proto.Errorf1(proto.ErrorCode_ProtocolNotFound)
@@ -183,6 +183,16 @@ func (g *Gate) Receive(_ context.Context, req *common.RpcMessage, resp *common.R
 	if session == nil {
 		logger.Get().Warn("[Receive] session not found", zap.Uint64("roleID", req.Player.RoleID))
 		return fmt.Errorf("session not found, roleID: %d", req.Player.RoleID)
+	}
+	// todo 需要修改room 信息?
+	if req.Data.Head.Protocol == 1010 { //离开room
+		groupId := utils.GetGroupIdByPb(int(req.Data.Head.Protocol))
+		id := utils.GetServerId(groupId, session.Player.ServerIds) //本网关可能没有
+		for index, fid := range session.Player.ServerIds {
+			if fid == uint32(id) {
+				session.Player.ServerIds = append(session.Player.ServerIds[:index], session.Player.ServerIds[index+1:]...)
+			}
+		}
 	}
 	return g.tcpServer.write(session, resp, req.Data)
 }

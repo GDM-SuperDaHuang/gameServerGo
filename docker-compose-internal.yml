@@ -52,12 +52,14 @@ services:
       - "32380:2380"
     networks:
       - ldl_network
+      -
 
   node-room-1:
     build:
       context: .
       dockerfile: service/app/node/Dockerfile
     container_name: node-room-1
+    restart: always
     ports:
       - "7081:7081"
     volumes:
@@ -103,6 +105,81 @@ services:
       - etcd3
     networks:
       - ldl_network
+
+  monitor:
+    image: alpine:latest
+    container_name: docker-monitor
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - ldl_network
+    command: >
+      sh -c "
+      apk add --no-cache docker-cli curl &&
+      docker events --filter 'event=die' |
+      while read event; do
+        CONTAINER=$(echo $$event | awk '{print $$4}');
+        if [ \"$$CONTAINER\" = \"node-room-1\" ] || [ \"$$CONTAINER\" = \"node-gate-1\" ]; then
+          CODE=$(docker inspect $$CONTAINER --format='{{.State.ExitCode}}');
+          curl -s 'https://oapi.dingtalk.com/robot/send?access_token=3a82c9b9cd6eff02094f27497b847e8635abf2a740737a05b458e5f06b301062' \
+            -H 'Content-Type: application/json' \
+            -d '{\"msgtype\":\"text\",\"text\":{\"content\":\"容器异常退出: '$$CONTAINER' 退出码: '$$CODE'\"}}';
+        fi
+      done
+      "
+
+  monitor1:
+    image: alpine:latest
+    container_name: docker-monitor
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - ldl_network
+    command: >
+      sh -c "
+      apk add --no-cache docker-cli curl openssl coreutils jq &&
+      SECRET='你的钉钉secret';
+      TOKEN='你的钉钉access_token';
+
+      docker events --filter 'event=die' |
+      while read event; do
+        # 获取容器名称
+        CONTAINER=$(echo \$event | awk '{print \$4}');
+      
+        # 只处理 node-room-* / node-gate-*
+        if echo \"\$CONTAINER\" | grep -Eq 'node-(room|gate)-[0-9]+'; then
+      
+          # 获取退出码
+          CODE=$(docker inspect \$CONTAINER --format='{{.State.ExitCode}}');
+      
+          # 只报警非正常退出
+          if [ \"\$CODE\" != \"0\" ]; then
+            # 生成毫秒时间戳
+            TIMESTAMP=$(date +%s%3N)
+      
+            # 构造签名字符串（真实换行）
+            STRING_TO_SIGN=$(printf '%s\n%s' \$TIMESTAMP \$SECRET)
+      
+            # 计算 HmacSHA256 + Base64 + URL encode
+            SIGN=$(printf '%s' \"\$STRING_TO_SIGN\" \
+              | openssl dgst -sha256 -hmac \"\$SECRET\" -binary \
+              | base64 \
+              | tr -d '\n' \
+              | jq -sRr @uri)
+      
+            # 拼接 webhook URL
+            WEBHOOK_URL=\"https://oapi.dingtalk.com/robot/send?access_token=\$TOKEN&timestamp=\$TIMESTAMP&sign=\$SIGN\"
+      
+            # 发送报警
+            curl -s \"\$WEBHOOK_URL\" \
+              -H 'Content-Type: application/json' \
+              -d '{\"msgtype\":\"text\",\"text\":{\"content\":\"【服务器异常】容器: '\$CONTAINER' 退出码: '\$CODE'\"}}'
+          fi
+        fi
+      done
+      "
 #  arena:
 #    image: 192.168.1.4:8003/ldl/arena:latest
 #    container_name: ldl.arena

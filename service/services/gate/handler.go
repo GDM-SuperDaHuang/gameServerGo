@@ -5,18 +5,22 @@ import (
 	"gameServer/protobuf/pbGo"
 	"gameServer/service/common"
 	"gameServer/service/common/proto"
+	"gameServer/service/config"
+	"slices"
+	"time"
 )
 
 // heartHandler 心跳处理
-//
-//	func (g *Gate) heartHandler(session *session.Session) *proto.Resp {
-//		t := time.Now()
-//		session.pingTime = t
-//		return proto.Response1(&pb_gate.HeartResp{
-//			Time:     t.Unix(),
-//			Location: t.Location().String(),
-//		})
-//	}
+func (g *Gate) heartHandler(session *common.Session, message *common.Message) *common.Resp {
+	t := time.Now()
+	session.PingTime = t
+	return nil
+	//return proto.Response1(&pbGo.HeartResp{
+	//	Time:     t.Unix(),
+	//	Location: t.Location().String(),
+	//})
+}
+
 var uuid uint64 = 0
 
 // loginHandler 登录
@@ -27,6 +31,10 @@ func (g *Gate) loginHandler(session *common.Session, message *common.Message) *c
 	//session.pingTime = t
 	session.Player = &common.Player{
 		RoleID: 1,
+	}
+	// 保存网关节点
+	if !slices.Contains(session.Player.ServerIds, config.Get().NodeID()) {
+		session.Player.ServerIds = append(session.Player.ServerIds, config.Get().NodeID())
 	}
 	return proto.Response1(&pbGo.LoginResp{
 		Uuid: uuid,

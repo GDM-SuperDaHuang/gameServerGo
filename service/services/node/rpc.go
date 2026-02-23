@@ -2,11 +2,16 @@ package node
 
 import (
 	"context"
+	"errors"
 	"gameServer/service/common"
 	"gameServer/service/config"
 	"gameServer/service/logger"
 	"gameServer/service/rpc"
 	rpcxServer "gameServer/service/rpc/server"
+	"gameServer/service/utils"
+	"strconv"
+
+	"github.com/smallnest/rpcx/share"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 )
@@ -39,6 +44,7 @@ func Push(roleID uint64, protoId uint16, message proto.Message) {
 	//	// 不在线
 	//	return
 	//}
+
 	player := &common.Player{}
 
 	if err := ToGate(player, protoId, message); err != nil {
@@ -65,5 +71,14 @@ func ToGate(player *common.Player, protocol uint16, message proto.Message) error
 		Player: player,
 	}
 	defer common.FreeMessage(pushMessage)
+	id := utils.GetServerId(1, player.ServerIds) //获取网关id
+	if id == 0 {
+		return errors.New("server id is 0")
+	}
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, share.ResMetaDataKey, map[string]string{
+		"id":      strconv.Itoa(id),
+		"groupId": strconv.Itoa(1),
+	})
 	return rpcClient.Call(context.Background(), "Receive", rpcReq, nil)
 }

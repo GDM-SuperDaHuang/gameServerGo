@@ -7,10 +7,11 @@ import (
 	"gameServer/service/common"
 	"gameServer/service/logger"
 	"gameServer/service/protoHandlerInit"
-	"go.uber.org/zap"
-	"google.golang.org/protobuf/proto"
 	"reflect"
 	"strings"
+
+	"go.uber.org/zap"
+	"google.golang.org/protobuf/proto"
 )
 
 var (
@@ -127,7 +128,7 @@ func (pm *ProtocolMethod) Call(ctx context.Context, p any, req *common.RpcMessag
 	protocolResp := common.Types().Get(pm.respTyp).(proto.Message)
 
 	// 3. 调用协议函数
-	pm.method.Func.Call([]reflect.Value{
+	results := pm.method.Func.Call([]reflect.Value{
 		pm.moduleVal,
 		reflect.ValueOf(ctx),
 		reflect.ValueOf(p),
@@ -135,21 +136,28 @@ func (pm *ProtocolMethod) Call(ctx context.Context, p any, req *common.RpcMessag
 		reflect.ValueOf(protocolResp),
 	})
 	common.Types().Put(pm.reqTyp, protocolReq)
-
+	if results != nil {
+		if !results[0].IsNil() {
+			if errResult := results[0].Interface().(*common.ErrorInfo); errResult != nil {
+				resp.Code = errResult.Code
+				resp.Flag = errResult.Flag
+				common.FreeErrorInfo(errResult)
+			}
+		}
+	}
 	// 4. 返回值处理
 	//c := config.Get()
 	//switch len(results) {
 	//case 1:
 	//	// 单返回值模式: error
-	//
 	//	if !results[0].IsNil() {
 	//		// 仅在开发模式下判断
-	//		if c.IsDevelop() {
-	//			if !results[0].IsNil() && !results[0].Type().Implements(typeOfResult) {
-	//				common.Types().Put(pm.respTyp, protocolResp)
-	//				return fmt.Errorf("single return value must be typeOfResult type, request: %s", pm.Name())
-	//			}
-	//		}
+	//		//if c.IsDevelop() {
+	//		//	if !results[0].IsNil() && !results[0].Type().Implements(typeOfResult) {
+	//		//		common.Types().Put(pm.respTyp, protocolResp)
+	//		//		return fmt.Errorf("single return value must be typeOfResult type, request: %s", pm.Name())
+	//		//	}
+	//		//}
 	//
 	//		if errResult := results[0].Interface().(Result); errResult != nil {
 	//			resp.Code = errResult.Code()

@@ -37,7 +37,7 @@ type Session struct {
 	conn       gnet.Conn
 	remoteAddr string
 
-	pingTime time.Time
+	PingTime time.Time
 	//readChan  chan struct{}
 	//closeChan chan struct{}
 
@@ -153,7 +153,7 @@ func NewSession(c gnet.Conn) *Session {
 }
 
 func (s *Session) Start() {
-	s.pingTime = time.Now()
+	s.PingTime = time.Now()
 
 	n := 0
 	maxN := getMaxRetries()
@@ -208,7 +208,7 @@ func (s *Session) Close() {
 func (s *Session) reset() {
 	s.conn = nil
 	s.remoteAddr = ""
-	s.pingTime = time.Time{}
+	s.PingTime = time.Time{}
 	//s.readChan = nil
 	//s.closeChan = nil
 	s.shareKey = ""
@@ -237,14 +237,14 @@ func (s *Session) checkHeart() (isTimeout bool) {
 	c := config.Get()
 	if c.IsDevelop() {
 		// 开发模式下，时间改大
-		if s.pingTime.Add(5 * time.Minute).Before(time.Now()) {
+		if s.PingTime.Add(5 * time.Minute).Before(time.Now()) {
 			isTimeout = true
 		}
 		return
 	}
 
 	// 10 次都未收到心跳信息
-	if s.pingTime.Add(PingCheckInterval * 10).Before(time.Now()) {
+	if s.PingTime.Add(PingCheckInterval * 10).Before(time.Now()) {
 		isTimeout = true
 	}
 

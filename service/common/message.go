@@ -14,25 +14,15 @@ type MessageHead struct {
 	// Checksum 校验值
 	//Checksum [ChecksumLength]byte
 }
+
 type Message struct {
 	Head *MessageHead
-	Body []byte
+	Body []byte //protobuf
 }
 
 type RpcMessage struct {
 	Data   *Message
 	Player *Player
-}
-
-// Reset 重置
-func (m *Message) Reset() {
-	m.Head.Len = 0
-	m.Head.Len = 0
-	m.Head.Flag = 0
-	m.Head.SN = 0
-	m.Head.Code = 0
-	m.Head.Protocol = 0
-	m.Body = nil
 }
 
 type Resp struct {
@@ -41,6 +31,21 @@ type Resp struct {
 	Flag uint16
 	Body []byte //pb
 }
+
+type ErrorInfo struct {
+	//engine  *engine.Engine
+	Code uint16
+	Flag uint16
+}
+
+// ------------------------------------------- Message ---------------------------------------------------
+// messagePool 消息池
+var messagePool = NewPool(func() *Message {
+	return &Message{
+		Head: &MessageHead{},
+		Body: nil,
+	}
+})
 
 // NewMessage 创建消息
 func NewMessage(flag uint16, sn uint32, code uint16, protocol uint16, payload []byte) *Message {
@@ -75,10 +80,47 @@ func FreeMessage(m *Message) {
 	messagePool.Put(m)
 }
 
-// messagePool 消息池
-var messagePool = NewPool(func() *Message {
-	return &Message{
-		Head: &MessageHead{},
-		Body: nil,
-	}
+// Reset 重置
+func (m *Message) Reset() {
+	m.Head.Len = 0
+	m.Head.Len = 0
+	m.Head.Flag = 0
+	m.Head.SN = 0
+	m.Head.Code = 0
+	m.Head.Protocol = 0
+	m.Body = nil
+}
+
+// ------------------------------------------- Message ---------------------------------------------------
+
+// ------------------------------------------- ErrorInfo ---------------------------------------------------
+var errorInfoPool = NewPool(func() *ErrorInfo {
+	return &ErrorInfo{}
 })
+
+// Reset 重置
+func (e *ErrorInfo) Reset() {
+	e.Code = 0
+	e.Flag = 0
+}
+
+// 释放消息
+func FreeErrorInfo(m *ErrorInfo) {
+	errorInfoPool.Put(m)
+}
+
+// Error 报错
+func Error(code uint16) *ErrorInfo {
+	m := errorInfoPool.Get()
+	m.Code = code
+	return m
+}
+
+func ErrorF(code, flag uint16) *ErrorInfo {
+	m := errorInfoPool.Get()
+	m.Code = code
+	m.Flag = flag
+	return m
+}
+
+// ------------------------------------------- ErrorInfo ---------------------------------------------------
