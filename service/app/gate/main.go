@@ -33,7 +33,7 @@ func main() {
 	//}
 	logger.Init(zapcore.DebugLevel, "", "", !config.Get().IsDevelop())
 	// [E:\gowork\gameServer]
-	if err := config.Init("gate-2", "gate", "./config", "test", "toml"); err != nil {
+	if err := config.Init("gate-1", "gate", "./config", "test", "toml"); err != nil {
 		panic(err)
 	}
 	// pprof
