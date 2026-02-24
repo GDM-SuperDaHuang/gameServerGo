@@ -1,5 +1,5 @@
 services:
-  monitor1:
+  docker-monitor:
     image: alpine:latest
     container_name: docker-monitor
     restart: always
@@ -7,49 +7,95 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - ldl_network
-    command: >
-      sh -c "
-      apk add --no-cache docker-cli curl openssl coreutils jq &&
-      SECRET='SECe5512edf3fc0ad0cf9d7e23ad67e88e7f695eba0298c7d370a13c82e640d68b6';
-      TOKEN='3a82c9b9cd6eff02094f27497b847e8635abf2a740737a05b458e5f06b301062';
+    command:
+      - /bin/sh
+      - -c
+      - |
+        echo "======================================"
+        echo "   Docker Container Monitor Started   "
+        echo "======================================"
 
-      docker events --filter 'event=die' |
-      while read event; do
-        # 获取容器名称
-        CONTAINER=$(echo \$event | awk '{print \$4}');
-      
-        # 只处理 node-room-* / node-gate-*
-        if echo \"\$CONTAINER\" | grep -Eq 'node-(room|gate)-[0-9]+'; then
-      
-          # 获取退出码
-          CODE=$(docker inspect \$CONTAINER --format='{{.State.ExitCode}}');
-      
-          # 只报警非正常退出
-          if [ \"\$CODE\" != \"0\" ]; then
-            # 生成毫秒时间戳
-            TIMESTAMP=$(date +%s%3N)
-      
-            # 构造签名字符串（真实换行）
-            STRING_TO_SIGN=$(printf '%s\n%s' \$TIMESTAMP \$SECRET)
-      
-            # 计算 HmacSHA256 + Base64 + URL encode
-            SIGN=$(printf '%s' \"\$STRING_TO_SIGN\" \
-              | openssl dgst -sha256 -hmac \"\$SECRET\" -binary \
-              | base64 \
-              | tr -d '\n' \
-              | jq -sRr @uri)
-      
-            # 拼接 webhook URL
-            WEBHOOK_URL=\"https://oapi.dingtalk.com/robot/send?access_token=\$TOKEN&timestamp=\$TIMESTAMP&sign=\$SIGN\"
+        apk add --no-cache docker-cli curl openssl coreutils jq
 
-            # 发送报警
-            curl -s \"\$WEBHOOK_URL\" \
-              -H 'Content-Type: application/json' \
-              -d '{\"msgtype\":\"text\",\"text\":{\"content\":\"【服务器异常】容器: '\$CONTAINER' 退出码: '\$CODE'\"}}'
-          fi
-        fi
-      done
-      "
+        SECRET='SECe5512edf3fc0ad0cf9d7e23ad67e88e7f695eba0298c7d370a13c82e640d68b6'
+        TOKEN='3a82c9b9cd6eff02094f27497b847e8635abf2a740737a05b458e5f06b301062'
+
+        log() {
+          echo "$(date '+%Y-%m-%d %H:%M:%S') $1"
+        }
+
+        send_alert() {
+          CONTAINER_NAME=$1
+          EXIT_CODE=$2
+
+          TIMESTAMP=$(date +%s%3N)
+
+          STRING_TO_SIGN=$(printf "%s\n%s" "$TIMESTAMP" "$SECRET")
+
+          SIGN=$(printf "%s" "$STRING_TO_SIGN" | \
+            openssl dgst -sha256 -hmac "$SECRET" -binary | \
+            base64 | tr -d '\n' | jq -sRr @uri)
+
+          WEBHOOK_URL="https://oapi.dingtalk.com/robot/send?access_token=${TOKEN}&timestamp=${TIMESTAMP}&sign=${SIGN}"
+
+          log "[ALERT] Sending DingTalk notification..."
+
+          RESPONSE=$(curl -s "$WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "{\"msgtype\":\"text\",\"text\":{\"content\":\"【服务器异常】容器: ${CONTAINER_NAME} 退出码: ${EXIT_CODE}\"}}")
+
+          log "[ALERT RESULT] $RESPONSE"
+        }
+
+        monitor() {
+          docker events --filter 'event=die' | while read event; do
+
+            log "--------------------------------------"
+            log "[EVENT] $event"
+
+            CONTAINER=$(echo "$event" | awk '{print $4}')
+
+            if [ -z "$CONTAINER" ]; then
+              log "[WARN] Empty container name"
+              continue
+            fi
+
+            log "[INFO] Container: $CONTAINER"
+
+            
+            if echo "$CONTAINER" | grep -q "node"; then
+
+              log "[MATCH] Target container matched"
+
+              EXIT_CODE=$(docker inspect "$CONTAINER" --format='{{.State.ExitCode}}' 2>/dev/null)
+
+              if [ -z "$EXIT_CODE" ]; then
+                log "[ERROR] docker inspect failed"
+                continue
+              fi
+
+              log "[INFO] Exit Code: $EXIT_CODE"
+
+              if [ "$EXIT_CODE" != "0" ]; then
+                send_alert "$CONTAINER" "$EXIT_CODE"
+              else
+                log "[SKIP] Exit code is 0"
+              fi
+
+            else
+              log "[SKIP] Not monitored container"
+            fi
+
+          done
+        }
+
+        while true; do
+          log "[MONITOR] Listening docker events..."
+          monitor
+          log "[WARN] docker events stopped. Reconnecting in 3s..."
+          sleep 3
+        done
+
 networks:
   ldl_network:
     driver: bridge

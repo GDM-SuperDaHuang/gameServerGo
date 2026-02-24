@@ -88,6 +88,7 @@ services:
     networks:
       - ldl_network
 
+
   node-gate-2:
     build:
       context: .
