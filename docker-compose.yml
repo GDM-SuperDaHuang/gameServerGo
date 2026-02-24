@@ -58,6 +58,7 @@ services:
       - "32380:2380"
     networks:
       - ldl_network
+
   node-room-1:
     build:
       context: .

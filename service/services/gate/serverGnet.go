@@ -1,6 +1,7 @@
 package gate
 
 import (
+	"encoding/hex"
 	"fmt"
 	"gameServer/service/common"
 	"gameServer/service/logger"
@@ -116,11 +117,17 @@ func (gn *gNetServer) OnClose(c gnet.Conn, err error) (action gnet.Action) {
 // 有数据可读时触发（核心处理逻辑）
 func (ts *gNetServer) OnTraffic(c gnet.Conn) (action gnet.Action) {
 	// 收到消息二进制打印
-	//rawBuf := make([]byte, 1024) // 或者适当大小
-	//n, _ := c.Read(rawBuf)
-	//if n > 0 {
-	//	fmt.Printf("Recv raw bytes: %d\n%s\n", n, hex.Dump(rawBuf[:n]))
-	//}
+	rawBuf := make([]byte, 1024) // 或者适当大小
+	n, _ := c.Read(rawBuf)
+	if n > 0 {
+		fmt.Printf("Recv raw bytes: %d\n%s\n", n, hex.Dump(rawBuf[:n]))
+	}
+
+	// 打印
+	err, g, done := ts.PrintfBuffered(c)
+	if done {
+		return g
+	}
 
 	session := ts.session(c)
 	if session == nil {
@@ -154,6 +161,24 @@ func (ts *gNetServer) OnTraffic(c gnet.Conn) (action gnet.Action) {
 	// qps 每处理一个请求，计数器 +1
 	atomic.AddInt64(&ts.requestCount, 1)
 	return
+}
+
+func (ts *gNetServer) PrintfBuffered(c gnet.Conn) (error, gnet.Action, bool) {
+	// 当前缓冲区已有的数据长度
+	n := c.InboundBuffered()
+	if n == 0 {
+		return nil, 0, true
+	}
+
+	// 只查看，不读取（不会清除缓冲区数据）
+	buf, err := c.Peek(n)
+	if err != nil {
+		fmt.Println("peek error:", err)
+		return nil, gnet.Close, true
+	}
+	// 打印十六进制
+	fmt.Printf("recv (%d bytes): % X\n", n, buf)
+	return err, 0, false
 }
 
 // -------------------------------------- 内部 --------------------------------------
