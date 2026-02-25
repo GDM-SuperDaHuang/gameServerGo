@@ -1,7 +1,6 @@
 package gate
 
 import (
-	"encoding/hex"
 	"fmt"
 	"gameServer/pkg/logger"
 	"gameServer/service/common"
@@ -117,11 +116,11 @@ func (gn *gNetServer) OnClose(c gnet.Conn, err error) (action gnet.Action) {
 // 有数据可读时触发（核心处理逻辑）
 func (ts *gNetServer) OnTraffic(c gnet.Conn) (action gnet.Action) {
 	// 收到消息二进制打印
-	rawBuf := make([]byte, 1024) // 或者适当大小
-	n, _ := c.Read(rawBuf)
-	if n > 0 {
-		fmt.Printf("Recv raw bytes: %d\n%s\n", n, hex.Dump(rawBuf[:n]))
-	}
+	//rawBuf := make([]byte, 1024) // 或者适当大小
+	//n, _ := c.Read(rawBuf)
+	//if n > 0 {
+	//	fmt.Printf("Recv raw bytes: %d\n%s\n", n, hex.Dump(rawBuf[:n]))
+	//}
 
 	// 打印
 	err, g, done := ts.PrintfBuffered(c)

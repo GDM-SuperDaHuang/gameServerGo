@@ -3,6 +3,7 @@ package node
 import (
 	"context"
 	"errors"
+	"fmt"
 	"gameServer/pkg/config"
 	"gameServer/pkg/logger"
 	"gameServer/pkg/utils"
@@ -45,9 +46,9 @@ func Push(roleID uint64, protoId uint16, message proto.Message) {
 	//	return
 	//}
 
+	fmt.Println("=============")
 	player := &common.Player{}
-
-	if err := ToGate(player, protoId, message); err != nil {
+	if err := ToGate(player, protoId, message, RPCClients()); err != nil {
 		logger.Get().Error("push to gate failed", zap.Uint64("roleID", roleID), zap.Int32("protocol", int32(protoId)), zap.Error(err))
 	}
 }
@@ -55,7 +56,7 @@ func Push(roleID uint64, protoId uint16, message proto.Message) {
 // ToGate 推送到网关，立即推送
 //
 //   - gateID: 网关 id
-func ToGate(player *common.Player, protocol uint16, message proto.Message) error {
+func ToGate(player *common.Player, protocol uint16, message proto.Message, rpcClient rpc.ClientInterface) error {
 	if config.Get().IsTest() {
 		return nil
 	}
@@ -71,7 +72,7 @@ func ToGate(player *common.Player, protocol uint16, message proto.Message) error
 		Player: player,
 	}
 	defer common.FreeMessage(pushMessage)
-	id := utils.GetServerId(1, player.ServerIds) //获取网关id
+	id := utils.GetServerId(1, player.ServerIds) //获取网关id,网格为1组
 	if id == 0 {
 		return errors.New("server id is 0")
 	}
@@ -80,5 +81,6 @@ func ToGate(player *common.Player, protocol uint16, message proto.Message) error
 		"id":      strconv.Itoa(id),
 		"groupId": strconv.Itoa(1),
 	})
+
 	return rpcClient.Call(context.Background(), "Receive", rpcReq, nil)
 }

@@ -28,7 +28,7 @@ FROM prepare AS builder
 
 COPY . .
 
-RUN go build -ldflags="-s -w" -o dockerMonitor ./service/app/monitor
+RUN go build -ldflags="-s -w" -o dockerMonitor ./app/monitor
 #
 # STAGE 3: RUN
 #
