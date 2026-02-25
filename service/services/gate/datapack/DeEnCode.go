@@ -1,8 +1,9 @@
 package datapack
 
 import (
+	"gameServer/pkg/bytes"
+	"gameServer/pkg/compress"
 	"gameServer/service/common"
-	"gameServer/service/compress"
 	//"crypto"
 	"encoding/binary"
 	"fmt"
@@ -66,7 +67,7 @@ func (l *deEnCode) Pack(message *common.Message, cryptoHandler Crypto) (Callback
 	}
 
 	// 固定大小的，可复用 ，todo 可能不安全？？？
-	buffer := common.Get().Buffer(defaultBufferSize)
+	buffer := bytes.Get().Buffer(defaultBufferSize)
 
 	if buffer.Cap() < estimatedSize {
 		buffer.Grow(estimatedSize)
@@ -126,7 +127,7 @@ func (l *deEnCode) Pack(message *common.Message, cryptoHandler Crypto) (Callback
 	//}
 
 	return func() {
-		common.Get().Release(buffer)
+		bytes.Get().Release(buffer)
 	}, allBytes, nil
 }
 

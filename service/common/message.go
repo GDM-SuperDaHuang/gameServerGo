@@ -1,5 +1,7 @@
 package common
 
+import "gameServer/pkg/bytes"
+
 type MessageHead struct {
 	// Len 消息体长度
 	Len uint16 //2
@@ -40,7 +42,7 @@ type ErrorInfo struct {
 
 // ------------------------------------------- Message ---------------------------------------------------
 // messagePool 消息池
-var messagePool = NewPool(func() *Message {
+var messagePool = bytes.NewPool(func() *Message {
 	return &Message{
 		Head: &MessageHead{},
 		Body: nil,
@@ -94,7 +96,7 @@ func (m *Message) Reset() {
 // ------------------------------------------- Message ---------------------------------------------------
 
 // ------------------------------------------- ErrorInfo ---------------------------------------------------
-var errorInfoPool = NewPool(func() *ErrorInfo {
+var errorInfoPool = bytes.NewPool(func() *ErrorInfo {
 	return &ErrorInfo{}
 })
 

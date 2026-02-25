@@ -13,8 +13,8 @@
 # isdevelop = true
 
 # etcd 地址
-# etcdaddress = ":12379;:22329;:32329"
-etcdaddress = "etcd1:2379;etcd2:2379;etcd3:2379"
+etcdaddress = ":12379;:22329;:32329"
+# etcdaddress = "etcd1:2379;etcd2:2379;etcd3:2379"
 # etcd 前缀
 etcdprefix = "node"
 # rpc 心跳间隔，秒

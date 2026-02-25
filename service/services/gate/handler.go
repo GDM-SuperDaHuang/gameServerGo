@@ -2,10 +2,10 @@ package gate
 
 import (
 	"fmt"
+	"gameServer/pkg/config"
 	"gameServer/protobuf/pbGo"
 	"gameServer/service/common"
 	"gameServer/service/common/proto"
-	"gameServer/service/config"
 	"slices"
 	"time"
 )

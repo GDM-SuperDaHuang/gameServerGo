@@ -57,7 +57,7 @@ services:
   node-room-1:
     build:
       context: .
-      dockerfile: service/app/node/Dockerfile
+      dockerfile: app/node/Dockerfile
     container_name: node-room-1
     restart: always
     ports:
@@ -75,7 +75,7 @@ services:
   node-gate-1:
     build:
       context: .
-      dockerfile: service/app/gate/Dockerfile
+      dockerfile: app/gate/Dockerfile
     container_name: node-gate-1
     ports:
       - "7001:7001"
@@ -93,7 +93,7 @@ services:
   node-gate-2:
     build:
       context: .
-      dockerfile: service/app/gate/Dockerfile
+      dockerfile: app/gate/Dockerfile
     container_name: node-gate-2
     ports:
       - "7002:7002"

@@ -1,8 +1,9 @@
 package common
 
 import (
-	"gameServer/service/config"
-	"gameServer/service/logger"
+	"gameServer/pkg/bytes"
+	"gameServer/pkg/config"
+	"gameServer/pkg/logger"
 	"net"
 	"sync"
 	"time"
@@ -27,7 +28,7 @@ type Player struct {
 	RoleID       uint64 // 角色 id
 }
 
-var sessionPool = NewPool(func() *Session {
+var sessionPool = bytes.NewPool(func() *Session {
 	return &Session{}
 })
 
@@ -280,7 +281,7 @@ func (s *Session) roleID() uint64 {
 	return s.Player.RoleID
 }
 
-var playerPool = NewPool(func() *Player {
+var playerPool = bytes.NewPool(func() *Player {
 	return &Player{}
 })
 

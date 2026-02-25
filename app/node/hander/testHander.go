@@ -7,7 +7,7 @@ import (
 	"gameServer/service/common"
 )
 
-type HanderTest struct {
+type HanderTest struct { //必须大写,必须使用指针
 }
 
 func (h *HanderTest) TestHandler(_ context.Context, _ uint64, req *pbGo.TestRpcRep, resp *pbGo.TestRpcResp) *common.ErrorInfo {

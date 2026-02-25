@@ -3,7 +3,7 @@ package client
 import (
 	"context"
 	"fmt"
-	"gameServer/service/common"
+	"gameServer/pkg/bytes"
 	"gameServer/service/rpc"
 	"strconv"
 	"time"
@@ -135,7 +135,7 @@ func (w *wrapClient) Reset() {
 	w.versionMax = 0
 }
 
-var wrapClientPool = common.NewPool(func() *wrapClient {
+var wrapClientPool = bytes.NewPool(func() *wrapClient {
 	return &wrapClient{}
 })
 

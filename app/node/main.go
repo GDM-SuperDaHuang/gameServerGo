@@ -1,9 +1,9 @@
 package main
 
 import (
-	"gameServer/service/app/node/hander"
-	"gameServer/service/config"
-	"gameServer/service/logger"
+	"gameServer/app/node/hander"
+	"gameServer/pkg/config"
+	"gameServer/pkg/logger"
 	"gameServer/service/rpc"
 	"gameServer/service/services/node"
 	"net/http"

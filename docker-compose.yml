@@ -62,7 +62,7 @@ services:
   node-room-1:
     build:
       context: .
-      dockerfile: service/app/node/Dockerfile
+      dockerfile: app/node/Dockerfile
     container_name: node-room-1
     ports:
       - "7081:7081"

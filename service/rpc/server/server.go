@@ -1,7 +1,7 @@
 package server
 
 import (
-	"gameServer/service/config"
+	"gameServer/pkg/config"
 	"time"
 )
 

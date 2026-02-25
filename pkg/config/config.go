@@ -3,10 +3,11 @@ package config
 import (
 	"errors"
 	"fmt"
-	"gameServer/service/logger"
+	"gameServer/pkg/logger"
+	"strings"
+
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
-	"strings"
 )
 
 // Config 服务配置表

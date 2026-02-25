@@ -2,7 +2,7 @@ package client
 
 import (
 	"fmt"
-	"gameServer/service/config"
+	"gameServer/pkg/config"
 	"time"
 
 	xclient "github.com/smallnest/rpcx/client"

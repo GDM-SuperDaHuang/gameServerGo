@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
 	"context"
 	"crypto/hmac"
@@ -66,27 +65,35 @@ func listenDockerEvents() error {
 
 	fmt.Println("已连接 Docker events 流")
 
-	reader := bufio.NewReader(resp.Body)
+	decoder := json.NewDecoder(resp.Body)
 
 	for {
-		line, err := reader.ReadBytes('\n')
-		if err != nil {
+		var event map[string]interface{}
+		if err := decoder.Decode(&event); err != nil {
 			if err == io.EOF {
 				return fmt.Errorf("docker stream closed")
 			}
 			return err
 		}
-
-		handleEvent(line)
+		handleEvent(event)
 	}
 }
 
-func handleEvent(data []byte) {
-
-	var event map[string]interface{}
-	if err := json.Unmarshal(data, &event); err != nil {
+func handleEvent(event map[string]interface{}) {
+	//fmt.Println(fmt.Printf(" events 流%v", event))
+	b, err := json.MarshalIndent(event, "", "  ")
+	if err != nil {
+		fmt.Println("event marshal error:", err)
 		return
 	}
+	fmt.Println("========== Docker Event Start ==========")
+	fmt.Println(string(b))
+	fmt.Println("========================================")
+
+	//var event map[string]interface{}
+	//if err := json.Unmarshal(data, &event); err != nil {
+	//	return
+	//}
 
 	// 只处理 container 事件
 	if event["Type"] != "container" {
@@ -120,14 +127,20 @@ func handleEvent(data []byte) {
 		return
 	}
 
-	if exitCode == 0 {
-		return
+	//if exitCode == 0 {//正常关闭
+	//	return
+	//}
+	format := ""
+	if exitCode != 0 {
+		fmt.Printf("[检测到容器异常退出: %s, code=%d,时间=%s ]\n", name, exitCode, time.Now().Format("2006-01-02 15:04:05"))
+		format = "🚨 Docker容器异常退出\n容器: %s\n退出码: %d\n时间: %s"
+	} else {
+		fmt.Printf("[检测到容器正常退出: %s, code=%d,时间=%s]\n", name, exitCode, time.Now().Format("2006-01-02 15:04:05"))
+		format = "🚨 Docker容器正常退出\n容器: %s\n退出码: %d\n时间: %s"
 	}
 
-	fmt.Printf("检测到异常容器退出: %s, code=%d\n", name, exitCode)
-
 	text := fmt.Sprintf(
-		"🚨 Docker容器异常退出\n容器: %s\n退出码: %d\n时间: %s",
+		format,
 		name,
 		exitCode,
 		time.Now().Format("2006-01-02 15:04:05"),
@@ -159,7 +172,7 @@ func GenFeiShuSign(secret string, timestamp int64) (string, error) {
 	}
 
 	signature := base64.StdEncoding.EncodeToString(h.Sum(nil))
-	fmt.Println(signature)
+	//fmt.Println(signature)
 	return signature, nil
 }
 
@@ -200,5 +213,6 @@ func SendFeiShu(webhook, secret, text string) error {
 
 	respBody, _ := io.ReadAll(resp.Body)
 	fmt.Println("Feishu response:", string(respBody))
+	fmt.Println("========== Docker Event End ======")
 	return nil
 }

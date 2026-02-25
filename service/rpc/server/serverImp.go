@@ -2,13 +2,14 @@ package server
 
 import (
 	"fmt"
-	"gameServer/service/logger"
+	"gameServer/pkg/logger"
+	utils2 "gameServer/pkg/utils"
 	"gameServer/service/rpc"
-	"gameServer/service/utils"
-	"go.uber.org/zap"
 	"reflect"
 	"strings"
 	"sync/atomic"
+
+	"go.uber.org/zap"
 
 	"time"
 
@@ -143,7 +144,7 @@ func (s *Server) Register(rcvr any) error {
 //
 // 使用系统分配的端口
 func (s *Server) serve() error {
-	ip := utils.LocalIP()
+	ip := utils2.LocalIP()
 
 	address := fmt.Sprintf("%s:%d", ip, 0)
 	// 随机获取可用的ip和端口
@@ -159,7 +160,7 @@ func (s *Server) serve() error {
 // buildMetadata 编写服务器元数据
 func (s *Server) buildMetadata() string {
 	serverId := s.config.ID
-	gouldId := utils.GetGroupIdByServerId(serverId) // (1~999):1 （1000~1999):2 (2000~2999):3
+	gouldId := utils2.GetGroupIdByServerId(serverId) // (1~999):1 （1000~1999):2 (2000~2999):3
 	metadata := strings.Join([]string{
 		fmt.Sprintf("id=%d", serverId),
 		fmt.Sprintf("version=%d", s.config.Version),

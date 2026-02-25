@@ -3,6 +3,7 @@ package selector
 import (
 	"context"
 	"fmt"
+	"math/rand"
 	"strconv"
 	"strings"
 
@@ -61,16 +62,22 @@ func (s *DefaultSelector) Select(ctx context.Context, servicePath, serviceMethod
 		//	(metadata.versionMax == 0 || server.version >= metadata.versionMin && server.version <= metadata.versionMax) {
 		//	return server.address
 		//}
-		if oneServer.id == 0 { //没有数据
-
+		if oneServer.id == 0 { //没有数据,则按平均分配服务器
 			if server.groupId == oneServer.groupId && server.curVersion == server.maxVersion { //没有则返回最大版本
+				serverList := make([]*serverInfo, 0) //获取所有最大版本
+				for _, tempServer := range s.servers {
+					if server.groupId == tempServer.groupId && tempServer.curVersion == tempServer.maxVersion {
+						serverList = append(serverList, tempServer)
+					}
+				}
+				// 从 serverList 选择一个
+				targetServer := serverList[rand.Intn(len(serverList))]
 				// 写入返回数据
 				ctx = context.WithValue(ctx, share.ResMetaDataKey, map[string]string{
-					"id": strconv.Itoa(int(server.id)),
+					"id": strconv.Itoa(int(targetServer.id)),
 				})
-				return server.address
+				return targetServer.address
 			}
-
 		} else {
 			if server.id == oneServer.id {
 				return server.address
@@ -88,9 +95,19 @@ func (s *DefaultSelector) UpdateServer(servers map[string]string) {
 		fmt.Println("servers is empty")
 		return
 	}
+
+	// 更新版本
 	s.servers = make([]*serverInfo, 0)
+	groupIdMaxVersionMap := make(map[uint32]uint32)
 	for address, metadata := range servers {
-		s.servers = append(s.servers, parseServerMetadata(metadata, address))
+		serverMetadata := parseServerMetadata(metadata, address)
+		if groupIdMaxVersionMap[serverMetadata.groupId] <= serverMetadata.curVersion {
+			groupIdMaxVersionMap[serverMetadata.groupId] = serverMetadata.curVersion
+		}
+		s.servers = append(s.servers, serverMetadata)
+	}
+	for _, info := range s.servers {
+		info.maxVersion = groupIdMaxVersionMap[info.groupId]
 	}
 }
 
@@ -132,18 +149,12 @@ func parseServerMetadata(metadata, address string) *serverInfo {
 		//	out.curVersion = uint32(t)
 		case "curVersion":
 			t, _ := strconv.Atoi(value)
-			out.groupId = uint32(t)
+			out.curVersion = uint32(t)
 		case "roomStatus":
 			t, _ := strconv.Atoi(value)
-			out.groupId = uint32(t)
+			out.roomStatus = uint8(t)
 		}
 	}
-
-	//if {
-	//
-	//	t, _ := strconv.Atoi(value)
-	//	out.curVersion = uint32(t)
-	//}
 
 	return out
 }

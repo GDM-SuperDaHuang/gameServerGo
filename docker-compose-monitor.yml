@@ -2,7 +2,7 @@ services:
   docker-monitor:
     build:
       context: .
-      dockerfile: service/app/monitor/Dockerfile
+      dockerfile: app/monitor/Dockerfile
     image: docker-monitor:latest
     container_name: docker-monitor
     restart: always

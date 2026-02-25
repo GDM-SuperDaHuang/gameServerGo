@@ -1,9 +1,9 @@
 package gate
 
 import (
-	"gameServer/service/compress"
-	"gameServer/service/config"
-	"gameServer/service/logger"
+	"gameServer/pkg/compress"
+	"gameServer/pkg/config"
+	"gameServer/pkg/logger"
 	"gameServer/service/rpc"
 	"gameServer/service/services"
 	"gameServer/service/services/gate/datapack"

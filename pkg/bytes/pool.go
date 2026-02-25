@@ -1,10 +1,10 @@
-package common
+package bytes
 
 import (
 	"bytes"
 	"fmt"
-	"gameServer/service/logger"
-	"gameServer/service/utils"
+	"gameServer/pkg/logger"
+	"gameServer/pkg/utils"
 	"reflect"
 	"sync"
 	"time"
@@ -252,7 +252,6 @@ func (tp *TypePools) Add(t reflect.Type) {
 	tp.pools[t] = p
 }
 
-// Get ..
 func (tp *TypePools) Get(t reflect.Type) any {
 	tp.lock.RLock()
 	pool, found := tp.pools[t]

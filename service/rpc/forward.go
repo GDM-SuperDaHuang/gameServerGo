@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"gameServer/pkg/bytes"
+	"gameServer/pkg/logger"
 	"gameServer/service/common"
-	"gameServer/service/logger"
 	"gameServer/service/protoHandlerInit"
 	"reflect"
 	"strings"
@@ -67,6 +68,8 @@ func (f *Forward) AddModules(modules []interface{}) error {
 
 	// 2. 模块注册
 	if err := f.register(); err != nil {
+		// 注册失败直接结束
+		panic(err)
 		return fmt.Errorf("register modules failed: %w", err)
 	}
 
@@ -121,13 +124,13 @@ func (pm *ProtocolMethod) Call(ctx context.Context, p any, req *common.RpcMessag
 
 	reqParam := req.Data.Body //protobuf
 	// 对象池获取
-	protocolReq := common.Types().Get(pm.reqTyp).(proto.Message)
+	protocolReq := bytes.Types().Get(pm.reqTyp).(proto.Message)
 	if err := proto.Unmarshal(reqParam, protocolReq); err != nil {
 		return fmt.Errorf("failed to unmarshal, request: %s, err: %v", pm.Name(), err)
 	}
 
 	// 2. 协议函数返回值
-	protocolResp := common.Types().Get(pm.respTyp).(proto.Message)
+	protocolResp := bytes.Types().Get(pm.respTyp).(proto.Message)
 
 	// 3. 调用协议函数
 	results := pm.method.Func.Call([]reflect.Value{
@@ -137,7 +140,7 @@ func (pm *ProtocolMethod) Call(ctx context.Context, p any, req *common.RpcMessag
 		reflect.ValueOf(protocolReq),
 		reflect.ValueOf(protocolResp),
 	})
-	common.Types().Put(pm.reqTyp, protocolReq)
+	bytes.Types().Put(pm.reqTyp, protocolReq)
 	if results != nil {
 		if !results[0].IsNil() {
 			if errResult := results[0].Interface().(*common.ErrorInfo); errResult != nil {
@@ -204,7 +207,7 @@ func (pm *ProtocolMethod) Call(ctx context.Context, p any, req *common.RpcMessag
 
 	// 4.2 协议返回值写入远程调用的返回值中
 	respData, err := proto.Marshal(protocolResp)
-	common.Types().Put(pm.respTyp, protocolResp)
+	bytes.Types().Put(pm.respTyp, protocolResp)
 	if err != nil {
 		return fmt.Errorf("failed to marshal, request: %s, err: %v", pm.Name(), err)
 	}
@@ -332,8 +335,8 @@ func parsedProtocolMethod(rcvr any) (map[uint16]*ProtocolMethod, error) {
 				moduleName: moduleName,
 				methodName: methodName,
 			}
-			common.Types().Add(reqTyp)
-			common.Types().Add(respTyp)
+			bytes.Types().Add(reqTyp)
+			bytes.Types().Add(respTyp)
 		}
 	}
 	return out, nil

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"gameServer/service/config"
-	"gameServer/service/logger"
+	"gameServer/pkg/config"
+	"gameServer/pkg/logger"
 	"gameServer/service/services/gate"
 	"net/http"
 	"time"

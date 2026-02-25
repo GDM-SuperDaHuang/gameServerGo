@@ -1,8 +1,8 @@
 package node
 
 import (
-	"gameServer/service/config"
-	"gameServer/service/logger"
+	"gameServer/pkg/config"
+	"gameServer/pkg/logger"
 	"gameServer/service/rpc"
 	"os"
 	"os/signal"
