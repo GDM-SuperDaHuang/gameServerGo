@@ -15,9 +15,11 @@ import (
 )
 
 var (
-	typeOfResult   = reflect.TypeOf((*common.Resp)(nil)).Elem()
+	//typeOfResult   = reflect.TypeOf((*common.Resp)(nil)).Elem()
 	typeOfContext  = reflect.TypeOf((*context.Context)(nil)).Elem()
 	typeOfProtoMsg = reflect.TypeOf((*proto.Message)(nil)).Elem()
+	typeOfResult   = reflect.TypeOf((*common.ErrorInfo)(nil)).Elem()
+
 	//typeOfCallback = reflect.TypeOf((*Callback)(nil)).Elem()
 	// typeOfPollerData = reflect.TypeOf((*poller.PollerData)(nil)).Elem()
 )
@@ -312,10 +314,14 @@ func parsedProtocolMethod(rcvr any) (map[uint16]*ProtocolMethod, error) {
 			//	return nil, fmt.Errorf("protocol function must have 1 or 2 return values, please check %s.%s", moduleName, methodName)
 			//}
 
-			// 5.1 如果返回值为 1 个, 必须为 typeOfResult 类型
-			if methodType.NumOut() == 1 && !methodType.Out(0).Implements(typeOfResult) {
+			if methodType.NumOut() == 1 && !methodType.Out(0).AssignableTo(typeOfResult) && !methodType.Out(0).AssignableTo(reflect.PtrTo(typeOfResult)) {
+				// 处理错误
 				return nil, fmt.Errorf("single return value must be Result type, please check %s.%s", moduleName, methodName)
 			}
+			//// 5.1 如果返回值为 1 个, 必须为 typeOfResult 类型
+			//if methodType.NumOut() == 1 && !methodType.Out(0).Implements(typeOfResult) {
+			//	return nil, fmt.Errorf("single return value must be Result type, please check %s.%s", moduleName, methodName)
+			//}
 
 			out[protoId] = &ProtocolMethod{
 				method:     method,

@@ -90,6 +90,7 @@ func (g *Gate) forwardLocal(session *common.Session, message *common.Message) *c
 	//case proto.MessageID_SecretShareTest:
 	//	return g.secretShareTestHandler(session, message)
 	case 4:
+		fmt.Println("=======4=============")
 		return g.loginHandler(session, message)
 	}
 	return proto.Errorf1(proto.ErrorCode_ProtocolNotFound)
