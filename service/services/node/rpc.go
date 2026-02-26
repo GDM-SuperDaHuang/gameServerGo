@@ -3,7 +3,6 @@ package node
 import (
 	"context"
 	"errors"
-	"fmt"
 	"gameServer/pkg/config"
 	"gameServer/pkg/logger"
 	"gameServer/pkg/utils"
@@ -18,6 +17,8 @@ import (
 )
 
 func (n *NodeServer) initRPC(f *rpc.Forward) error {
+	SetNodeRPCClient(RPCNodeClients())
+
 	// 1. 服务端
 	s, err := rpcxServer.NewServer(rpcxServer.BuildServerConfig())
 	if err != nil {
@@ -32,24 +33,21 @@ func (n *NodeServer) initRPC(f *rpc.Forward) error {
 	}
 
 	logger.Get().Info("[initRPC] server start", zap.String("info", s.Output()))
-
 	n.rpcServer = s
 
 	return nil
 }
 
-func Push(roleID uint64, protoId uint16, message proto.Message) {
+// 主动推送给到网关到客户端
+func Push(player *common.Player, protoId uint16, message proto.Message) {
 	// todo 在线判断
 	//player := online.Get(roleID)
 	//if player == nil {
 	//	// 不在线
 	//	return
 	//}
-
-	fmt.Println("=============")
-	player := &common.Player{}
-	if err := ToGate(player, protoId, message, RPCClients()); err != nil {
-		logger.Get().Error("push to gate failed", zap.Uint64("roleID", roleID), zap.Int32("protocol", int32(protoId)), zap.Error(err))
+	if err := ToGate(player, protoId, message, RpcNodeClient); err != nil {
+		logger.Get().Error("push to gate failed", zap.Uint64("roleID", player.RoleID), zap.Int32("protocol", int32(protoId)), zap.Error(err))
 	}
 }
 
@@ -82,5 +80,5 @@ func ToGate(player *common.Player, protocol uint16, message proto.Message, rpcCl
 		"groupId": strconv.Itoa(1),
 	})
 
-	return rpcClient.Call(context.Background(), "Receive", rpcReq, nil)
+	return rpcClient.Call(ctx, "Receive", rpcReq, nil)
 }

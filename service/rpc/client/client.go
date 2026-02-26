@@ -18,7 +18,7 @@ type ClientConfig struct {
 	BasePath string
 	// 服务名称，例如 gate, game, battle
 	ServiceName string
-	// 服务对象名称，例如 Forward
+	// 服务对象名称，例如 Forward，Gate
 	ServicePath string
 
 	// 客户端连接池数量
@@ -58,7 +58,7 @@ func BuildClientConfig(name, methodName string, poolSize int, failMode xclient.F
 		HeartbeatInterval: time.Duration(c.RPCHeart()) * time.Second,
 		EtcdEndpoints:     c.EtcdAddress(), //":12379;:22329;:32329"
 		BasePath:          basePath,
-		ServiceName:       name,
+		ServiceName:       name, //没用上
 		ServicePath:       methodName,
 		PoolSize:          poolSize,
 		FailMode:          failMode,

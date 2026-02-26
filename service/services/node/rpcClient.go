@@ -10,23 +10,23 @@ import (
 )
 
 // RPCClient 远程调用客户端
-var rpcClient rpc.ClientInterface
+var RpcNodeClient rpc.ClientInterface
 
 // SetRPCClient 设置 rpc 调用，用于测试
-func SetRPCClient(c rpc.ClientInterface) {
-	rpcClient = c
+func SetNodeRPCClient(c rpc.ClientInterface) {
+	RpcNodeClient = c
 }
 
 // 获取远程调用客户端
-var RPCClients = sync.OnceValue(func() rpc.ClientInterface {
-	if rpcClient != nil {
-		return rpcClient
+var RPCNodeClients = sync.OnceValue(func() rpc.ClientInterface {
+	if RpcNodeClient != nil {
+		return RpcNodeClient
 	}
 
 	// gate 集群
 	c, err := client.NewClient(client.BuildClientConfig(
 		"gate",
-		"Receive",
+		"Gate",
 		8,
 		xclient.Failfast,     // account 节点具有唯一性，不需要重复尝试
 		xclient.SelectByUser, // 使用自定义选择器

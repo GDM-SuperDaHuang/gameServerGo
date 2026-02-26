@@ -208,6 +208,9 @@ func (g *Gate) gNetStart() error {
 }
 
 func (g *Gate) initRPC() error {
+	// 客户端懒加载
+	SetGateRPCClient(GateRPCClients())
+
 	s, err := rpcxServer.NewServer(rpcxServer.BuildServerConfig())
 	if err != nil {
 		return err
@@ -220,8 +223,6 @@ func (g *Gate) initRPC() error {
 	if err = s.Register(g); err != nil {
 		return err
 	}
-
-	// 客户端懒加载
 
 	logger.Get().Info("[initRPC] server start", zap.String("info", s.Output()))
 

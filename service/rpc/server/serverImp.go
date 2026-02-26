@@ -57,7 +57,7 @@ func (s *Server) Start() error {
 
 	errCh := make(chan error, 1)
 	go func() {
-		errCh <- s.serve()
+		errCh <- s.serve() //不会触发
 	}()
 
 	// 启动rpcx服务端
@@ -79,7 +79,7 @@ func (s *Server) Start() error {
 	logger.Get().Info("etcd Register==", zap.String("address=", address), zap.Strings("etcd =", config.EtcdEndpoints))
 
 	r := &serverplugin.EtcdV3RegisterPlugin{
-		BasePath:       s.publicServicePath(), //根目录， eg：gate/Forward,room/Forward
+		BasePath:       s.publicServicePath(), //根目录， eg：node/Forward,xxx/Forward
 		ServiceAddress: address,
 		EtcdServers:    config.EtcdEndpoints,  //往etcd注册地址
 		UpdateInterval: config.UpdateInterval, //信息更新间隔

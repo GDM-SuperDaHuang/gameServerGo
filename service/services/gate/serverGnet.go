@@ -238,7 +238,7 @@ func (ts *gNetServer) initPool(poolSize int) error {
 }
 
 // Create response handler closure
-func (ts *gNetServer) handleMessage(session *common.Session, message *common.Message) {
+func (ts *gNetServer) handleMessage(session *common.Session, req *common.Message) {
 	//if ts.isTest {
 	//	logger.Get().Info(
 	//		"req <----",
@@ -249,14 +249,14 @@ func (ts *gNetServer) handleMessage(session *common.Session, message *common.Mes
 	//}
 
 	// 返回结果
-	resp := ts.gate.forward(session, message)
+	resp := ts.gate.forward(session, req)
 	// request->response 模式
-	_ = ts.write(session, resp, message)
+	_ = ts.write(session, resp, req)
 }
 
 // write 写入数据，发送到客户端
-func (ts *gNetServer) write(session *common.Session, resp *common.Resp, message *common.Message) error {
-	respMessage := common.NewMessageResp(resp, message)
+func (ts *gNetServer) write(session *common.Session, resp *common.Resp, req *common.Message) error {
+	respMessage := common.NewMessageResp(resp, req)
 	defer common.FreeMessage(respMessage)
 
 	// 分享秘钥时不加密，也不验证校验值

@@ -99,7 +99,7 @@ func (g *Gate) forwardLocal(session *common.Session, message *common.Message) *c
 func (g *Gate) rpcForward(session *common.Session, message *common.Message) *common.Resp {
 	//return g.forwardTarget (session, message, nil)
 	// 根据etcd创建客户端，进行调用
-	return ForwardTarget(session, message, RPCClients())
+	return ForwardTarget(session, message, RpcGateClient)
 }
 
 func ForwardTarget(session *common.Session, message *common.Message, rpcClient rpc.ClientInterface) *common.Resp {
@@ -177,7 +177,7 @@ func ForwardTarget(session *common.Session, message *common.Message, rpcClient r
 	return rpcResp
 }
 
-// Receive 网关接收其它服务的单个消息推送,必须实现，不然无法注册
+// Receive 网关接收其它服务的单个消息推送,必须实现，不然无法注册，rpcx协程
 func (g *Gate) Receive(_ context.Context, req *common.RpcMessage, resp *common.Resp) error {
 	//找到对应的 session，写入消息
 	session := g.tcpServer.findSession(req.Player.RoleID)
@@ -195,5 +195,6 @@ func (g *Gate) Receive(_ context.Context, req *common.RpcMessage, resp *common.R
 			}
 		}
 	}
+	resp.Body = req.Data.Body
 	return g.tcpServer.write(session, resp, req.Data)
 }

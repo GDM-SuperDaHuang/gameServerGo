@@ -36,6 +36,6 @@ func (f *Forward) Dispatch(ctx context.Context, req *common.RpcMessage, resp *co
 		return fmt.Errorf("protocol not found: %d", req.Data.Head.Protocol)
 	}
 
-	err := protocolMethod.Call(ctx, req.Player.RoleID, req, resp)
+	err := protocolMethod.Call(ctx, req.Player, req, resp)
 	return err
 }

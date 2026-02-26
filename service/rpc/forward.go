@@ -93,7 +93,7 @@ func (f *Forward) register() error {
 
 // Call 调用协议函数
 /**
- * p:玩家信息
+ * p:玩家信息 Player *Player
 * req 请求体
 * resp 响应
 */

@@ -6,42 +6,24 @@
   <component name="ChangeListManager">
     <list default="true" id="0210bdac-a28d-412f-b3da-7837bed304cd" name="Changes" comment="1">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node/hander/testHander.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/node/hander/testHander.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/room.toml" beforeDir="false" afterPath="$PROJECT_DIR$/config/room.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/test.toml" beforeDir="false" afterPath="$PROJECT_DIR$/config/test.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose-internal.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose-internal.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose-monitor.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose-monitor.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/app/gate/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/app/gate/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/app/gate/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/gate/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/app/monitor/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/app/monitor/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/app/monitor/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/monitor/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/app/node/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/app/node/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/app/node/hander/testHander.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/node/hander/testHander.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/app/node/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/node/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/common/bufferPool.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/bytes/bufferPool.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/config/config.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/common/message.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/common/message.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/common/pool.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/bytes/pool.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/common/session.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/common/session.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/compress/compress.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/compress/compress.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/compress/zlib.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/compress/zlib.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/logger/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/logger/logger.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/protoHandlerInit/method.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/protoHandlerInit/method.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/rpc/client/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/rpc/client/client.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/rpc/client/clientImp.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/rpc/client/clientImp.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/rpc/client/selector/defaultSelector.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/rpc/client/selector/defaultSelector.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/rpc/dispatch.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/rpc/dispatch.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/rpc/forward.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/rpc/forward.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/rpc/server/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/rpc/server/server.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/rpc/server/serverImp.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/rpc/server/serverImp.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/services/gate/datapack/DeEnCode.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/gate/datapack/DeEnCode.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/services/gate/forward.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/gate/forward.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/services/gate/gateImp.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/gate/gateImp.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/services/gate/handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/gate/handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/services/gate/rpcClient.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/gate/rpcClient.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/services/gate/serverGnet.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/gate/serverGnet.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/services/node/nodeImp.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/node/nodeImp.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/services/node/rpc.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/node/rpc.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/utils/ip.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/utils/ip.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/utils/serverInfo.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/utils/serverInfo.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/services/node/rpcClient.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/node/rpcClient.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,7 +37,7 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" url="file://$PROJECT_DIR$/../go1.26.0" />
+  <component name="GOROOT" url="file://$USER_HOME$/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.0.windows-amd64" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -83,48 +65,48 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultGoTemplateProperty": "Go File",
-    "Docker.docker-compose-internal.yml.etcd1: Compose Deployment.executor": "Run",
-    "Docker.docker-compose-internal.yml.etcd3: Compose Deployment.executor": "Run",
-    "Docker.docker-compose-internal.yml.node-gate-1: Compose Deployment.executor": "Run",
-    "Docker.docker-compose-internal.yml.node-gate-2: Compose Deployment.executor": "Run",
-    "Docker.docker-compose-internal.yml.node-room-1: Compose Deployment.executor": "Run",
-    "Docker.docker-compose-internal.yml: Compose Deployment.executor": "Run",
-    "Docker.docker-compose-monitor.yml.docker-monitor: Compose 部署.executor": "Run",
-    "Docker.docker-compose.yml.etcd1: Compose Deployment.executor": "Run",
-    "Docker.docker-compose.yml.etcd1: Compose 部署.executor": "Run",
-    "Docker.docker-compose.yml: Compose Deployment.executor": "Run",
-    "Docker.node/Dockerfile.executor": "Run",
-    "Go Build.go build gameServer.executor": "Debug",
-    "Go Build.go build gameServer/service/app/gate.executor": "Debug",
-    "Go Build.go build gameServer/service/app/monitor.executor": "Run",
-    "Go Build.go build gameServer/service/app/node.executor": "Debug",
-    "Go 构建.go build gameServer/app/gate.executor": "Debug",
-    "Go 构建.go build gameServer/app/node.executor": "Debug",
-    "Go 构建.go build gameServer/service/app/gate.executor": "Debug",
-    "RunOnceActivity.GoLinterPluginOnboarding": "true",
-    "RunOnceActivity.GoLinterPluginStorageMigration": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.go.formatter.settings.were.checked": "true",
-    "RunOnceActivity.go.migrated.go.modules.settings": "true",
-    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
-    "git-widget-placeholder": "main",
-    "go.import.settings.migrated": "true",
-    "go.sdk.automatically.set": "true",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Users/gdm",
-    "node.js.detected.package.eslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "onboarding.tips.debug.path": "E:/gowork/gameServer/main.go",
-    "run.configurations.included.in.services": "true",
-    "settings.editor.selected.configurable": "go.sdk"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultGoTemplateProperty&quot;: &quot;Go File&quot;,
+    &quot;Docker.docker-compose-internal.yml.etcd1: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose-internal.yml.etcd3: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose-internal.yml.node-gate-1: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose-internal.yml.node-gate-2: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose-internal.yml.node-room-1: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose-internal.yml: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose-monitor.yml.docker-monitor: Compose 部署.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose.yml.etcd1: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose.yml.etcd1: Compose 部署.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose.yml: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.node/Dockerfile.executor&quot;: &quot;Run&quot;,
+    &quot;Go Build.go build gameServer.executor&quot;: &quot;Debug&quot;,
+    &quot;Go Build.go build gameServer/service/app/gate.executor&quot;: &quot;Debug&quot;,
+    &quot;Go Build.go build gameServer/service/app/monitor.executor&quot;: &quot;Run&quot;,
+    &quot;Go Build.go build gameServer/service/app/node.executor&quot;: &quot;Debug&quot;,
+    &quot;Go 构建.go build gameServer/app/gate.executor&quot;: &quot;Debug&quot;,
+    &quot;Go 构建.go build gameServer/app/node.executor&quot;: &quot;Debug&quot;,
+    &quot;Go 构建.go build gameServer/service/app/gate.executor&quot;: &quot;Debug&quot;,
+    &quot;RunOnceActivity.GoLinterPluginOnboarding&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.GoLinterPluginStorageMigration&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
+    &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/gdm&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;onboarding.tips.debug.path&quot;: &quot;E:/gowork/gameServer/main.go&quot;,
+    &quot;run.configurations.included.in.services&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;go.sdk&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="E:\gowork\gameServer\config" />
@@ -177,7 +159,8 @@
     <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
       <module name="gameServer" />
       <working_directory value="$PROJECT_DIR$" />
-      <kind />
+      <kind value="PACKAGE" />
+      <package value="gameServer" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <method v="2" />
@@ -221,7 +204,7 @@
     <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
       <module name="gameServer" />
       <working_directory value="$PROJECT_DIR$" />
-      <kind />
+      <kind value="DIRECTORY" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
@@ -342,33 +325,8 @@
       <breakpoints>
         <line-breakpoint type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/service/services/gate/serverGnet.go</url>
-          <line>56</line>
+          <line>55</line>
           <option name="timeStamp" value="49" />
-        </line-breakpoint>
-        <line-breakpoint type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/service/rpc/client/selector/defaultSelector.go</url>
-          <line>36</line>
-          <option name="timeStamp" value="111" />
-        </line-breakpoint>
-        <line-breakpoint type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/service/rpc/dispatch.go</url>
-          <line>39</line>
-          <option name="timeStamp" value="113" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/service/services/node/nodeImp.go</url>
-          <line>83</line>
-          <option name="timeStamp" value="120" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/service/services/node/rpc.go</url>
-          <line>29</line>
-          <option name="timeStamp" value="121" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/service/services/node/rpc.go</url>
-          <line>25</line>
-          <option name="timeStamp" value="122" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/pkg/utils/ip.go</url>
@@ -381,14 +339,49 @@
           <option name="timeStamp" value="142" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/service/rpc/client/selector/defaultSelector.go</url>
-          <line>46</line>
-          <option name="timeStamp" value="165" />
+          <url>file://$PROJECT_DIR$/service/services/node/rpc.go</url>
+          <line>82</line>
+          <option name="timeStamp" value="201" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/service/rpc/dispatch.go</url>
-          <line>33</line>
-          <option name="timeStamp" value="172" />
+          <url>file://$PROJECT_DIR$/service/services/gate/gateImp.go</url>
+          <line>223</line>
+          <option name="timeStamp" value="225" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/service/services/gate/forward.go</url>
+          <line>182</line>
+          <option name="timeStamp" value="247" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/service/services/gate/forward.go</url>
+          <line>198</line>
+          <option name="timeStamp" value="251" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/service/services/gate/forward.go</url>
+          <line>176</line>
+          <option name="timeStamp" value="252" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/service/services/gate/serverGnet.go</url>
+          <line>259</line>
+          <option name="timeStamp" value="253" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/service/services/gate/serverGnet.go</url>
+          <line>253</line>
+          <option name="timeStamp" value="254" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/service/common/message.go</url>
+          <line>65</line>
+          <option name="timeStamp" value="256" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/service/common/message.go</url>
+          <line>76</line>
+          <option name="timeStamp" value="258" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

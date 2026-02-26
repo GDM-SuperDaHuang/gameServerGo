@@ -10,17 +10,17 @@ import (
 )
 
 // RPCClient 远程调用客户端
-var rpcClient rpc.ClientInterface
+var RpcGateClient rpc.ClientInterface
 
 // SetRPCClient 设置 rpc 调用，用于测试
-func SetRPCClient(c rpc.ClientInterface) {
-	rpcClient = c
+func SetGateRPCClient(c rpc.ClientInterface) {
+	RpcGateClient = c
 }
 
 // 获取远程调用客户端
-var RPCClients = sync.OnceValue(func() rpc.ClientInterface {
-	if rpcClient != nil {
-		return rpcClient
+var GateRPCClients = sync.OnceValue(func() rpc.ClientInterface {
+	if RpcGateClient != nil {
+		return RpcGateClient
 	}
 
 	// node

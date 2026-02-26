@@ -6,12 +6,14 @@ import (
 	"math/rand"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/smallnest/rpcx/share"
 )
 
 // DefaultSelector 选择特定版本，如果没有选择最新的版本，（如果退出登录再次请求，回选择最新的版本,否则用户选择旧的版本）
 type DefaultSelector struct {
+	mu      sync.RWMutex //可能并发
 	servers []*serverInfo
 }
 type serverInfo struct {
@@ -58,13 +60,9 @@ func (s *DefaultSelector) Select(ctx context.Context, servicePath, serviceMethod
 		//
 		// 此时，versionMin = 2, versionMax = 2
 		// 就会匹配到 v2 版本
-		//if server.id == metadata.id &&
-		//	(metadata.versionMax == 0 || server.version >= metadata.versionMin && server.version <= metadata.versionMax) {
-		//	return server.address
-		//}
 		if oneServer.id == 0 { //没有数据,则按平均分配服务器
 			if server.groupId == oneServer.groupId && server.curVersion == server.maxVersion { //没有则返回最大版本
-				serverList := make([]*serverInfo, 0) //获取所有最大版本
+				serverList := make([]*serverInfo, 0) //相同组的所有版本
 				for _, tempServer := range s.servers {
 					if server.groupId == tempServer.groupId && tempServer.curVersion == tempServer.maxVersion {
 						serverList = append(serverList, tempServer)
@@ -91,6 +89,8 @@ func (s *DefaultSelector) Select(ctx context.Context, servicePath, serviceMethod
 
 // UpdateServer 更新服务器列表，由 rpcx 调用
 func (s *DefaultSelector) UpdateServer(servers map[string]string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	if len(servers) == 0 {
 		fmt.Println("servers is empty")
 		return
@@ -104,9 +104,19 @@ func (s *DefaultSelector) UpdateServer(servers map[string]string) {
 		if groupIdMaxVersionMap[serverMetadata.groupId] <= serverMetadata.curVersion {
 			groupIdMaxVersionMap[serverMetadata.groupId] = serverMetadata.curVersion
 		}
-		s.servers = append(s.servers, serverMetadata)
+		// 排重
+		flag := false
+		for _, info := range s.servers {
+			if info.id == serverMetadata.id {
+				flag = true
+				break
+			}
+		}
+		if !flag {
+			s.servers = append(s.servers, serverMetadata)
+		}
 	}
-	for _, info := range s.servers {
+	for _, info := range s.servers { //todo？？？
 		info.maxVersion = groupIdMaxVersionMap[info.groupId]
 	}
 }

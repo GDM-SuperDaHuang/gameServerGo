@@ -23,7 +23,7 @@ rpcheart = 10
 
 [room]
 [room-1]
-# 区服编号 1000~1999
+# 区服编号 1000~1999, gould=2
 id = 1000
 # 名称
 name = "room-1"

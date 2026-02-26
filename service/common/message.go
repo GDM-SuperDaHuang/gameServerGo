@@ -61,14 +61,14 @@ func NewMessage(flag uint16, sn uint32, code uint16, protocol uint16, payload []
 	return m
 }
 
-func NewMessageResp(resp *Resp, message *Message) *Message {
+func NewMessageResp(resp *Resp, req *Message) *Message {
 	m := messagePool.Get()
 	m.Head = &MessageHead{
-		Len:      uint16(len(message.Body)),
+		Len:      uint16(len(req.Body)),
 		Flag:     resp.Flag,
-		SN:       message.Head.SN,
+		SN:       req.Head.SN,
 		Code:     resp.Code,
-		Protocol: message.Head.Protocol,
+		Protocol: req.Head.Protocol,
 	}
 	if resp.Body != nil {
 		m.Body = resp.Body

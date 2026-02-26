@@ -22,10 +22,10 @@ func NewClient(config *ClientConfig) (*Client, error) {
 
 	// 创建服务发现
 	//gate: node/Forward
-	//node: node/r
+	//node: node/Gate
 	discovery, err := etcdClient.NewEtcdV3Discovery(
 		config.BasePath,    //基本路径 node
-		config.ServicePath, //具体分支路径的服务，相同则是集群 forward
+		config.ServicePath, //具体分支路径的服务对象
 		config.EtcdEndpoints,
 		true, //监听节点上下线变化
 		nil,

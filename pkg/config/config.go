@@ -184,6 +184,7 @@ func (c *Config) IsDevelop() bool {
 	return false
 }
 
+// =======================================================redis=================================================================
 // CachePrefix 缓存公共前缀
 func (c *Config) CachePrefix() string {
 	return c.common.GetString("cacheprefix")
@@ -219,6 +220,9 @@ func (c *Config) JaegerAddress() string {
 	return c.common.GetString("jaegeraddress")
 }
 
+//=======================================================redis=================================================================
+
+// =======================================================etcd=================================================================
 // EtcdAddress etcd 地址
 func (c *Config) EtcdAddress() []string {
 	l := c.common.GetString("etcdaddress")
@@ -236,6 +240,8 @@ func (c *Config) EtcdPrefix() string {
 	}
 	return v
 }
+
+//=======================================================etcd=================================================================
 
 // RPCHeart rpc 心跳间隔
 func (c *Config) RPCHeart() int {
