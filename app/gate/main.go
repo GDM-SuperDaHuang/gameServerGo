@@ -2,7 +2,8 @@ package main
 
 import (
 	"gameServer/pkg/config"
-	"gameServer/pkg/logger"
+	"gameServer/pkg/logger/log1"
+	"gameServer/pkg/logger/log2"
 	"gameServer/service/services/gate"
 	"net/http"
 	"time"
@@ -14,24 +15,15 @@ import (
 // TIP <p>To run your code, right-click the code and select <b>Run</b>.</p> <p>Alternatively, click
 // the <icon src="AllIcons.Actions.Execute"/> icon in the gutter and select the <b>Run</b> menu item from here.</p>
 func main() {
-	//TIP <p>Press <shortcut actionId="ShowIntentionActions"/> when your caret is at the underlined text
-	// to see how GoLand suggests fixing the warning.</p><p>Alternatively, if available, click the lightbulb to view possible fixes.</p>
-	// 创建应用,读取配置启动
-	//engine, err := services.New(&services.Options{
-	//	NodeName:    "gate-1",
-	//	ServiceName: "gate",
-	//	ConfigPath:  "",
-	//	ConfigName:  "",
-	//	ConfigType:  "",
-	//	LogPath:     "",
-	//	LogName:     "",
-	//	LogLevel:    "",
-	//})
+	// 打docker的时候需要填写路径
+	log1.Init(zapcore.DebugLevel, "gate-1", "./logs", !config.Get().IsDevelop())
+	log2.Init(log2.Config{Level: zapcore.DebugLevel, LogDir: "./logs", IsDocker: false})
 
-	//if err != nil {
-	//	panic(err)
-	//}
-	logger.Init(zapcore.DebugLevel, "", "", !config.Get().IsDevelop())
+	//log2.Get().Debug("etcd Register==", zap.String("address=", "123123"))
+	//log2.Get().Info("etcd Register==", zap.String("address=", "44444"))
+	//log2.Get().Warn("etcd Register==", zap.String("address=", "5555"))
+	//log2.Get().Error("etcd Register==", zap.String("address=", "6666"))
+
 	// [E:\gowork\gameServer]
 	if err := config.Init("gate-1", "gate", "./config", "test", "toml"); err != nil {
 		panic(err)
@@ -42,7 +34,7 @@ func main() {
 		if len(pprofAddr) == 0 {
 			return
 		}
-		logger.Get().Info("pprof listen", zap.String("address", pprofAddr))
+		log1.Get().Info("pprof listen", zap.String("address", pprofAddr))
 
 		server := &http.Server{
 			Addr:        pprofAddr,
@@ -50,7 +42,7 @@ func main() {
 		}
 
 		if err2 := server.ListenAndServe(); err2 != nil {
-			logger.Get().Error("pprof listen error", zap.String("address", pprofAddr), zap.Error(err2))
+			log1.Get().Error("pprof listen error", zap.String("address", pprofAddr), zap.Error(err2))
 		}
 	}()
 
@@ -72,6 +64,6 @@ func main() {
 	if err = service.Start(); err != nil {
 		panic(err)
 	}
-	logger.Get().Info("server stop ！")
+	log1.Get().Info("server stop ！")
 
 }

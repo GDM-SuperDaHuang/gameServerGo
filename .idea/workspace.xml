@@ -6,24 +6,19 @@
   <component name="ChangeListManager">
     <list default="true" id="0210bdac-a28d-412f-b3da-7837bed304cd" name="Changes" comment="1">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/node/hander/testHander.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/node/hander/testHander.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/room.toml" beforeDir="false" afterPath="$PROJECT_DIR$/config/room.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/gate/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/gate/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/node/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/bytes/pool.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/bytes/pool.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/common/message.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/common/message.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/rpc/client/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/rpc/client/client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/rpc/client/clientImp.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/rpc/client/clientImp.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/rpc/client/selector/defaultSelector.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/rpc/client/selector/defaultSelector.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/rpc/dispatch.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/rpc/dispatch.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/logger/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/logger/log1/logger.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/common/session.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/common/session.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/rpc/forward.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/rpc/forward.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/rpc/server/serverImp.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/rpc/server/serverImp.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/services/gate/forward.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/gate/forward.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/services/gate/gateImp.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/gate/gateImp.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/services/gate/handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/gate/handler.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/services/gate/rpcClient.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/gate/rpcClient.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/services/gate/serverGnet.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/gate/serverGnet.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/services/node/nodeImp.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/node/nodeImp.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/services/node/rpc.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/node/rpc.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/services/node/rpcClient.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/node/rpcClient.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -116,11 +111,11 @@
       <recent name="E:\gowork\gameServer\protobuf\proto" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\work\work2\gameServerGo\pkg\logger\log2" />
+      <recent name="D:\work\work2\gameServerGo\pkg\logger\log1" />
       <recent name="D:\work\work2\gameServerGo\pkg" />
       <recent name="D:\work\work2\gameServerGo" />
       <recent name="D:\work\work2\gameServerGo\pkg\bytes" />
-      <recent name="E:\gowork\gameServer\service\app\node" />
-      <recent name="E:\gowork\gameServer\service\services\node" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -143,7 +138,7 @@
       </map>
     </option>
   </component>
-  <component name="RunManager" selected="Go 构建.go build gameServer/app/node">
+  <component name="RunManager" selected="Go 构建.go build gameServer/app/gate">
     <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
       <deployment type="docker-compose.yml">
         <settings />
@@ -270,8 +265,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Go 构建.go build gameServer/app/node" />
         <item itemvalue="Go 构建.go build gameServer/app/gate" />
+        <item itemvalue="Go 构建.go build gameServer/app/node" />
         <item itemvalue="Go 构建.go build gameServer/service/app/gate" />
         <item itemvalue="Docker.docker-compose-monitor.yml.docker-monitor: Compose 部署" />
         <item itemvalue="Docker.docker-compose-internal.yml.node-room-1: Compose Deployment" />

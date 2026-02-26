@@ -3,7 +3,7 @@ package common
 import (
 	"gameServer/pkg/bytes"
 	"gameServer/pkg/config"
-	"gameServer/pkg/logger"
+	"gameServer/pkg/logger/log1"
 	"net"
 	"sync"
 	"time"
@@ -184,7 +184,7 @@ func (s *Session) incrementAndCheckRetries(n *int, maxN int) bool {
 	*n++
 	if *n > maxN {
 		if err := s.conn.Close(); err != nil {
-			logger.Get().Error("[gate.session.start] checkHeart failed then conn.Close failed", zap.Error(err))
+			log1.Get().Error("[gate.session.start] checkHeart failed then conn.Close failed", zap.Error(err))
 		}
 		return true
 	}
@@ -223,7 +223,7 @@ func (s *Session) shutdown() {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
-	logger.Get().Debug(
+	log1.Get().Debug(
 		"[gate.session.shutdown] exit",
 		zap.String("address", s.RemoteAddrString()),
 		zap.Uint64("account", s.accountID()),

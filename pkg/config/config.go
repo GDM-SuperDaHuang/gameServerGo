@@ -3,7 +3,7 @@ package config
 import (
 	"errors"
 	"fmt"
-	"gameServer/pkg/logger"
+	"gameServer/pkg/logger/log1"
 	"strings"
 
 	"github.com/fsnotify/fsnotify"
@@ -91,7 +91,7 @@ func New(nodeName, serviceName, filePath, fileName, fileType string) (*Config, e
 	viper.OnConfigChange(func(_ fsnotify.Event) {
 		c.read(v, nodeName, serviceName)
 
-		logger.Get().Info("config reload")
+		log1.Get().Info("config reload")
 	})
 
 	return c, nil

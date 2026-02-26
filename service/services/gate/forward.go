@@ -3,7 +3,7 @@ package gate
 import (
 	"context"
 	"fmt"
-	"gameServer/pkg/logger"
+	"gameServer/pkg/logger/log1"
 	"gameServer/pkg/utils"
 	"strconv"
 
@@ -182,7 +182,7 @@ func (g *Gate) Receive(_ context.Context, req *common.RpcMessage, resp *common.R
 	//找到对应的 session，写入消息
 	session := g.tcpServer.findSession(req.Player.RoleID)
 	if session == nil {
-		logger.Get().Warn("[Receive] session not found", zap.Uint64("roleID", req.Player.RoleID))
+		log1.Get().Warn("[Receive] session not found", zap.Uint64("roleID", req.Player.RoleID))
 		return fmt.Errorf("session not found, roleID: %d", req.Player.RoleID)
 	}
 	// todo 需要修改room 信息?

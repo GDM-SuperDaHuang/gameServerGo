@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"gameServer/pkg/config"
-	"gameServer/pkg/logger"
+	"gameServer/pkg/logger/log1"
 	"gameServer/pkg/utils"
 	"gameServer/service/common"
 	"gameServer/service/rpc"
@@ -32,7 +32,7 @@ func (n *NodeServer) initRPC(f *rpc.Forward) error {
 		return err
 	}
 
-	logger.Get().Info("[initRPC] server start", zap.String("info", s.Output()))
+	log1.Get().Info("[initRPC] server start", zap.String("info", s.Output()))
 	n.rpcServer = s
 
 	return nil
@@ -47,7 +47,7 @@ func Push(player *common.Player, protoId uint16, message proto.Message) {
 	//	return
 	//}
 	if err := ToGate(player, protoId, message, RpcNodeClient); err != nil {
-		logger.Get().Error("push to gate failed", zap.Uint64("roleID", player.RoleID), zap.Int32("protocol", int32(protoId)), zap.Error(err))
+		log1.Get().Error("push to gate failed", zap.Uint64("roleID", player.RoleID), zap.Int32("protocol", int32(protoId)), zap.Error(err))
 	}
 }
 
@@ -60,7 +60,7 @@ func ToGate(player *common.Player, protocol uint16, message proto.Message, rpcCl
 	}
 	body, err := proto.Marshal(message)
 	if err != nil {
-		logger.Get().Error("proto marshal failed", zap.Error(err))
+		log1.Get().Error("proto marshal failed", zap.Error(err))
 		return err
 	}
 	// todo 可优化为对象池是否有问题

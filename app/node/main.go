@@ -3,7 +3,7 @@ package main
 import (
 	"gameServer/app/node/hander"
 	"gameServer/pkg/config"
-	"gameServer/pkg/logger"
+	"gameServer/pkg/logger/log1"
 	"gameServer/service/rpc"
 	"gameServer/service/services/node"
 	"net/http"
@@ -22,22 +22,20 @@ func main() {
 	// room [room]
 	// ./config 路径
 	// room.tom文件
-
+	log1.Init(zapcore.DebugLevel, "room-1", "./logs", !config.Get().IsDevelop())
 	if err := config.Init("room-1", "room", "./config", "room", "toml"); err != nil {
 		panic(err)
 	}
 	//if err := config.Init("room-1", "room", "./config", "room", "toml"); err != nil {
 	//	panic(err)
 	//}
-	logger.Init(zapcore.DebugLevel, "", "", !config.Get().IsDevelop())
-
 	// pprof
 	go func() {
 		pprofAddr := config.Get().PProfAddress()
 		if len(pprofAddr) == 0 {
 			return
 		}
-		logger.Get().Info("pprof listen", zap.String("address", pprofAddr))
+		log1.Get().Info("pprof listen", zap.String("address", pprofAddr))
 
 		server := &http.Server{
 			Addr:        pprofAddr,
@@ -45,7 +43,7 @@ func main() {
 		}
 
 		if err2 := server.ListenAndServe(); err2 != nil {
-			logger.Get().Error("pprof listen error", zap.String("address", pprofAddr), zap.Error(err2))
+			log1.Get().Error("pprof listen error", zap.String("address", pprofAddr), zap.Error(err2))
 		}
 	}()
 

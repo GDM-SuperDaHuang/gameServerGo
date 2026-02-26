@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"gameServer/pkg/bytes"
-	"gameServer/pkg/logger"
+	"gameServer/pkg/logger/log1"
 	"gameServer/service/common"
 	"gameServer/service/protoHandlerInit"
 	"reflect"
@@ -87,7 +87,7 @@ func (f *Forward) register() error {
 		return errors.New("no protocol methods registered")
 	}
 
-	logger.Get().Info("[game.forward.register] success", zap.Int("num", len(f.protocoles)))
+	log1.Get().Info("[game.forward.register] success", zap.Int("num", len(f.protocoles)))
 	return nil
 }
 
@@ -239,7 +239,7 @@ func ParsedProtocolMethods(rcvrs []interface{}) (map[uint16]*ProtocolMethod, err
 
 	if len(repeated) > 0 {
 		for _, v := range repeated {
-			logger.Get().Error("repeated protocol", zap.String("protocol", v))
+			log1.Get().Error("repeated protocol", zap.String("protocol", v))
 		}
 		return nil, errors.New("protocol already exists")
 	}

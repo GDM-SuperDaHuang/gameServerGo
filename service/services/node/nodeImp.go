@@ -2,7 +2,7 @@ package node
 
 import (
 	"gameServer/pkg/config"
-	"gameServer/pkg/logger"
+	"gameServer/pkg/logger/log1"
 	"gameServer/service/rpc"
 	"os"
 	"os/signal"
@@ -34,7 +34,7 @@ func NewServer() (*NodeServer, error) {
 	//	return nil, err
 	//}
 
-	logger.Get().Info("[gate] create success", zap.Uint32("id", g.id), zap.String("node", g.name), zap.Uint32("version", g.version))
+	log1.Get().Info("[gate] create success", zap.Uint32("id", g.id), zap.String("node", g.name), zap.Uint32("version", g.version))
 	return g, nil
 }
 
@@ -83,7 +83,7 @@ func (n *NodeServer) Start(f *rpc.Forward) error {
 	if err != nil {
 		return err
 	}
-	logger.Get().Info("[account] started")
+	log1.Get().Info("[account] started")
 	n.listenSignal()
 	return nil
 }
@@ -91,11 +91,11 @@ func (n *NodeServer) Start(f *rpc.Forward) error {
 // Close 关闭服务
 func (a *NodeServer) Close() error {
 	if err := a.rpcServer.Stop(); err != nil {
-		logger.Get().Error("[account] close failed", zap.Error(err))
+		log1.Get().Error("[account] close failed", zap.Error(err))
 		return err
 	}
 
-	logger.Get().Info("[account] closed")
+	log1.Get().Info("[account] closed")
 	return nil
 }
 
@@ -106,14 +106,14 @@ func (e *NodeServer) listenSignal() {
 	sig := <-ch
 	signal.Stop(ch)
 
-	logger.Get().Sugar().Infof("received signal: %+v", sig)
+	log1.Get().Sugar().Infof("received signal: %+v", sig)
 
 	switch sig {
 	case syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP, syscall.SIGQUIT:
-		logger.Get().Info("close signal .. shufhown server ..")
+		log1.Get().Info("close signal .. shufhown server ..")
 		e.close()
 	default:
-		logger.Get().Sugar().Errorf("unsupport signal: %s", sig.String())
+		log1.Get().Sugar().Errorf("unsupport signal: %s", sig.String())
 	}
 }
 
@@ -130,9 +130,9 @@ func (g *NodeServer) close() {
 	//	logger.Get().Info("all services closed")
 	//})
 	if err := g.Close(); err != nil {
-		logger.Get().Sugar().Errorf("service: %s(%d) close failed: %s", g.Name(), g.ID(), err.Error())
+		log1.Get().Sugar().Errorf("service: %s(%d) close failed: %s", g.Name(), g.ID(), err.Error())
 	} else {
-		logger.Get().Sugar().Infof("service: %s(%d) closed successfully", g.Name(), g.ID())
+		log1.Get().Sugar().Infof("service: %s(%d) closed successfully", g.Name(), g.ID())
 	}
-	logger.Get().Info("all services closed")
+	log1.Get().Info("all services closed")
 }

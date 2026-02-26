@@ -2,7 +2,7 @@ package server
 
 import (
 	"fmt"
-	"gameServer/pkg/logger"
+	"gameServer/pkg/logger/log1"
 	utils2 "gameServer/pkg/utils"
 	"gameServer/service/rpc"
 	"reflect"
@@ -76,7 +76,7 @@ func (s *Server) Start() error {
 
 	// 向etcd注册
 	address := fmt.Sprintf("%s@%s", addr.Network(), addr.String())
-	logger.Get().Info("etcd Register==", zap.String("address=", address), zap.Strings("etcd =", config.EtcdEndpoints))
+	log1.Get().Info("etcd Register==", zap.String("address=", address), zap.Strings("etcd =", config.EtcdEndpoints))
 
 	r := &serverplugin.EtcdV3RegisterPlugin{
 		BasePath:       s.publicServicePath(), //根目录， eg：node/Forward,xxx/Forward
