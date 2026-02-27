@@ -47,7 +47,7 @@ func Push(player *common.Player, protoId uint16, message proto.Message) {
 	//	return
 	//}
 	if err := ToGate(player, protoId, message, RpcNodeClient); err != nil {
-		log1.Get().Error("push to gate failed", zap.Uint64("roleID", player.RoleID), zap.Int32("protocol", int32(protoId)), zap.Error(err))
+		log1.Get().Error("push to gate failed", zap.Uint64("roleID", player.UserId), zap.Int32("protocol", int32(protoId)), zap.Error(err))
 	}
 }
 

@@ -1,0 +1,14 @@
+services:
+  ssdb1:
+    image: tsl0922/ssdb:latest
+    container_name: ldl.ssdb1
+    command: ssdb-server /data/ssdb.conf
+    volumes:
+      - ./storage/ssdb:/data
+    ports:
+      - "8888:8888"
+    networks:
+      - ldl_network
+networks:
+  ldl_network:
+    driver: bridge

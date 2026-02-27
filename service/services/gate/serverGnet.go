@@ -216,8 +216,8 @@ func (ts *gNetServer) delete(address string) {
 		return
 	}
 	session := sessionI.(*common.Session)
-	if session.Player != nil && session.Player.RoleID > 0 {
-		ts.roles.Delete(session.Player.RoleID)
+	if session.Player != nil && session.Player.UserId > 0 {
+		ts.roles.Delete(session.Player.UserId)
 	}
 	ts.sessions.Delete(address)
 }

@@ -5,19 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0210bdac-a28d-412f-b3da-7837bed304cd" name="Changes" comment="1">
+      <change afterPath="$PROJECT_DIR$/pkg/cache/ssdb/test/cache_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/gate/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/gate/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/node/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/node/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/bytes/pool.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/bytes/pool.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/logger/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/logger/log1/logger.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/node00.toml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/test.toml" beforeDir="false" afterPath="$PROJECT_DIR$/config/test.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/common/session.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/common/session.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/protoHandlerInit/method.go" beforeDir="false" afterPath="$PROJECT_DIR$/protobuf/protoHandlerInit/method.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/rpc/dispatch.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/rpc/dispatch.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/rpc/forward.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/rpc/forward.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/rpc/server/serverImp.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/rpc/server/serverImp.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/services/gate/forward.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/gate/forward.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/services/gate/gateImp.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/gate/gateImp.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/services/gate/handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/gate/handler.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/services/gate/serverGnet.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/gate/serverGnet.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/services/node/nodeImp.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/node/nodeImp.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/services/node/rpc.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/node/rpc.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -60,62 +62,64 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;DefaultGoTemplateProperty&quot;: &quot;Go File&quot;,
-    &quot;Docker.docker-compose-internal.yml.etcd1: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.docker-compose-internal.yml.etcd3: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.docker-compose-internal.yml.node-gate-1: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.docker-compose-internal.yml.node-gate-2: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.docker-compose-internal.yml.node-room-1: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.docker-compose-internal.yml: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.docker-compose-monitor.yml.docker-monitor: Compose 部署.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.docker-compose.yml.etcd1: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.docker-compose.yml.etcd1: Compose 部署.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.docker-compose.yml: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.node/Dockerfile.executor&quot;: &quot;Run&quot;,
-    &quot;Go Build.go build gameServer.executor&quot;: &quot;Debug&quot;,
-    &quot;Go Build.go build gameServer/service/app/gate.executor&quot;: &quot;Debug&quot;,
-    &quot;Go Build.go build gameServer/service/app/monitor.executor&quot;: &quot;Run&quot;,
-    &quot;Go Build.go build gameServer/service/app/node.executor&quot;: &quot;Debug&quot;,
-    &quot;Go 构建.go build gameServer/app/gate.executor&quot;: &quot;Debug&quot;,
-    &quot;Go 构建.go build gameServer/app/node.executor&quot;: &quot;Debug&quot;,
-    &quot;Go 构建.go build gameServer/service/app/gate.executor&quot;: &quot;Debug&quot;,
-    &quot;RunOnceActivity.GoLinterPluginOnboarding&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.GoLinterPluginStorageMigration&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
-    &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/gdm&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;onboarding.tips.debug.path&quot;: &quot;E:/gowork/gameServer/main.go&quot;,
-    &quot;run.configurations.included.in.services&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;go.sdk&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultGoTemplateProperty": "Go File",
+    "Docker.docker-compose-internal.yml.etcd1: Compose Deployment.executor": "Run",
+    "Docker.docker-compose-internal.yml.etcd3: Compose Deployment.executor": "Run",
+    "Docker.docker-compose-internal.yml.node-gate-1: Compose Deployment.executor": "Run",
+    "Docker.docker-compose-internal.yml.node-gate-2: Compose Deployment.executor": "Run",
+    "Docker.docker-compose-internal.yml.node-room-1: Compose Deployment.executor": "Run",
+    "Docker.docker-compose-internal.yml: Compose Deployment.executor": "Run",
+    "Docker.docker-compose-monitor.yml.docker-monitor: Compose 部署.executor": "Run",
+    "Docker.docker-compose-ssdb.yml.ssdb1: Compose 部署.executor": "Run",
+    "Docker.docker-compose.yml.etcd1: Compose Deployment.executor": "Run",
+    "Docker.docker-compose.yml.etcd1: Compose 部署.executor": "Run",
+    "Docker.docker-compose.yml: Compose Deployment.executor": "Run",
+    "Docker.node/Dockerfile.executor": "Run",
+    "Go Build.go build gameServer.executor": "Debug",
+    "Go Build.go build gameServer/service/app/gate.executor": "Debug",
+    "Go Build.go build gameServer/service/app/monitor.executor": "Run",
+    "Go Build.go build gameServer/service/app/node.executor": "Debug",
+    "Go 构建.go build gameServer/app/gate.executor": "Debug",
+    "Go 构建.go build gameServer/app/node.executor": "Debug",
+    "Go 构建.go build gameServer/service/app/gate.executor": "Debug",
+    "Go 测试.gameServer/pkg/cache/ssdb/test 中的 TestRun.executor": "Debug",
+    "RunOnceActivity.GoLinterPluginOnboarding": "true",
+    "RunOnceActivity.GoLinterPluginStorageMigration": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.go.migrated.go.modules.settings": "true",
+    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
+    "git-widget-placeholder": "main",
+    "go.import.settings.migrated": "true",
+    "go.sdk.automatically.set": "true",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "D:/work/work2/gameServerGo",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "onboarding.tips.debug.path": "E:/gowork/gameServer/main.go",
+    "run.configurations.included.in.services": "true",
+    "settings.editor.selected.configurable": "go.sdk"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\work\work2\gameServerGo" />
       <recent name="E:\gowork\gameServer\config" />
       <recent name="E:\gowork\gameServer\service\app\node" />
       <recent name="E:\gowork\gameServer\service\app\gate" />
       <recent name="E:\gowork\gameServer" />
-      <recent name="E:\gowork\gameServer\protobuf\proto" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\work\work2\gameServerGo\pkg\cache\cacheX" />
+      <recent name="D:\work\work2\gameServerGo\protobuf" />
       <recent name="D:\work\work2\gameServerGo\pkg\logger\log2" />
       <recent name="D:\work\work2\gameServerGo\pkg\logger\log1" />
       <recent name="D:\work\work2\gameServerGo\pkg" />
-      <recent name="D:\work\work2\gameServerGo" />
-      <recent name="D:\work\work2\gameServerGo\pkg\bytes" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -130,7 +134,7 @@
           <value>
             <map>
               <entry key="go build gameServer/app/gate" value="STOPPED" />
-              <entry key="go build gameServer/app/node" value="STOPPED" />
+              <entry key="go build gameServer/app/node" value="FAILED" />
               <entry key="go build gameServer/service/app/gate" value="STOPPED" />
             </map>
           </value>
@@ -138,7 +142,7 @@
       </map>
     </option>
   </component>
-  <component name="RunManager" selected="Go 构建.go build gameServer/app/gate">
+  <component name="RunManager" selected="Go 测试.gameServer/pkg/cache/ssdb/test 中的 TestRun">
     <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
       <deployment type="docker-compose.yml">
         <settings />
@@ -205,6 +209,18 @@
       <framework value="gotest" />
       <method v="2" />
     </configuration>
+    <configuration name="gameServer/pkg/cache/ssdb/test 中的 TestRun" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="gameServer" />
+      <working_directory value="$PROJECT_DIR$/pkg/cache/ssdb/test" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="gameServer/pkg/cache/ssdb/test" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestRun\E$" />
+      <method v="2" />
+    </configuration>
     <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
       <deployment type="docker-compose.yml">
         <settings />
@@ -230,54 +246,41 @@
       </deployment>
       <method v="2" />
     </configuration>
-    <configuration name="docker-compose-internal.yml.node-room-1: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+    <configuration name="docker-compose-ssdb.yml.ssdb1: Compose 部署" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
       <deployment type="docker-compose.yml">
         <settings>
           <option name="services">
             <list>
-              <option value="node-room-1" />
+              <option value="ssdb1" />
             </list>
           </option>
-          <option name="sourceFilePath" value="docker-compose-internal.yml" />
-        </settings>
-      </deployment>
-      <method v="2" />
-    </configuration>
-    <configuration name="docker-compose-monitor.yml.docker-monitor: Compose 部署" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
-      <deployment type="docker-compose.yml">
-        <settings>
-          <option name="services">
-            <list>
-              <option value="docker-monitor" />
-            </list>
-          </option>
-          <option name="sourceFilePath" value="docker-compose-monitor.yml" />
+          <option name="sourceFilePath" value="docker-compose-ssdb.yml" />
         </settings>
       </deployment>
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Docker.docker-compose-monitor.yml.docker-monitor: Compose 部署" />
-      <item itemvalue="Docker.docker-compose-internal.yml.node-room-1: Compose Deployment" />
+      <item itemvalue="Docker.docker-compose-ssdb.yml.ssdb1: Compose 部署" />
       <item itemvalue="Go 构建.go build gameServer/app/gate" />
       <item itemvalue="Go 构建.go build gameServer/app/node" />
       <item itemvalue="Go 构建.go build gameServer/service/app/gate" />
+      <item itemvalue="Go 测试.gameServer/pkg/cache/ssdb/test 中的 TestRun" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Go 构建.go build gameServer/app/gate" />
+        <item itemvalue="Go 测试.gameServer/pkg/cache/ssdb/test 中的 TestRun" />
         <item itemvalue="Go 构建.go build gameServer/app/node" />
+        <item itemvalue="Docker.docker-compose-ssdb.yml.ssdb1: Compose 部署" />
+        <item itemvalue="Go 构建.go build gameServer/app/gate" />
         <item itemvalue="Go 构建.go build gameServer/service/app/gate" />
-        <item itemvalue="Docker.docker-compose-monitor.yml.docker-monitor: Compose 部署" />
-        <item itemvalue="Docker.docker-compose-internal.yml.node-room-1: Compose Deployment" />
       </list>
     </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-gosdk-d297c17c1fbd-d82d926f19eb-org.jetbrains.plugins.go.sharedIndexes.bundled-GO-243.22562.186" />
-        <option value="bundled-js-predefined-d6986cc7102b-deb605915726-JavaScript-GO-243.22562.186" />
+        <option value="bundled-gosdk-f466f9b0953e-146d08934cbf-org.jetbrains.plugins.go.sharedIndexes.bundled-GO-252.26830.102" />
+        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-GO-252.26830.102" />
       </set>
     </attachedChunks>
   </component>
@@ -345,17 +348,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/service/services/gate/forward.go</url>
-          <line>182</line>
+          <line>187</line>
           <option name="timeStamp" value="247" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/service/services/gate/forward.go</url>
-          <line>198</line>
+          <line>203</line>
           <option name="timeStamp" value="251" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/service/services/gate/forward.go</url>
-          <line>176</line>
+          <line>181</line>
           <option name="timeStamp" value="252" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
@@ -377,6 +380,26 @@
           <url>file://$PROJECT_DIR$/service/common/message.go</url>
           <line>76</line>
           <option name="timeStamp" value="258" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/pkg/cache/ssdb/test/cache_test.go</url>
+          <line>38</line>
+          <option name="timeStamp" value="265" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/pkg/cache/ssdb/test/cache_test.go</url>
+          <line>30</line>
+          <option name="timeStamp" value="266" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/pkg/cache/cacheX/KV.go</url>
+          <line>45</line>
+          <option name="timeStamp" value="267" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/pkg/cache/cacheX/hash.go</url>
+          <line>47</line>
+          <option name="timeStamp" value="270" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

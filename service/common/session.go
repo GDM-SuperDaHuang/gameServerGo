@@ -25,7 +25,7 @@ type Player struct {
 	accountID    uint64
 	realServerID uint32 // 角色当前所在的区服 id
 	serverID     uint32 // 角色归属区服 id
-	RoleID       uint64 // 角色 id
+	UserId       uint64 // 角色 id
 }
 
 var sessionPool = bytes.NewPool(func() *Session {
@@ -278,7 +278,7 @@ func (s *Session) roleID() uint64 {
 	if s.Player == nil {
 		return 0
 	}
-	return s.Player.RoleID
+	return s.Player.UserId
 }
 
 var playerPool = bytes.NewPool(func() *Player {
@@ -290,7 +290,7 @@ func (p *Player) Reset() {
 	p.accountID = 0
 	p.realServerID = 0
 	p.serverID = 0
-	p.RoleID = 0
+	p.UserId = 0
 }
 
 func (p *Player) set(accountID uint64, realServerID uint32) {

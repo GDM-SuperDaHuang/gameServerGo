@@ -6,8 +6,10 @@ require (
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/panjf2000/ants/v2 v2.11.5
 	github.com/panjf2000/gnet/v2 v2.9.7
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/redis/go-redis/v9 v9.18.0
 	github.com/rpcxio/rpcx-etcd v0.5.0
+	github.com/seefan/gossdb/v2 v2.0.1
 	github.com/smallnest/rpcx v1.9.1
 	github.com/spf13/viper v1.21.0
 	go.uber.org/zap v1.27.1
@@ -65,6 +67,7 @@ require (
 	github.com/rs/cors v1.11.1 // indirect
 	github.com/rubyist/circuitbreaker v2.2.1+incompatible // indirect
 	github.com/sagikazarmark/locafero v0.12.0 // indirect
+	github.com/seefan/goerr v1.1.2 // indirect
 	github.com/smallnest/quick v0.2.0 // indirect
 	github.com/smallnest/rsocket v0.0.0-20241130031020-4a72eb6ff62a // indirect
 	github.com/soheilhy/cmux v0.1.5 // indirect

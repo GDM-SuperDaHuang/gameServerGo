@@ -3,6 +3,7 @@ package gate
 import (
 	"context"
 	"fmt"
+	"gameServer/pkg/cache/ssdb"
 	"gameServer/pkg/logger/log1"
 	"gameServer/pkg/utils"
 	"strconv"
@@ -122,9 +123,13 @@ func ForwardTarget(session *common.Session, message *common.Message, rpcClient r
 	id := utils.GetServerId(groupId, session.Player.ServerIds) //本网关可能没有
 	flagRoom := false
 	if id == 0 {
-		if protocolId >= 1000 && protocolId < 2000 { //room类型，可能正在进行游戏
+		if protocolId >= 1000 && protocolId < 2000 { //room类型协议，可能正在进行游戏
 			flagRoom = true
-			id = 1000 //todo 如果缓存没有，从 redis/mysql 获取房间服务器信息
+			roleID := strconv.FormatUint(session.Player.UserId, 10)
+			value, err := ssdb.GetClient().Get("RoleID:" + roleID)
+			if err == nil && value.String() != "" {
+				id = value.Int()
+			}
 		}
 	}
 
@@ -180,10 +185,10 @@ func ForwardTarget(session *common.Session, message *common.Message, rpcClient r
 // Receive 网关接收其它服务的单个消息推送,必须实现，不然无法注册，rpcx协程
 func (g *Gate) Receive(_ context.Context, req *common.RpcMessage, resp *common.Resp) error {
 	//找到对应的 session，写入消息
-	session := g.tcpServer.findSession(req.Player.RoleID)
+	session := g.tcpServer.findSession(req.Player.UserId)
 	if session == nil {
-		log1.Get().Warn("[Receive] session not found", zap.Uint64("roleID", req.Player.RoleID))
-		return fmt.Errorf("session not found, roleID: %d", req.Player.RoleID)
+		log1.Get().Warn("[Receive] session not found", zap.Uint64("roleID", req.Player.UserId))
+		return fmt.Errorf("session not found, roleID: %d", req.Player.UserId)
 	}
 	// todo 需要修改room 信息?
 	if req.Data.Head.Protocol == 1010 { //离开room

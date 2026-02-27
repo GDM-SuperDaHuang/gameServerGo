@@ -30,9 +30,9 @@ func (g *Gate) loginHandler(session *common.Session, message *common.Message) *c
 	//t := time.Now()
 	//session.pingTime = t
 	session.Player = &common.Player{
-		RoleID: 1,
+		UserId: 1,
 	}
-	g.tcpServer.roles.Store(session.Player.RoleID, session)
+	g.tcpServer.roles.Store(session.Player.UserId, session)
 	// 保存网关节点
 	if !slices.Contains(session.Player.ServerIds, config.Get().NodeID()) {
 		session.Player.ServerIds = append(session.Player.ServerIds, config.Get().NodeID())

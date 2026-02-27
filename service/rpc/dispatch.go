@@ -22,7 +22,7 @@ func (f *Forward) Dispatch(ctx context.Context, req *common.RpcMessage, resp *co
 		return errors.New("resp is nil")
 	}
 
-	if req.Player == nil || req.Player.RoleID == 0 {
+	if req.Player == nil || req.Player.UserId == 0 {
 		resp = &common.Resp{}
 		resp.Code = proto.ErrorCode_RespNull
 		return errors.New("player is nil")

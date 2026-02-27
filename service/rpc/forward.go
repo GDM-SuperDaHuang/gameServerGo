@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"gameServer/pkg/bytes"
 	"gameServer/pkg/logger/log1"
+	"gameServer/protobuf/protoHandlerInit"
 	"gameServer/service/common"
-	"gameServer/service/protoHandlerInit"
 	"reflect"
 	"strings"
 

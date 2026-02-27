@@ -2,6 +2,7 @@ package main
 
 import (
 	"gameServer/app/node/hander"
+	"gameServer/pkg/cache/ssdb"
 	"gameServer/pkg/config"
 	"gameServer/pkg/logger/log1"
 	"gameServer/service/rpc"
@@ -9,6 +10,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/seefan/gossdb/v2/conf"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -52,6 +54,22 @@ func main() {
 		panic(err)
 	}
 
+	// 获取数据源
+	cfg := &conf.Config{
+		Host:        "127.0.0.1",
+		Port:        8888,
+		MinPoolSize: 20,
+		MaxPoolSize: 100,
+		Encoding:    true, // 支持非基本数据类型
+		Password:    "123",
+		// 更多配置可参考pkg文档
+	}
+	err = ssdb.Init(cfg)
+	if err != nil {
+		panic(err)
+	}
+	defer ssdb.Close()
+
 	// 注册处理器
 	f := rpc.NewForward()
 	if err = f.AddModules([]interface {
@@ -65,4 +83,5 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
 }
