@@ -5,22 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0210bdac-a28d-412f-b3da-7837bed304cd" name="Changes" comment="1">
-      <change afterPath="$PROJECT_DIR$/pkg/cache/ssdb/test/cache_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/node/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/node/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/node00.toml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/test.toml" beforeDir="false" afterPath="$PROJECT_DIR$/config/test.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/common/session.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/common/session.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/protoHandlerInit/method.go" beforeDir="false" afterPath="$PROJECT_DIR$/protobuf/protoHandlerInit/method.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/rpc/dispatch.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/rpc/dispatch.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/rpc/forward.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/rpc/forward.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/services/gate/forward.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/gate/forward.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/services/gate/handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/gate/handler.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/services/gate/serverGnet.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/gate/serverGnet.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/services/node/rpc.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/node/rpc.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/gate/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/app/gate/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/gate/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/gate/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/test.toml" beforeDir="false" afterPath="$PROJECT_DIR$/config/gate.toml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -135,14 +123,13 @@
             <map>
               <entry key="go build gameServer/app/gate" value="STOPPED" />
               <entry key="go build gameServer/app/node" value="FAILED" />
-              <entry key="go build gameServer/service/app/gate" value="STOPPED" />
             </map>
           </value>
         </entry>
       </map>
     </option>
   </component>
-  <component name="RunManager" selected="Go 测试.gameServer/pkg/cache/ssdb/test 中的 TestRun">
+  <component name="RunManager" selected="Go 构建.go build gameServer/app/gate">
     <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
       <deployment type="docker-compose.yml">
         <settings />
@@ -167,6 +154,7 @@
     <configuration name="go build gameServer/app/gate" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="gameServer" />
       <working_directory value="$PROJECT_DIR$" />
+      <parameters value="--configPath=./config --logPath=./logs" />
       <kind value="PACKAGE" />
       <package value="gameServer/app/gate" />
       <directory value="$PROJECT_DIR$" />
@@ -180,15 +168,6 @@
       <package value="gameServer/app/node" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$/app/node/main.go" />
-      <method v="2" />
-    </configuration>
-    <configuration name="go build gameServer/service/app/gate" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
-      <module name="gameServer" />
-      <working_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="gameServer/service/app/gate" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/service/app/gate/main.go" />
       <method v="2" />
     </configuration>
     <configuration name="go build gameServer/service/app/gate" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
@@ -260,19 +239,18 @@
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="Docker.docker-compose-internal.yml.node-room-1: Compose Deployment" />
       <item itemvalue="Docker.docker-compose-ssdb.yml.ssdb1: Compose 部署" />
       <item itemvalue="Go 构建.go build gameServer/app/gate" />
       <item itemvalue="Go 构建.go build gameServer/app/node" />
-      <item itemvalue="Go 构建.go build gameServer/service/app/gate" />
       <item itemvalue="Go 测试.gameServer/pkg/cache/ssdb/test 中的 TestRun" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Go 构建.go build gameServer/app/gate" />
         <item itemvalue="Go 测试.gameServer/pkg/cache/ssdb/test 中的 TestRun" />
         <item itemvalue="Go 构建.go build gameServer/app/node" />
         <item itemvalue="Docker.docker-compose-ssdb.yml.ssdb1: Compose 部署" />
-        <item itemvalue="Go 构建.go build gameServer/app/gate" />
-        <item itemvalue="Go 构建.go build gameServer/service/app/gate" />
       </list>
     </recent_temporary>
   </component>
@@ -400,6 +378,16 @@
           <url>file://$PROJECT_DIR$/pkg/cache/cacheX/hash.go</url>
           <line>47</line>
           <option name="timeStamp" value="270" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/app/gate/main.go</url>
+          <line>38</line>
+          <option name="timeStamp" value="272" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/app/gate/main.go</url>
+          <line>29</line>
+          <option name="timeStamp" value="273" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
