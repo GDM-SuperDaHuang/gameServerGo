@@ -37,13 +37,14 @@ func NewClient(config *ClientConfig) (*Client, error) {
 
 	// 创建客户端选项
 	option := xclient.DefaultOption
-	option.Heartbeat = true
-	option.HeartbeatInterval = config.HeartbeatInterval
+	//option.Heartbeat = true
+	//option.HeartbeatInterval = config.HeartbeatInterval
 	option.ConnectTimeout = time.Second * 3
 	option.SerializeType = protocol.MsgPack
 	option.CompressType = protocol.None
 	option.BackupLatency = time.Second // 设置故障转移延迟
-	option.Retries = 3                 // 设置重试次数
+	option.Retries = 1                 // 设置重试次数
+	//option.Sticky = true
 
 	// 创建客户端
 	var (
@@ -109,6 +110,10 @@ func (c *Client) Close() error {
 // Name rpc 服务提供者名称
 func (c *Client) Name() string {
 	return c.config.ServiceName
+}
+
+func (c *Client) GetSelector() xclient.Selector {
+	return c.config.Selector
 }
 
 //// WrapClient 指定额外参数调用

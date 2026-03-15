@@ -1,0 +1,14 @@
+{"level":"info","ts":"2026-03-06T18:16:26.936+0800","caller":"gate/gateImp.go:47","msg":"[gate] create success","Id":1,"node":"gate-1","version":0}
+{"level":"info","ts":"2026-03-06T18:16:26.936+0800","caller":"gate/main.go:59","msg":"pprof listen","Address":":7051"}
+{"level":"debug","ts":"2026-03-06T18:16:26.937+0800","caller":"logging/logger.go:249","msg":"default logging level is INFO"}
+{"level":"info","ts":"2026-03-06T18:16:26.938+0800","caller":"logging/logger.go:256","msg":"Launching gnet with 12 event-loops, listening on: tcp://:7001"}
+{"level":"info","ts":"2026-03-06T18:16:26.938+0800","caller":"gate/serverGnet.go:48","msg":"[gate] tcp start","Address":":7001","multicore":false}
+{"level":"info","ts":"2026-03-06T18:16:31.957+0800","caller":"server/serverImp.go:79","msg":"etcd Register==","Address=":"tcp@172.28.112.1:49236","etcd =":[":12379",":22329",":32329"]}
+{"level":"info","ts":"2026-03-06T18:16:31.977+0800","caller":"gate/gateImp.go:227","msg":"[initRPC] server start","info":"gate-1(Id: 1)[version: 0][listen: tcp@172.28.112.1:49236]"}
+{"level":"info","ts":"2026-03-06T18:16:31.977+0800","caller":"gate/gateImp.go:80","msg":"[gate] service started"}
+{"level":"info","ts":"2026-03-06T18:16:37.456+0800","caller":"gate/gateImp.go:104","msg":"received signal: interrupt"}
+{"level":"info","ts":"2026-03-06T18:16:37.456+0800","caller":"gate/gateImp.go:108","msg":"close signal .. shufhown server .."}
+{"level":"info","ts":"2026-03-06T18:16:37.458+0800","caller":"gate/gateImp.go:92","msg":"[gate] service closed"}
+{"level":"info","ts":"2026-03-06T18:16:37.458+0800","caller":"gate/gateImp.go:130","msg":"service: gate-1(1) closed successfully"}
+{"level":"info","ts":"2026-03-06T18:16:37.458+0800","caller":"gate/gateImp.go:132","msg":"all services closed"}
+{"level":"info","ts":"2026-03-06T18:16:37.458+0800","caller":"gate/main.go:89","msg":"server stop ！"}

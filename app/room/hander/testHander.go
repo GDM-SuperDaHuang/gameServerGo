@@ -1,0 +1,24 @@
+package hander
+
+import (
+	"context"
+	"fmt"
+	"gameServer/protobuf/pbGo"
+	"gameServer/service/common"
+	"gameServer/service/services/node"
+)
+
+type HanderTest struct { //必须大写,必须使用指针
+}
+
+func (h *HanderTest) TestHandler(_ context.Context, player *common.Player, req *pbGo.TestRpcRep, resp *pbGo.TestRpcResp) *common.ErrorInfo {
+	fmt.Println("%d===%s", req.Id, req.Name)
+	resp.Id = 130
+	resp.Name = "回包测试"
+	if 4 == 5 {
+		return common.Error(4)
+	}
+	// 主动推送
+	node.Push(player, 1000, resp)
+	return nil
+}

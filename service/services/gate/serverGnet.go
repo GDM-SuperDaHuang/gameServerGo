@@ -2,13 +2,14 @@ package gate
 
 import (
 	"fmt"
-	"gameServer/pkg/logger/log1"
+	"gameServer/pkg/logger/log2"
 	"gameServer/service/common"
 	datapack2 "gameServer/service/services/gate/datapack"
 	"sync"
 	"sync/atomic"
 	"time"
 
+	"github.com/lxzan/gws"
 	"github.com/panjf2000/ants/v2"
 	"github.com/panjf2000/gnet/v2"
 	"go.uber.org/zap"
@@ -19,6 +20,7 @@ import (
 // gnet 实现
 type gNetServer struct {
 	*gnet.BuiltinEventEngine // 默认接口实现
+	upgrader                 *gws.Upgrader
 	gate                     *Gate
 	//engine                   Engine
 	address   string
@@ -44,15 +46,15 @@ type gNetServer struct {
 // The parameter engine has information and various utilities.
 func (ts *gNetServer) OnBoot(_ gnet.Engine) (action gnet.Action) {
 	// 启动 QPS 监控协程
-	go ts.monitorQPS()
-	log1.Get().Info("[gate] tcp start", zap.String("address", ts.address), zap.Bool("multicore", ts.multicore))
+	//go ts.monitorQPS()
+	log2.Get().Info("[gate] tcp start", zap.String("address", ts.address), zap.Bool("multicore", ts.multicore))
 	return
 }
 
 // OnShutdown fires when the engine is being shut down, it is called right after
 // all event-loops and connections are closed.
 func (ts *gNetServer) OnShutdown(_ gnet.Engine) {
-	log1.Get().Info("[gate] tcp close", zap.String("address", ts.address))
+	log2.Get().Info("[gate] tcp close", zap.String("address", ts.address))
 	ts.pool.Release()
 }
 
@@ -69,7 +71,7 @@ func (ts *gNetServer) OnOpen(c gnet.Conn) (out []byte, action gnet.Action) {
 	ts.sessions.Store(remoteAddress, s)
 
 	n := ts.sessionCount.Add(1)
-	log1.Get().Debug("[gate.OnOpen] connected",
+	log2.Get().Debug("[gate.OnOpen] connected",
 		zap.Int32("total", n),
 		zap.String("address", remoteAddress))
 
@@ -83,9 +85,7 @@ func (ts *gNetServer) OnOpen(c gnet.Conn) (out []byte, action gnet.Action) {
 // 无论怎么样退出都清除玩家的 session 数据
 func (gn *gNetServer) OnClose(c gnet.Conn, err error) (action gnet.Action) {
 	n := gn.sessionCount.Add(-1)
-	log1.Get().Debug("[gate.OnOpen] disconnect",
-		zap.Int32("remain", n),
-		zap.String("address", c.RemoteAddr().String()))
+	log2.Get().Debug("[gate.OnOpen] disconnect", zap.Int32("remain", n), zap.String("address", c.RemoteAddr().String()))
 
 	if err != nil {
 		switch err.Error() {
@@ -93,20 +93,20 @@ func (gn *gNetServer) OnClose(c gnet.Conn, err error) (action gnet.Action) {
 			"connection reset by peer", "read: EOF":
 			// Ignore common connection errors
 		default:
-			log1.Get().Error("Connection error", zap.Error(err))
+			log2.Get().Warn("Connection error", zap.Error(err))
 		}
 	}
 
 	// 尽量推送未完成的信息
 	if err = c.Flush(); err != nil {
-		log1.Get().Error("Failed to flush connection", zap.Error(err))
+		log2.Get().Error("Failed to flush connection", zap.Error(err))
 	}
 
 	if s := gn.session(c); s != nil {
 		gn.delete(s.RemoteAddrString())
 		s.Close()
 	} else {
-		log1.Get().Warn("[gate.tcpServer.OnClose] session not found",
+		log2.Get().Warn("[gate.tcpServer.OnClose] session not found",
 			zap.String("address", c.RemoteAddr().String()))
 	}
 
@@ -115,6 +115,7 @@ func (gn *gNetServer) OnClose(c gnet.Conn, err error) (action gnet.Action) {
 
 // 有数据可读时触发（核心处理逻辑）
 func (ts *gNetServer) OnTraffic(c gnet.Conn) (action gnet.Action) {
+
 	// 收到消息二进制打印
 	//rawBuf := make([]byte, 1024) // 或者适当大小
 	//n, _ := c.Read(rawBuf)
@@ -226,7 +227,7 @@ func (ts *gNetServer) initPool(poolSize int) error {
 	pool, err := ants.NewPool(
 		poolSize,
 		ants.WithPanicHandler(func(i any) {
-			log1.Get().Error("[web.ants] panic", zap.Any("err", i))
+			log2.Get().Error("[web.ants] panic", zap.Any("err", i))
 		}),
 	)
 	if err != nil {
@@ -252,10 +253,12 @@ func (ts *gNetServer) handleMessage(session *common.Session, req *common.Message
 	resp := ts.gate.forward(session, req)
 	// request->response 模式
 	_ = ts.write(session, resp, req)
+
 }
 
 // write 写入数据，发送到客户端
 func (ts *gNetServer) write(session *common.Session, resp *common.Resp, req *common.Message) error {
+
 	respMessage := common.NewMessageResp(resp, req)
 	defer common.FreeMessage(respMessage)
 
@@ -291,7 +294,6 @@ func (ts *gNetServer) write(session *common.Session, resp *common.Resp, req *com
 			return err
 		}
 	}
-
 	return nil
 }
 
@@ -299,7 +301,7 @@ func (ts *gNetServer) InitPool(poolSize int) error {
 	pool, err := ants.NewPool(
 		poolSize,
 		ants.WithPanicHandler(func(i any) {
-			log1.Get().Error("[web.ants] panic", zap.Any("err", i))
+			log2.Get().Error("[web.ants] panic", zap.Any("err", i))
 		}),
 	)
 	if err != nil {

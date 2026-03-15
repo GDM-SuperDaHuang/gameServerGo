@@ -1,0 +1,15 @@
+services:
+  redis:
+    image: redis:7.4.2
+    container_name: ldl.redis
+    command: redis-server --requirepass 123456 --appendonly yes
+    ports:
+      - "16379:6379"
+    restart: always
+    volumes:
+      - ./storage/redis:/data
+    networks:
+      - ldl_network
+networks:
+  ldl_network:
+    external: true

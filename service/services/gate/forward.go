@@ -3,14 +3,16 @@ package gate
 import (
 	"context"
 	"fmt"
+	"gameServer/common/errorCode"
 	"gameServer/pkg/cache/ssdb"
-	"gameServer/pkg/logger/log1"
+	"gameServer/pkg/logger/log2"
 	"gameServer/pkg/utils"
-	"strconv"
-
 	"gameServer/service/common"
 	"gameServer/service/common/proto"
 	"gameServer/service/rpc"
+	"gameServer/service/rpc/client/selector"
+	"strconv"
+	"time"
 
 	"github.com/smallnest/rpcx/share"
 	"go.uber.org/zap"
@@ -23,15 +25,14 @@ func (g *Gate) forward(session *common.Session, message *common.Message) *common
 	// protocol 范围: 0 ~ 65535
 
 	// 并发控制
-	// 1. 生产模式下，只允许心跳验证并发处理
-	// 2. 开发模式下，全部都只能串行处理，方便调试
-	//if protocol != int32(pb_protocol.MessageID_Heart) || config.Get().IsDevelop() {
-	//	session.readChan <- struct{}{}
-	//	defer func() {
-	//		<-session.readChan
-	//	}()
-	//}
-
+	//1. 生产模式下，只允许心跳验证并发处理
+	//2. 开发模式下，全部都只能串行处理，方便调试
+	if protocol != 1 {
+		session.ReadChan <- struct{}{}
+		defer func() {
+			<-session.ReadChan
+		}()
+	}
 	// 本地处理: < 1000
 	if protocol < 1000 {
 		return g.forwardLocal(session, message)
@@ -39,47 +40,11 @@ func (g *Gate) forward(session *common.Session, message *common.Message) *common
 
 	//转发到其它服务，需要 登录 准备好
 	if session.Player == nil {
-		return proto.Errorf1(proto.ErrorCode_PushFailed)
+		return proto.Errorf1(errorCode.ErrorCode_PushFailed)
 	}
 
 	// 远程rpc: 101 ~ 199
 	return g.rpcForward(session, message)
-
-	//if protocol < 199 {
-	//	return g.rpcForward(session, message)
-	//}
-	//
-	//// battle: 400 ~ 479
-	//if protocol < 479 {
-	//	return g.forwardBattle(session, message)
-	//}
-	//
-	//// battlerecord: 480 ~ 499
-	//if protocol < 499 {
-	//	return g.forwardBattleRecord(session, message)
-	//}
-	//
-	//// lang: 500 ~ 549
-	//if protocol < 549 {
-	//	return g.forwardLang(session, message)
-	//}
-	//
-	//// unions: 600 - 799
-	//if protocol >= 600 && protocol <= 799 {
-	//	return g.forwardUnion(session, message)
-	//}
-	//
-	//// game: 1001 - 39999
-	//if protocol < 39999 {
-	//	return g.forwardGame(session, message)
-	//}
-	//
-	//// sdk: 40000 ~ 41999
-	//if protocol < 41999 {
-	//	return g.forwardSDK(session, message)
-	//}
-
-	//return proto.Errorf(pb_protocol.ErrorCode_ProtocolNotFound, "协议号: %d", protocol)
 }
 
 func (g *Gate) forwardLocal(session *common.Session, message *common.Message) *common.Resp {
@@ -94,7 +59,7 @@ func (g *Gate) forwardLocal(session *common.Session, message *common.Message) *c
 		fmt.Println("=======4=============")
 		return g.loginHandler(session, message)
 	}
-	return proto.Errorf1(proto.ErrorCode_ProtocolNotFound)
+	return proto.Errorf1(errorCode.ErrorCode_ProtocolNotFound)
 }
 
 func (g *Gate) rpcForward(session *common.Session, message *common.Message) *common.Resp {
@@ -104,7 +69,7 @@ func (g *Gate) rpcForward(session *common.Session, message *common.Message) *com
 }
 
 func ForwardTarget(session *common.Session, message *common.Message, rpcClient rpc.ClientInterface) *common.Resp {
-	// todo 可优化为对象池
+	start := time.Now().UnixMilli()
 	rpcReq := common.RpcMessage{
 		Data:   message,
 		Player: session.Player,
@@ -112,25 +77,40 @@ func ForwardTarget(session *common.Session, message *common.Message, rpcClient r
 	var rpcResp = &common.Resp{}
 	var err error
 
-	//if targetID > 0 {
-	//	err = rpcClient.Wrap(targetID, versionMin, versionMax).Call(context.Background(), "Dispatch", rpcReq, rpcResp)
-	//} else {
-	//	err = rpcClient.Call(context.Background(), "Dispatch", rpcReq, rpcResp)
-	//}
 	ctx := context.Background()
 	protocolId := message.Head.Protocol
 	groupId := utils.GetGroupIdByPb(int(protocolId))
 	id := utils.GetServerId(groupId, session.Player.ServerIds) //本网关可能没有
-	flagRoom := false
+	flag := false
 	if id == 0 {
 		if protocolId >= 1000 && protocolId < 2000 { //room类型协议，可能正在进行游戏
-			flagRoom = true
+
 			roleID := strconv.FormatUint(session.Player.UserId, 10)
 			value, err := ssdb.GetClient().Get("RoleID:" + roleID)
 			if err == nil && value.String() != "" {
 				id = value.Int()
 			}
 		}
+
+		s, ok := rpcClient.GetSelector().(*selector.DefaultSelector)
+		if !ok {
+			log2.Get().Error("转换失败")
+			return proto.Errorf1(errorCode.ErrorCode_RemoteCallFailed)
+		}
+		ctx = context.WithValue(ctx, share.ResMetaDataKey, map[string]string{
+			"id":      "0",
+			"groupId": strconv.Itoa(int(groupId)),
+		})
+		addr := s.Select(ctx, "", "", nil)
+		if addr != "" {
+			for _, info := range s.Servers {
+				if info.Address == addr {
+					id = int(info.Id)
+					break
+				}
+			}
+		}
+		flag = true
 	}
 
 	ctx = context.WithValue(ctx, share.ResMetaDataKey, map[string]string{
@@ -138,47 +118,58 @@ func ForwardTarget(session *common.Session, message *common.Message, rpcClient r
 		"groupId": strconv.Itoa(int(groupId)),
 	})
 	// 调用远程的Dispatch方法
+	//start := time.Now() // 记录开始时间
+
 	err = rpcClient.Call(ctx, "Dispatch", rpcReq, rpcResp)
 	//err = rpcClient.Go(context.Background(), "Dispatch", rpcReq, rpcResp)
 
+	// 计算耗时
+	end := time.Now().UnixMilli()
+	fmt.Printf("gate:函数运行时间: %v\n", end-start)
+
 	if err != nil {
-		//logger.Get().Error(
+		//log2.Get().Error(
 		//	"ForwardTarget call Dispatch failed",
 		//	zap.String("target", rpcclient.Name()),
-		//	zap.Uint32("realServerID", rpcReq.RealServerId),
+		//	zap.Uint32("realServerID", rpcReq.Player.UserId),
 		//	zap.Uint32("serverID", req.ServerId),
 		//	zap.Uint64("roleID", req.RoleId),
 		//	zap.Uint16("protocol", uint16(req.Protocol)),
 		//	zap.Error(err),
 		//)
 		//todo 如果失败，也更新session,删除id
-		for index, fid := range session.Player.ServerIds {
-			if fid == uint32(id) {
-				session.Player.ServerIds = append(session.Player.ServerIds[:index], session.Player.ServerIds[index+1:]...)
+		for i := len(session.Player.ServerIds) - 1; i >= 0; i-- {
+			if session.Player.ServerIds[i] == uint32(id) {
+				session.Player.ServerIds = append(session.Player.ServerIds[:i], session.Player.ServerIds[i+1:]...)
 			}
 		}
-		return proto.Errorf1(proto.ErrorCode_RemoteCallFailed)
+		return proto.Errorf1(errorCode.ErrorCode_RemoteCallFailed)
 	}
 
 	// 更新 session
-	if id == 0 || flagRoom {
-		if !flagRoom { //非房间类型
-			m, ok := ctx.Value(share.ResMetaDataKey).(map[string]string)
-			if ok {
-				id, _ = strconv.Atoi(m["id"])
+	if flag {
+		//if !flagRoom { //非房间类型
+		//	m, ok := ctx.Value(share.ResMetaDataKey).(map[string]string)
+		//	if ok {
+		//		id, _ = strconv.Atoi(m["id"])
+		//	}
+		//}
+		//m, ok := ctx.Value(share.ResMetaDataKey).(map[string]string)
+		//if ok {
+		//	id, _ = strconv.Atoi(m["id"])
+		//}
+
+		// 排除相同的
+		for _, serverId := range session.Player.ServerIds {
+			if serverId == uint32(id) {
+				return rpcResp
 			}
+		}
+		if id == 0 {
+			return rpcResp
 		}
 		session.Player.ServerIds = append(session.Player.ServerIds, uint32(id))
 	}
-
-	//if resp.Code == pb_protocol.ErrorCode_Success && len(resp.Data) == 0 {
-	//	return proto.Response(nil)
-	//}
-	//
-	//if resp.Code != pb_protocol.ErrorCode_Success {
-	//	return proto.Error(resp.Code, resp.Devmsg)
-	//}
-
 	return rpcResp
 }
 
@@ -187,19 +178,24 @@ func (g *Gate) Receive(_ context.Context, req *common.RpcMessage, resp *common.R
 	//找到对应的 session，写入消息
 	session := g.tcpServer.findSession(req.Player.UserId)
 	if session == nil {
-		log1.Get().Warn("[Receive] session not found", zap.Uint64("roleID", req.Player.UserId))
+		log2.Get().Warn("[Receive] session not found", zap.Uint64("roleID", req.Player.UserId))
 		return fmt.Errorf("session not found, roleID: %d", req.Player.UserId)
 	}
 	// todo 需要修改room 信息?
-	if req.Data.Head.Protocol == 1010 { //离开room
-		groupId := utils.GetGroupIdByPb(int(req.Data.Head.Protocol))
-		id := utils.GetServerId(groupId, session.Player.ServerIds) //本网关可能没有
-		for index, fid := range session.Player.ServerIds {
-			if fid == uint32(id) {
-				session.Player.ServerIds = append(session.Player.ServerIds[:index], session.Player.ServerIds[index+1:]...)
-			}
-		}
-	}
+	//if req.Data.Head.Protocol == 1010 { //离开room
+	//	groupId := utils.GetGroupIdByPb(int(req.Data.Head.Protocol))
+	//	id := utils.GetServerId(groupId, session.Player.ServerIds) //本网关可能没有
+	//	for i := len(session.Player.ServerIds) - 1; i >= 0; i-- {
+	//		if session.Player.ServerIds[i] == uint32(id) {
+	//			session.Player.ServerIds = append(session.Player.ServerIds[:i], session.Player.ServerIds[i+1:]...)
+	//		}
+	//	}
+	//	//for index, fid := range session.Player.ServerIds {
+	//	//	if fid == uint32(id) {
+	//	//		session.Player.ServerIds = append(session.Player.ServerIds[:index], session.Player.ServerIds[index+1:]...)
+	//	//	}
+	//	//}
+	//}
 	resp.Body = req.Data.Body
 	return g.tcpServer.write(session, resp, req.Data)
 }

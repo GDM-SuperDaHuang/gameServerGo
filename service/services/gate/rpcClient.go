@@ -23,14 +23,15 @@ var GateRPCClients = sync.OnceValue(func() rpc.ClientInterface {
 		return RpcGateClient
 	}
 
+	defaultSelector := selector.DefaultSelector{}
 	// node
 	c, err := client.NewClient(client.BuildClientConfig(
 		"node",
 		"Forward",
-		8,
+		100,
 		xclient.Failfast,     // account 节点具有唯一性，不需要重复尝试
 		xclient.SelectByUser, // 使用自定义选择器
-		&selector.DefaultSelector{},
+		&defaultSelector,
 	))
 	if err != nil {
 		panic(err)

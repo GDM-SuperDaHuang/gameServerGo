@@ -1,0 +1,16 @@
+services:
+  node-gate-1:
+    image: gate1.0
+    container_name: node-gate-1
+    ports:
+      - "7001:7001"
+    volumes:
+      - ./config:/config
+      - ./logs:/logs
+      - ./excels:/excels
+    networks:
+      - ldl_network
+
+networks:
+  ldl_network:
+    external: true

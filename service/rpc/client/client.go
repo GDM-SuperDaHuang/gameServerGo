@@ -39,6 +39,8 @@ type Client struct {
 	pool *xclient.XClientPool
 	// etcd 服务发现
 	discovery xclient.ServiceDiscovery
+
+	selector xclient.Selector
 }
 
 // 从服务配置中创建

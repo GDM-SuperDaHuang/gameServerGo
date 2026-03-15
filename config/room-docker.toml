@@ -1,8 +1,8 @@
 [common]
-# 本专服 id
-# id = 1
+# 本专服 Id
+# Id = 1
 # 本专服名称
-# name = "local-dev"
+# name = "Local-dev"
 # 本专服登录秘钥
 # secret = "p5KJRYz777mBd559"
 # 本专服充值秘钥
@@ -23,7 +23,7 @@ rpcheart = 10
 [room]
 [room-1]
 # 区服编号
-id = 10
+Id = 10
 # 名称
 name = "room-1"
 # 版本号
@@ -33,7 +33,7 @@ pprofaddr = ":7081"
 
 [room-2]
 # 区服编号
-id = 11
+Id = 11
 # 名称
 name = "room-2"
 # 版本号

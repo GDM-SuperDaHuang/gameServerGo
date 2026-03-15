@@ -2,6 +2,7 @@ package rpc
 
 import (
 	"context"
+
 	xclient "github.com/smallnest/rpcx/client"
 )
 
@@ -38,6 +39,8 @@ type ClientInterface interface {
 
 	// Name rpc 服务提供者名称
 	Name() string
+	//
+	GetSelector() xclient.Selector
 }
 
 // WrapClient 指定额外参数调用

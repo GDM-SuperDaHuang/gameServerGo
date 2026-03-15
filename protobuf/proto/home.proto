@@ -1,0 +1,36 @@
+syntax = "proto3";
+package hero;
+option go_package = "gameServer/protobuf/pbGo";
+import "item.proto";
+
+
+// RoleInfo 角色完整数据，玩家登录时使用
+message room {
+  uint32 roomType = 1; // 房间类型
+  uint32 playerSum = 2;  //人数
+}
+
+message roomInfo {
+  repeated roomInfo roomInfoList = 1;
+}
+
+// 领取奖励 2004
+message receiveAwardReq {
+  uint32 id = 1; // 奖励id
+}
+message receiveAwardResp {
+  repeated item.itemInfo itemList = 1;
+}
+
+// 排行榜 2005
+message rankInfoReq{
+  uint32 rankType = 1; // 排行版类型 0:金钱榜
+}
+message rankInfoResp {
+  repeated userInfo userInfoList = 1;
+}
+message userInfo {
+  uint64 userId = 1;
+  uint32 index = 2; // 排名 从0开始
+  item.itemInfo item = 3;
+}

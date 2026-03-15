@@ -1,0 +1,10 @@
+syntax = "proto3";
+package player;
+option go_package = "gameServer/protobuf/pbGo";
+import "item.proto";
+
+message playerInfo {
+  uint64 userId = 1;//玩家id
+  uint32 heroId = 2;//人物id
+  repeated item.itemInfo betInfo = 3;//竞拍花费，只给上一局的数据
+}

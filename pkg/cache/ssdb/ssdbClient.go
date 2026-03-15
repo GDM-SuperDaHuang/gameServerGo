@@ -8,6 +8,10 @@ import (
 	"github.com/seefan/gossdb/v2/pool"
 )
 
+var (
+	ssdbPool *pool.Connectors
+)
+
 //Host string //ssdb的ip或主机名
 //Port int //ssdb的端口
 //GetClientTimeout int //获取连接超时时间，单位为秒。默认值: 5
@@ -27,32 +31,45 @@ import (
 //AutoClose bool //是否自动回收连接，如果开启后，获取的连接在使用后立即会被回收，所以不要重复使用。
 //Encoding bool //是否开启自动序列化
 
-var globalSSDBClient *pool.Client
+//var globalSSDBClient *pool.Client
 
-func New(cfg *conf.Config) error {
-	err := gossdb.Start(cfg)
+func New(cfg *conf.Config) (*pool.Connectors, error) {
+	pool, err := gossdb.NewPool(cfg)
+	//err := gossdb.Start(cfg)
+	//if err != nil {
+	//	return err
+	//}
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	err = pool.Start()
+	if err != nil {
+		return nil, err
+	}
+	return pool, nil
 }
 
 func Init(cfg *conf.Config) error {
-	err := New(cfg)
+	var err error
+	ssdbPool, err = New(cfg)
+	if err != nil {
+		return err
+	}
+	cli, err := ssdbPool.NewClient()
 	if err != nil {
 		return err
 	}
 	// 测试链接
-	globalSSDBClient = gossdb.Client()
-	if !globalSSDBClient.Ping() {
+	//globalSSDBClient = gossdb.Client()
+	if !cli.Ping() {
 		return errors.New("invalid ssdb ping false ")
 	}
 	return nil
 }
 func GetClient() *pool.Client {
-	return globalSSDBClient
+	return ssdbPool.GetClient()
 }
 
 func Close() {
-	gossdb.Shutdown()
+	ssdbPool.Close()
 }

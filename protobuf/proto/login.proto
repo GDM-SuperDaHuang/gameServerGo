@@ -1,19 +1,23 @@
 syntax = "proto3";
 package login;
 option go_package = "gameServer/protobuf/pbGo";
-import "user.proto";
+import "item.proto";
+import "hero.proto";
 
-// 协议: 13 登录
+// 协议: 4 登录
 message LoginReq {
-  string token = 1; // 由验证服务器 auth 返回 access_token
-  uint64 uuid = 2; // 由验证服务器 auth 返回 uuid
-  uint32 server_id = 3; // 当前选择的区服 id
-  uint32 version = 4; // 版本，用于测试
-  int32 lang = 5; // 玩家当前语言 language_type.xlsx - id
+  string code = 1; //  第三方登录凭证
+  int32 loginType = 2; // 登录类型，1：抖音登录
+}
+message LoginResp {
+  uint64 userId = 1;//自身id
+  repeated awardInfo awardInfoList = 3;//奖励信息集合
+  repeated item.itemInfo itemList = 7;//道具集合
+  repeated hero.heroInfo heroList = 8;//人物集合
 }
 
-message LoginResp {
-  user.user role = 1; // 角色详情，没有会自动创建
-  uint64 uuid = 2;
-  string name = 3;
+// 奖励信息
+message awardInfo {
+  uint32 id = 1; //  奖励id
+  bool isReceived  = 2; // 是否已经领取,true已经领取
 }

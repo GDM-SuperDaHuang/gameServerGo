@@ -1,0 +1,16 @@
+services:
+  node-home-1:
+    image: home1.0
+    container_name: node-home-1
+    ports:
+      - "7061:7061"
+    volumes:
+      - ./config:/config
+      - ./logs:/logs
+      - ./excels:/excels
+    networks:
+      - ldl_network
+
+networks:
+  ldl_network:
+    external: true

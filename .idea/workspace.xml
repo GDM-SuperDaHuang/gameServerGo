@@ -5,10 +5,58 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0210bdac-a28d-412f-b3da-7837bed304cd" name="Changes" comment="1">
+      <change afterPath="$PROJECT_DIR$/common/db/user/user.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/errorCode/errorCode.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/excel/models/s.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/random/snowflake/snowflake.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/1.md" beforeDir="false" afterPath="$PROJECT_DIR$/1.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/gate/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/app/gate/Dockerfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/gate/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/gate/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/test.toml" beforeDir="false" afterPath="$PROJECT_DIR$/config/gate.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/app/room/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node/hander/testHander.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/room/hander/testHander.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/room/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/gate.toml" beforeDir="false" afterPath="$PROJECT_DIR$/config/gate.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/room-docker.toml" beforeDir="false" afterPath="$PROJECT_DIR$/config/room-docker.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/room.toml" beforeDir="false" afterPath="$PROJECT_DIR$/config/room.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose-internal.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose-internal.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose-monitor.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose-monitor.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose-ssdb.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose-ssdb.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generatePb.bat" beforeDir="false" afterPath="$PROJECT_DIR$/generatePb.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/bytes/pool.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/bytes/pool.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/cache/cacheX/KV.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/cache/cacheX/KV.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/cache/cacheX/cachex.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/cache/cacheX/cachex.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/cache/cacheX/hash.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/cache/ssdb/ssdbClient.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/cache/ssdb/ssdbClient.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/cache/ssdb/test/cache_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/cache/ssdb/test/cache_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/utils/serverInfo.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/utils/serverInfo.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/protobuf/pbGo/login.pb.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/protobuf/pbGo/test.pb.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/protobuf/pbGo/user.pb.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/protobuf/proto/login.proto" beforeDir="false" afterPath="$PROJECT_DIR$/protobuf/proto/login.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/protobuf/proto/test.proto" beforeDir="false" afterPath="$PROJECT_DIR$/protobuf/proto/test.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/protobuf/protoHandlerInit/method.go" beforeDir="false" afterPath="$PROJECT_DIR$/protobuf/protoHandlerInit/method.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/common/proto/constValue.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/common/proto/proto.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/common/proto/proto.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/common/session.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/common/session.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/rpc/client/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/rpc/client/client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/rpc/client/clientImp.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/rpc/client/clientImp.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/rpc/client/selector/defaultSelector.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/rpc/client/selector/defaultSelector.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/rpc/dispatch.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/rpc/dispatch.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/rpc/forward.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/rpc/forward.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/rpc/rpc.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/rpc/rpc.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/rpc/server/serverImp.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/rpc/server/serverImp.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/services/gate/forward.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/gate/forward.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/services/gate/gateImp.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/gate/gateImp.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/services/gate/handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/gate/handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/services/gate/rpcClient.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/gate/rpcClient.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/services/gate/serverGnet.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/gate/serverGnet.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/services/node/nodeImp.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/node/nodeImp.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/services/node/rpc.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/node/rpc.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,7 +70,7 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" url="file://$USER_HOME$/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.0.windows-amd64" />
+  <component name="GOROOT" url="file://$PROJECT_DIR$/../../Program Files/Go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -38,10 +86,16 @@
     &quot;accountId&quot;: &quot;61d8dcec-2548-4ddd-9987-026d4e69dfd3&quot;
   }
 }</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/../pkg/mod/github.com/bytedance/douyin-openapi-sdk-go@v1.0.3/client/client.go" root0="FORCE_HIGHLIGHTING" />
+  </component>
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
 }</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="com.goide.dfa.ui.problems.view" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 3
 }</component>
@@ -56,58 +110,81 @@
     "Docker.docker-compose-internal.yml.etcd1: Compose Deployment.executor": "Run",
     "Docker.docker-compose-internal.yml.etcd3: Compose Deployment.executor": "Run",
     "Docker.docker-compose-internal.yml.node-gate-1: Compose Deployment.executor": "Run",
+    "Docker.docker-compose-internal.yml.node-gate-1: Compose 部署.executor": "Run",
     "Docker.docker-compose-internal.yml.node-gate-2: Compose Deployment.executor": "Run",
     "Docker.docker-compose-internal.yml.node-room-1: Compose Deployment.executor": "Run",
     "Docker.docker-compose-internal.yml: Compose Deployment.executor": "Run",
     "Docker.docker-compose-monitor.yml.docker-monitor: Compose 部署.executor": "Run",
+    "Docker.docker-compose-monitor.yml: Compose 部署.executor": "Run",
+    "Docker.docker-compose-redis.yml.redis: Compose 部署.executor": "Run",
+    "Docker.docker-compose-ssdb.yml.ssdb-admin: Compose 部署.executor": "Run",
     "Docker.docker-compose-ssdb.yml.ssdb1: Compose 部署.executor": "Run",
     "Docker.docker-compose.yml.etcd1: Compose Deployment.executor": "Run",
     "Docker.docker-compose.yml.etcd1: Compose 部署.executor": "Run",
     "Docker.docker-compose.yml: Compose Deployment.executor": "Run",
+    "Docker.gate/Dockerfile.executor": "Run",
+    "Docker.home/Dockerfile.executor": "Run",
+    "Docker.monitor/Dockerfile.executor": "Run",
     "Docker.node/Dockerfile.executor": "Run",
     "Go Build.go build gameServer.executor": "Debug",
     "Go Build.go build gameServer/service/app/gate.executor": "Debug",
     "Go Build.go build gameServer/service/app/monitor.executor": "Run",
     "Go Build.go build gameServer/service/app/node.executor": "Debug",
     "Go 构建.go build gameServer/app/gate.executor": "Debug",
+    "Go 构建.go build gameServer/app/home.executor": "Debug",
     "Go 构建.go build gameServer/app/node.executor": "Debug",
+    "Go 构建.go build gameServer/app/room.executor": "Debug",
     "Go 构建.go build gameServer/service/app/gate.executor": "Debug",
+    "Go 测试.gameServer/app/node/hander/MaxRects/test 中的 TestRun.executor": "Debug",
+    "Go 测试.gameServer/app/node/hander/test 中的 TestRun.executor": "Debug",
+    "Go 测试.gameServer/app/node/test 中的 TestRun (1).executor": "Debug",
+    "Go 测试.gameServer/app/node/test 中的 TestRun.executor": "Debug",
+    "Go 测试.gameServer/pkg/cache/ssdb/test 中的 TestHashRun.executor": "Debug",
+    "Go 测试.gameServer/pkg/cache/ssdb/test 中的 TestRun (1).executor": "Debug",
     "Go 测试.gameServer/pkg/cache/ssdb/test 中的 TestRun.executor": "Debug",
+    "Go 测试.gameServer/pkg/cache/ssdb/test 中的 TestStringRun.executor": "Debug",
+    "Go 测试.gameServer/pkg/excel/test 中的 TestRun.executor": "Debug",
+    "Go 测试.gameServer/pkg/excel/test 中的 TestRuntt.executor": "Debug",
+    "Go 测试.gameServer/pkg/loginSdk/test 中的 TestRun.executor": "Debug",
+    "Go 测试.gameServer/pkg/redis/test 中的 TestRun.executor": "Debug",
     "RunOnceActivity.GoLinterPluginOnboarding": "true",
+    "RunOnceActivity.GoLinterPluginOnboardingV2": "true",
     "RunOnceActivity.GoLinterPluginStorageMigration": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.go.analysis.ui.options.defaults": "true",
     "RunOnceActivity.go.formatter.settings.were.checked": "true",
     "RunOnceActivity.go.migrated.go.modules.settings": "true",
     "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "git-widget-placeholder": "main",
     "go.import.settings.migrated": "true",
     "go.sdk.automatically.set": "true",
     "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "D:/work/work2/gameServerGo",
+    "last_opened_file_path": "D:/work/gameServerGo",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "onboarding.tips.debug.path": "E:/gowork/gameServer/main.go",
     "run.configurations.included.in.services": "true",
-    "settings.editor.selected.configurable": "go.sdk"
+    "settings.editor.selected.configurable": "com.goide.configuration.GoLibrariesConfigurableProvider"
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="D:\work\work2\gameServerGo" />
-      <recent name="E:\gowork\gameServer\config" />
-      <recent name="E:\gowork\gameServer\service\app\node" />
-      <recent name="E:\gowork\gameServer\service\app\gate" />
-      <recent name="E:\gowork\gameServer" />
+      <recent name="D:\work\gameServerGo" />
+      <recent name="D:\work\gameServerGo\pkg\redis" />
+      <recent name="D:\work\gameServerGo\pkg" />
+      <recent name="D:\work\gameServerGo\config" />
+      <recent name="D:\work\gameServerGo\app" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\work\work2\gameServerGo\pkg\cache\cacheX" />
-      <recent name="D:\work\work2\gameServerGo\protobuf" />
-      <recent name="D:\work\work2\gameServerGo\pkg\logger\log2" />
-      <recent name="D:\work\work2\gameServerGo\pkg\logger\log1" />
-      <recent name="D:\work\work2\gameServerGo\pkg" />
+      <recent name="D:\work\gameServerGo\pkg\redis\test" />
+      <recent name="D:\work\gameServerGo\common\db" />
+      <recent name="D:\work\gameServerGo" />
+      <recent name="D:\work\gameServerGo\app\node\hander\room" />
+      <recent name="D:\work\gameServerGo\common\errorCode" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -122,7 +199,8 @@
           <value>
             <map>
               <entry key="go build gameServer/app/gate" value="STOPPED" />
-              <entry key="go build gameServer/app/node" value="FAILED" />
+              <entry key="go build gameServer/app/home" value="STOPPED" />
+              <entry key="go build gameServer/app/room" value="STOPPED" />
             </map>
           </value>
         </entry>
@@ -130,8 +208,68 @@
     </option>
   </component>
   <component name="RunManager" selected="Go 构建.go build gameServer/app/gate">
+    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
+      <module name="gameServer" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="gameServer" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
+      <module name="gameServer" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="gameServer" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
+      <module name="gameServer" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="DIRECTORY" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
+      <module name="gameServer" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="DIRECTORY" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <method v="2" />
+    </configuration>
     <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
       <deployment type="docker-compose.yml">
+        <settings />
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
+      <deployment type="docker-compose.yml">
+        <settings />
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
+      <deployment type="docker-compose.yml">
+        <settings />
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="dockerfile" temporary="true">
+      <deployment type="dockerfile">
+        <settings />
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="dockerfile" temporary="true">
+      <deployment type="dockerfile">
         <settings />
       </deployment>
       <method v="2" />
@@ -154,29 +292,71 @@
     <configuration name="go build gameServer/app/gate" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="gameServer" />
       <working_directory value="$PROJECT_DIR$" />
-      <parameters value="--configPath=./config --logPath=./logs" />
+      <parameters value="--configPath ./config/ --logPath ./logs/" />
       <kind value="PACKAGE" />
       <package value="gameServer/app/gate" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$/app/gate/main.go" />
       <method v="2" />
     </configuration>
-    <configuration name="go build gameServer/app/node" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+    <configuration name="go build gameServer/app/gate" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="gameServer" />
       <working_directory value="$PROJECT_DIR$" />
+      <parameters value="--configPath ./config/ --logPath ./logs/" />
       <kind value="PACKAGE" />
-      <package value="gameServer/app/node" />
+      <package value="gameServer/app/gate" />
       <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/app/node/main.go" />
+      <filePath value="$PROJECT_DIR$/app/gate/main.go" />
       <method v="2" />
     </configuration>
-    <configuration name="go build gameServer/service/app/gate" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+    <configuration name="go build gameServer/app/gate" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="gameServer" />
       <working_directory value="$PROJECT_DIR$" />
+      <parameters value="--configPath ./config/ --logPath ./logs/" />
       <kind value="PACKAGE" />
-      <package value="gameServer/service/app/gate" />
+      <package value="gameServer/app/gate" />
       <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/service/app/gate/main.go" />
+      <filePath value="$PROJECT_DIR$/app/gate/main.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build gameServer/app/home" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="gameServer" />
+      <working_directory value="$PROJECT_DIR$" />
+      <parameters value="--configPath ./config/ --logPath ./logs/" />
+      <kind value="PACKAGE" />
+      <package value="gameServer/app/home" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/app/home/main.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build gameServer/app/home" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="gameServer" />
+      <working_directory value="$PROJECT_DIR$" />
+      <parameters value="--configPath ./config/ --logPath ./logs/" />
+      <kind value="PACKAGE" />
+      <package value="gameServer/app/home" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/app/home/main.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build gameServer/app/room" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="gameServer" />
+      <working_directory value="$PROJECT_DIR$" />
+      <parameters value="--configPath ./config/ --logPath ./logs/" />
+      <kind value="PACKAGE" />
+      <package value="gameServer/app/room" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/app/room/main.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build gameServer/app/room" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="gameServer" />
+      <working_directory value="$PROJECT_DIR$" />
+      <parameters value="--configPath ./config/ --logPath ./logs/" />
+      <kind value="PACKAGE" />
+      <package value="gameServer/app/room" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/app/room/main.go" />
       <method v="2" />
     </configuration>
     <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
@@ -186,18 +366,6 @@
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <method v="2" />
-    </configuration>
-    <configuration name="gameServer/pkg/cache/ssdb/test 中的 TestRun" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="gameServer" />
-      <working_directory value="$PROJECT_DIR$/pkg/cache/ssdb/test" />
-      <root_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="gameServer/pkg/cache/ssdb/test" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <pattern value="^\QTestRun\E$" />
       <method v="2" />
     </configuration>
     <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
@@ -212,12 +380,12 @@
       </deployment>
       <method v="2" />
     </configuration>
-    <configuration name="docker-compose-internal.yml.node-room-1: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+    <configuration name="docker-compose-internal.yml.node-gate-1: Compose 部署" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
       <deployment type="docker-compose.yml">
         <settings>
           <option name="services">
             <list>
-              <option value="node-room-1" />
+              <option value="node-gate-1" />
             </list>
           </option>
           <option name="sourceFilePath" value="docker-compose-internal.yml" />
@@ -225,40 +393,63 @@
       </deployment>
       <method v="2" />
     </configuration>
-    <configuration name="docker-compose-ssdb.yml.ssdb1: Compose 部署" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+    <configuration name="docker-compose-monitor.yml.docker-monitor: Compose 部署" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
       <deployment type="docker-compose.yml">
         <settings>
           <option name="services">
             <list>
-              <option value="ssdb1" />
+              <option value="docker-monitor" />
             </list>
           </option>
-          <option name="sourceFilePath" value="docker-compose-ssdb.yml" />
+          <option name="sourceFilePath" value="docker-compose-monitor.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="gate/Dockerfile" type="docker-deploy" factoryName="dockerfile" temporary="true" server-name="Docker">
+      <deployment type="dockerfile">
+        <settings>
+          <option name="imageTag" value="gate1.5" />
+          <option name="buildOnly" value="true" />
+          <option name="contextFolderPath" value="." />
+          <option name="sourceFilePath" value="app/gate/Dockerfile" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="home/Dockerfile" type="docker-deploy" factoryName="dockerfile" temporary="true" server-name="Docker">
+      <deployment type="dockerfile">
+        <settings>
+          <option name="imageTag" value="home1.4" />
+          <option name="buildOnly" value="true" />
+          <option name="contextFolderPath" value="." />
+          <option name="sourceFilePath" value="app/home/Dockerfile" />
         </settings>
       </deployment>
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Docker.docker-compose-internal.yml.node-room-1: Compose Deployment" />
-      <item itemvalue="Docker.docker-compose-ssdb.yml.ssdb1: Compose 部署" />
+      <item itemvalue="Docker.gate/Dockerfile" />
+      <item itemvalue="Docker.home/Dockerfile" />
+      <item itemvalue="Go 构建.go build gameServer/app/home" />
+      <item itemvalue="Go 构建.go build gameServer/app/room" />
       <item itemvalue="Go 构建.go build gameServer/app/gate" />
-      <item itemvalue="Go 构建.go build gameServer/app/node" />
-      <item itemvalue="Go 测试.gameServer/pkg/cache/ssdb/test 中的 TestRun" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Go 构建.go build gameServer/app/gate" />
-        <item itemvalue="Go 测试.gameServer/pkg/cache/ssdb/test 中的 TestRun" />
-        <item itemvalue="Go 构建.go build gameServer/app/node" />
-        <item itemvalue="Docker.docker-compose-ssdb.yml.ssdb1: Compose 部署" />
+        <item itemvalue="Go 构建.go build gameServer/app/room" />
+        <item itemvalue="Docker.home/Dockerfile" />
+        <item itemvalue="Go 构建.go build gameServer/app/home" />
+        <item itemvalue="Docker.gate/Dockerfile" />
       </list>
     </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-gosdk-f466f9b0953e-146d08934cbf-org.jetbrains.plugins.go.sharedIndexes.bundled-GO-252.26830.102" />
-        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-GO-252.26830.102" />
+        <option value="bundled-gosdk-72a9cf600ed8-dfa3e7267ae0-org.jetbrains.plugins.go.sharedIndexes.bundled-GO-253.31033.129" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-GO-253.31033.129" />
       </set>
     </attachedChunks>
   </component>
@@ -293,15 +484,12 @@
     <MESSAGE value="1" />
     <option name="LAST_COMMIT_MESSAGE" value="1" />
   </component>
-  <component name="VgoProject">
-    <settings-migrated>true</settings-migrated>
-  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/service/services/gate/serverGnet.go</url>
-          <line>55</line>
+          <line>57</line>
           <option name="timeStamp" value="49" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
@@ -314,82 +502,183 @@
           <line>30</line>
           <option name="timeStamp" value="142" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/service/services/node/rpc.go</url>
-          <line>82</line>
-          <option name="timeStamp" value="201" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+        <line-breakpoint type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/service/services/gate/gateImp.go</url>
           <line>223</line>
           <option name="timeStamp" value="225" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/service/services/gate/forward.go</url>
-          <line>187</line>
-          <option name="timeStamp" value="247" />
+        <line-breakpoint type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/pkg/excel/excel1/api.go</url>
+          <line>280</line>
+          <option name="timeStamp" value="307" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/service/services/gate/forward.go</url>
-          <line>203</line>
-          <option name="timeStamp" value="251" />
+          <url>file://$PROJECT_DIR$/pkg/excel/test/excel_test.go</url>
+          <line>39</line>
+          <option name="timeStamp" value="334" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/service/services/gate/forward.go</url>
-          <line>181</line>
-          <option name="timeStamp" value="252" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/service/services/gate/serverGnet.go</url>
-          <line>259</line>
-          <option name="timeStamp" value="253" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/service/services/gate/serverGnet.go</url>
-          <line>253</line>
-          <option name="timeStamp" value="254" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/service/common/message.go</url>
-          <line>65</line>
-          <option name="timeStamp" value="256" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/service/common/message.go</url>
-          <line>76</line>
-          <option name="timeStamp" value="258" />
+          <url>file://$PROJECT_DIR$/pkg/loginSdk/test/sdk_test.go</url>
+          <line>14</line>
+          <option name="timeStamp" value="336" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/pkg/cache/ssdb/test/cache_test.go</url>
+          <line>73</line>
+          <option name="timeStamp" value="383" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/pkg/cache/ssdb/test/cache_test.go</url>
+          <line>179</line>
+          <option name="timeStamp" value="385" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/app/room/test/grid_test.go</url>
+          <line>40</line>
+          <option name="timeStamp" value="390" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/app/room/hander/test/grid_test.go</url>
+          <line>382</line>
+          <option name="timeStamp" value="393" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/app/room/hander/test/grid_test.go</url>
+          <line>375</line>
+          <option name="timeStamp" value="394" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/app/room/test/grid_test.go</url>
           <line>38</line>
-          <option name="timeStamp" value="265" />
+          <option name="timeStamp" value="395" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/pkg/cache/ssdb/test/cache_test.go</url>
+          <url>file://$PROJECT_DIR$/app/room/hander/grid/compactAlgorithm.go</url>
           <line>30</line>
-          <option name="timeStamp" value="266" />
+          <option name="timeStamp" value="403" />
+        </line-breakpoint>
+        <line-breakpoint type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/pkg/excel/reader/reader.go</url>
+          <line>147</line>
+          <option name="timeStamp" value="456" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/pkg/cache/cacheX/KV.go</url>
-          <line>45</line>
-          <option name="timeStamp" value="267" />
+          <url>file://$PROJECT_DIR$/app/room/hander/maxRects/test/grid_test.go</url>
+          <line>34</line>
+          <option name="timeStamp" value="531" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/pkg/cache/cacheX/hash.go</url>
-          <line>47</line>
-          <option name="timeStamp" value="270" />
+          <url>file://$PROJECT_DIR$/../pkg/mod/github.com/seefan/gossdb/v2@v2.0.1/client/client.go</url>
+          <line>67</line>
+          <option name="timeStamp" value="622" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/app/gate/main.go</url>
-          <line>38</line>
-          <option name="timeStamp" value="272" />
+          <url>file://$PROJECT_DIR$/../pkg/mod/github.com/seefan/gossdb/v2@v2.0.1/ssdbclient/ssdb_client.go</url>
+          <line>154</line>
+          <option name="timeStamp" value="625" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/app/gate/main.go</url>
-          <line>29</line>
-          <option name="timeStamp" value="273" />
+          <url>file://$PROJECT_DIR$/../pkg/mod/github.com/seefan/gossdb/v2@v2.0.1/ssdbclient/ssdb_client.go</url>
+          <line>108</line>
+          <option name="timeStamp" value="626" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/../pkg/mod/github.com/seefan/gossdb/v2@v2.0.1/ssdbclient/ssdb_client.go</url>
+          <line>112</line>
+          <option name="timeStamp" value="628" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/../pkg/mod/github.com/seefan/gossdb/v2@v2.0.1/ssdbclient/connection.go</url>
+          <line>180</line>
+          <option name="timeStamp" value="632" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/common/errorCode/errorCode.go</url>
+          <line>24</line>
+          <option name="timeStamp" value="692" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/app/room/hander/room/robot.go</url>
+          <line>133</line>
+          <option name="timeStamp" value="842" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/app/home/hander/inits/ints.go</url>
+          <line>51</line>
+          <option name="timeStamp" value="950" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/app/home/hander/HomeHander.go</url>
+          <line>234</line>
+          <option name="timeStamp" value="984" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/app/room/hander/room/robot.go</url>
+          <line>122</line>
+          <option name="timeStamp" value="994" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/app/room/hander/room/robot.go</url>
+          <line>138</line>
+          <option name="timeStamp" value="997" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/app/room/hander/room/robot.go</url>
+          <line>153</line>
+          <option name="timeStamp" value="998" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/app/room/hander/room/robot.go</url>
+          <line>106</line>
+          <option name="timeStamp" value="1020" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/app/room/hander/room/robot.go</url>
+          <line>116</line>
+          <option name="timeStamp" value="1026" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/app/room/hander/room/bidding.go</url>
+          <line>141</line>
+          <option name="timeStamp" value="1034" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/app/room/hander/room/robot.go</url>
+          <line>232</line>
+          <option name="timeStamp" value="1035" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/app/home/main.go</url>
+          <line>32</line>
+          <option name="timeStamp" value="1038" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/app/room/hander/room/robot.go</url>
+          <line>217</line>
+          <option name="timeStamp" value="1043" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/app/room/hander/room/robot.go</url>
+          <line>204</line>
+          <option name="timeStamp" value="1045" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/app/room/hander/room/robot.go</url>
+          <line>209</line>
+          <option name="timeStamp" value="1046" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/service/services/gate/serverGnet.go</url>
+          <line>122</line>
+          <option name="timeStamp" value="1048" />
         </line-breakpoint>
       </breakpoints>
+      <default-breakpoints>
+        <breakpoint type="DlvErrorBreakpoint" />
+      </default-breakpoints>
     </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/gameServerGo$gameServer_app_node_hander_MaxRects_test__TestRun.out" NAME="gameServer/app/node/hander/MaxRects/test 中的 TestRun 覆盖结果" MODIFIED="1773143285991" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="GoCoverage" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
   </component>
 </project>

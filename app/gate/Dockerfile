@@ -68,8 +68,8 @@ RUN echo "https://mirrors.aliyun.com/alpine/v3.20/main/" > /etc/apk/repositories
 
 COPY --from=builder /app/gate  /app/gate
 
-RUN mkdir -p  /app/logs
+RUN mkdir -p  /logs
 
 # 将来运行阶段
-#CMD ["/app/gate"]
-CMD ["/app/gate", "--configPath", "/app/logs", "--configName", "config.docker", "--configType", "toml", "--logPath", "/app/logs", "--logLevel", "debug", "--node", "account-1"]
+#CMD ["/app/gate", "--configPath", "/config", "--logPath", "/logs", "--node", "gate-1"]
+CMD ["/app/gate"]

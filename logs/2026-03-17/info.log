@@ -1,0 +1,62 @@
+{"level":"info","ts":"2026-03-17T00:00:59.738+0800","caller":"home/main.go:50","msg":"pprof listen","address":":7061"}
+{"level":"info","ts":"2026-03-17T00:00:59.766+0800","caller":"rpc/forward.go:90","msg":"[game.forward.register] success","num":5}
+{"level":"info","ts":"2026-03-17T00:00:59.766+0800","caller":"node/nodeImp.go:37","msg":"[gate] create success","id":2000,"node":"home-1","version":0}
+{"level":"info","ts":"2026-03-17T00:01:04.778+0800","caller":"server/serverImp.go:79","msg":"etcd Register==","address=":"tcp@172.28.112.1:57203","etcd =":[":12379",":22329",":32329"]}
+{"level":"info","ts":"2026-03-17T00:01:04.831+0800","caller":"node/rpc.go:35","msg":"[initRPC] server start","info":"home-1(id: 2000)[version: 0][listen: tcp@172.28.112.1:57203]"}
+{"level":"info","ts":"2026-03-17T00:01:04.831+0800","caller":"node/nodeImp.go:86","msg":"[account] started"}
+{"level":"info","ts":"2026-03-17T00:01:34.835+0800","caller":"node/nodeImp.go:109","msg":"received signal: interrupt"}
+{"level":"info","ts":"2026-03-17T00:01:34.835+0800","caller":"node/nodeImp.go:113","msg":"close signal .. shufhown server .."}
+{"level":"info","ts":"2026-03-17T00:01:34.845+0800","caller":"node/nodeImp.go:98","msg":"[account] closed"}
+{"level":"info","ts":"2026-03-17T00:01:34.845+0800","caller":"node/nodeImp.go:135","msg":"service: home-1(2000) closed successfully"}
+{"level":"info","ts":"2026-03-17T00:01:34.845+0800","caller":"node/nodeImp.go:137","msg":"all services closed"}
+{"level":"info","ts":"2026-03-17T23:57:53.401+0800","caller":"home/main.go:50","msg":"pprof listen","address":":7061"}
+{"level":"info","ts":"2026-03-17T23:57:53.430+0800","caller":"rpc/forward.go:90","msg":"[game.forward.register] success","num":5}
+{"level":"info","ts":"2026-03-17T23:57:53.430+0800","caller":"node/nodeImp.go:37","msg":"[gate] create success","id":2000,"node":"home-1","version":0}
+{"level":"info","ts":"2026-03-17T23:57:58.440+0800","caller":"server/serverImp.go:79","msg":"etcd Register==","address=":"tcp@172.28.112.1:57506","etcd =":[":12379",":22329",":32329"]}
+{"level":"info","ts":"2026-03-17T23:57:58.485+0800","caller":"node/rpc.go:35","msg":"[initRPC] server start","info":"home-1(id: 2000)[version: 0][listen: tcp@172.28.112.1:57506]"}
+{"level":"info","ts":"2026-03-17T23:57:58.485+0800","caller":"node/nodeImp.go:86","msg":"[account] started"}
+{"level":"info","ts":"2026-03-17T23:58:18.869+0800","caller":"gate/main.go:59","msg":"pprof listen","address":":7051"}
+{"level":"info","ts":"2026-03-17T23:58:18.869+0800","caller":"gate/gateImp.go:47","msg":"[gate] create success","id":1,"node":"gate-1","version":0}
+{"level":"debug","ts":"2026-03-17T23:58:18.902+0800","caller":"logging/logger.go:249","msg":"default logging level is INFO"}
+{"level":"info","ts":"2026-03-17T23:58:18.902+0800","caller":"logging/logger.go:256","msg":"Launching gnet with 12 event-loops, listening on: tcp://:7001"}
+{"level":"info","ts":"2026-03-17T23:58:18.902+0800","caller":"gate/serverGnet.go:48","msg":"[gate] tcp start","address":":7001","multicore":false}
+{"level":"info","ts":"2026-03-17T23:58:23.914+0800","caller":"server/serverImp.go:79","msg":"etcd Register==","address=":"tcp@172.28.112.1:57725","etcd =":[":12379",":22329",":32329"]}
+{"level":"info","ts":"2026-03-17T23:58:23.929+0800","caller":"gate/gateImp.go:227","msg":"[initRPC] server start","info":"gate-1(id: 1)[version: 0][listen: tcp@172.28.112.1:57725]"}
+{"level":"info","ts":"2026-03-17T23:58:23.929+0800","caller":"gate/gateImp.go:80","msg":"[gate] service started"}
+{"level":"debug","ts":"2026-03-17T23:58:25.913+0800","caller":"gate/serverGnet.go:72","msg":"[gate.OnOpen] connected","total":1,"address":"127.0.0.1:57759"}
+{"level":"info","ts":"2026-03-17T23:58:45.004+0800","caller":"room/main.go:50","msg":"pprof listen","address":":7081"}
+{"level":"info","ts":"2026-03-17T23:58:45.053+0800","caller":"rpc/forward.go:90","msg":"[game.forward.register] success","num":4}
+{"level":"info","ts":"2026-03-17T23:58:45.053+0800","caller":"node/nodeImp.go:37","msg":"[gate] create success","id":1000,"node":"room-1","version":0}
+{"level":"info","ts":"2026-03-17T23:58:50.063+0800","caller":"server/serverImp.go:79","msg":"etcd Register==","address=":"tcp@172.28.112.1:57930","etcd =":[":12379",":22329",":32329"]}
+{"level":"info","ts":"2026-03-17T23:58:50.077+0800","caller":"node/rpc.go:35","msg":"[initRPC] server start","info":"room-1(id: 1000)[version: 0][listen: tcp@172.28.112.1:57930]"}
+{"level":"info","ts":"2026-03-17T23:58:50.077+0800","caller":"node/nodeImp.go:86","msg":"[account] started"}
+{"level":"debug","ts":"2026-03-17T23:59:03.129+0800","caller":"gate/serverGnet.go:72","msg":"[gate.OnOpen] connected","total":2,"address":"127.0.0.1:57980"}
+{"level":"info","ts":"2026-03-18T00:00:42.738+0800","caller":"node/nodeImp.go:109","msg":"received signal: interrupt"}
+{"level":"info","ts":"2026-03-18T00:00:42.738+0800","caller":"node/nodeImp.go:113","msg":"close signal .. shufhown server .."}
+{"level":"info","ts":"2026-03-18T00:00:42.745+0800","caller":"node/nodeImp.go:98","msg":"[account] closed"}
+{"level":"info","ts":"2026-03-18T00:00:42.745+0800","caller":"node/nodeImp.go:135","msg":"service: home-1(2000) closed successfully"}
+{"level":"info","ts":"2026-03-18T00:00:42.745+0800","caller":"node/nodeImp.go:137","msg":"all services closed"}
+{"level":"info","ts":"2026-03-19T00:01:11.120+0800","caller":"bytes/pool.go:454","msg":"Pool","POOL_STATUS":"OK","type":"gameServer/service/common.Message","get_count":8,"put_count":8,"diff":0}
+{"level":"warn","ts":"2026-03-19T00:01:11.120+0800","caller":"bytes/pool.go:461","msg":"Pool","POOL_STATUS":"OK","type":"gameServer/service/common.Player","get_count":4,"put_count":0,"diff":4}
+{"level":"warn","ts":"2026-03-19T00:01:11.120+0800","caller":"bytes/pool.go:461","msg":"Pool","POOL_STATUS":"OK","type":"gameServer/service/common.Session","get_count":2,"put_count":0,"diff":2}
+{"level":"info","ts":"2026-03-19T00:01:11.120+0800","caller":"bytes/pool.go:454","msg":"Pool","POOL_STATUS":"OK","type":"gameServer/service/common.ErrorInfo","get_count":0,"put_count":0,"diff":0}
+{"level":"info","ts":"2026-03-19T00:01:11.122+0800","caller":"bytes/pool.go:454","msg":"Pool","POOL_STATUS":"OK","type":"gameServer/service/rpc/client.wrapClient","get_count":0,"put_count":0,"diff":0}
+{"level":"info","ts":"2026-03-19T00:01:37.187+0800","caller":"bytes/pool.go:454","msg":"Pool","POOL_STATUS":"OK","type":"gameServer/service/common.Player","get_count":0,"put_count":0,"diff":0}
+{"level":"info","ts":"2026-03-19T00:01:37.187+0800","caller":"bytes/pool.go:454","msg":"Pool","POOL_STATUS":"OK","type":"gameServer/service/common.ErrorInfo","get_count":0,"put_count":0,"diff":0}
+{"level":"info","ts":"2026-03-19T00:01:37.187+0800","caller":"bytes/pool.go:454","msg":"Pool","POOL_STATUS":"OK","type":"gameServer/service/common.Message","get_count":0,"put_count":0,"diff":0}
+{"level":"info","ts":"2026-03-19T00:01:37.187+0800","caller":"bytes/pool.go:454","msg":"Pool","POOL_STATUS":"OK","type":"gameServer/service/common.Session","get_count":0,"put_count":0,"diff":0}
+{"level":"info","ts":"2026-03-19T00:01:37.190+0800","caller":"bytes/pool.go:454","msg":"Pool","POOL_STATUS":"OK","type":"gameServer/service/rpc/client.wrapClient","get_count":0,"put_count":0,"diff":0}
+{"level":"info","ts":"2026-03-19T00:01:40.172+0800","caller":"room/logic.go:134","msg":"playerInfos match success","UserId":7438798923986112512,"roomId":1}
+{"level":"info","ts":"2026-03-19T00:01:44.762+0800","caller":"room/logic.go:134","msg":"playerInfos match success","UserId":7439701987056160768,"roomId":1}
+{"level":"info","ts":"2026-03-19T00:01:44.762+0800","caller":"room/logic.go:179","msg":"room start game","roomId":1}
+{"level":"info","ts":"2026-03-19T00:03:36.268+0800","caller":"gate/gateImp.go:104","msg":"received signal: interrupt"}
+{"level":"info","ts":"2026-03-19T00:03:36.269+0800","caller":"gate/gateImp.go:108","msg":"close signal .. shufhown server .."}
+{"level":"info","ts":"2026-03-19T00:03:36.270+0800","caller":"node/nodeImp.go:109","msg":"received signal: interrupt"}
+{"level":"info","ts":"2026-03-19T00:03:36.271+0800","caller":"node/nodeImp.go:113","msg":"close signal .. shufhown server .."}
+{"level":"info","ts":"2026-03-19T00:03:36.305+0800","caller":"node/nodeImp.go:98","msg":"[account] closed"}
+{"level":"info","ts":"2026-03-19T00:03:36.305+0800","caller":"node/nodeImp.go:135","msg":"service: room-1(1000) closed successfully"}
+{"level":"info","ts":"2026-03-19T00:03:36.305+0800","caller":"node/nodeImp.go:137","msg":"all services closed"}
+{"level":"info","ts":"2026-03-19T00:03:36.307+0800","caller":"gate/gateImp.go:92","msg":"[gate] service closed"}
+{"level":"info","ts":"2026-03-19T00:03:36.307+0800","caller":"gate/gateImp.go:130","msg":"service: gate-1(1) closed successfully"}
+{"level":"info","ts":"2026-03-19T00:03:36.307+0800","caller":"gate/gateImp.go:132","msg":"all services closed"}
+{"level":"info","ts":"2026-03-19T00:03:36.307+0800","caller":"gate/main.go:109","msg":"server stop ！"}

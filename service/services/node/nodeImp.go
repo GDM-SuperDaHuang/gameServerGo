@@ -2,7 +2,7 @@ package node
 
 import (
 	"gameServer/pkg/config"
-	"gameServer/pkg/logger/log1"
+	"gameServer/pkg/logger/log2"
 	"gameServer/service/rpc"
 	"os"
 	"os/signal"
@@ -22,7 +22,7 @@ type NodeServer struct {
 }
 
 // New 创建一个网格服务
-func NewServer() (*NodeServer, error) {
+func NewServer() *NodeServer {
 	c := config.Get()
 
 	g := &NodeServer{
@@ -34,8 +34,8 @@ func NewServer() (*NodeServer, error) {
 	//	return nil, err
 	//}
 
-	log1.Get().Info("[gate] create success", zap.Uint32("id", g.id), zap.String("node", g.name), zap.Uint32("version", g.version))
-	return g, nil
+	log2.Get().Info("[gate] create success", zap.Uint32("id", g.id), zap.String("node", g.name), zap.Uint32("version", g.version))
+	return g
 }
 
 // ID 返回服务唯一 ID
@@ -83,7 +83,7 @@ func (n *NodeServer) Start(f *rpc.Forward) error {
 	if err != nil {
 		return err
 	}
-	log1.Get().Info("[account] started")
+	log2.Get().Info("[account] started")
 	n.listenSignal()
 	return nil
 }
@@ -91,11 +91,11 @@ func (n *NodeServer) Start(f *rpc.Forward) error {
 // Close 关闭服务
 func (a *NodeServer) Close() error {
 	if err := a.rpcServer.Stop(); err != nil {
-		log1.Get().Error("[account] close failed", zap.Error(err))
+		log2.Get().Error("[account] close failed", zap.Error(err))
 		return err
 	}
 
-	log1.Get().Info("[account] closed")
+	log2.Get().Info("[account] closed")
 	return nil
 }
 
@@ -106,14 +106,14 @@ func (e *NodeServer) listenSignal() {
 	sig := <-ch
 	signal.Stop(ch)
 
-	log1.Get().Sugar().Infof("received signal: %+v", sig)
+	log2.Get().Sugar().Infof("received signal: %+v", sig)
 
 	switch sig {
 	case syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP, syscall.SIGQUIT:
-		log1.Get().Info("close signal .. shufhown server ..")
+		log2.Get().Info("close signal .. shufhown server ..")
 		e.close()
 	default:
-		log1.Get().Sugar().Errorf("unsupport signal: %s", sig.String())
+		log2.Get().Sugar().Errorf("unsupport signal: %s", sig.String())
 	}
 }
 
@@ -122,17 +122,17 @@ func (g *NodeServer) close() {
 	//e.closeOnce.Do(func() {
 	//	for _, s := range e.services {
 	//		if err := s.Close(); err != nil {
-	//			logger.Get().Sugar().Errorf("service: %s(%d) close failed: %s", s.Name(), s.ID(), err.Error())
+	//			logger.Get().Sugar().Errorf("service: %s(%d) close failed: %s", s.Name(), s.RoomType(), err.Error())
 	//		} else {
-	//			logger.Get().Sugar().Infof("service: %s(%d) closed successfully", s.Name(), s.ID())
+	//			logger.Get().Sugar().Infof("service: %s(%d) closed successfully", s.Name(), s.RoomType())
 	//		}
 	//	}
 	//	logger.Get().Info("all services closed")
 	//})
 	if err := g.Close(); err != nil {
-		log1.Get().Sugar().Errorf("service: %s(%d) close failed: %s", g.Name(), g.ID(), err.Error())
+		log2.Get().Sugar().Errorf("service: %s(%d) close failed: %s", g.Name(), g.ID(), err.Error())
 	} else {
-		log1.Get().Sugar().Infof("service: %s(%d) closed successfully", g.Name(), g.ID())
+		log2.Get().Sugar().Infof("service: %s(%d) closed successfully", g.Name(), g.ID())
 	}
-	log1.Get().Info("all services closed")
+	log2.Get().Info("all services closed")
 }

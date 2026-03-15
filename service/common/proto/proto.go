@@ -2,7 +2,9 @@ package proto
 
 import (
 	"errors"
+	"gameServer/common/errorCode"
 	"gameServer/service/common"
+
 	"google.golang.org/protobuf/proto"
 )
 
@@ -70,12 +72,12 @@ func Unmarshal(in []byte, out any) error {
 func Response1(in any) *common.Resp {
 	resp := &common.Resp{}
 	if in == nil {
-		resp.Code = ErrorCode_Success
+		resp.Code = errorCode.ErrorCode_Success
 		return resp
 	}
 	b, err := Marshal(in)
 	if err != nil {
-		resp.Code = ErrorCode_ProtoMarshalFailed
+		resp.Code = errorCode.ErrorCode_ProtoMarshalFailed
 		return resp
 	}
 	resp.Body = b
@@ -90,7 +92,7 @@ func Response2(in any, flag uint16) *common.Resp {
 	}
 	b, err := Marshal(in)
 	if err != nil {
-		resp.Code = ErrorCode_ProtoMarshalFailed
+		resp.Code = errorCode.ErrorCode_ProtoMarshalFailed
 		return resp
 	}
 	resp.Body = b

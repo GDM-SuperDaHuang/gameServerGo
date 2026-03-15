@@ -1,0 +1,24 @@
+syntax = "proto3";
+package item;
+option go_package = "gameServer/protobuf/pbGo";
+
+// RoleInfo 角色完整数据，玩家登录时使用
+message itemInfo {
+  uint64 itemId = 1; // 道具id
+  uint64 count = 2;  //道具数量
+}
+
+// 查询自身道具 2001
+message itemInfoRep {
+}
+message itemInfoResp {
+  repeated itemInfo itemList=1;
+}
+
+
+// 购买道具 2002
+message buyItemRep {
+    itemInfo item = 1;
+}
+message buyItemResp {
+}

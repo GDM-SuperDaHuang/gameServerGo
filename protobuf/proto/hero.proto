@@ -1,0 +1,18 @@
+syntax = "proto3";
+package hero;
+option go_package = "gameServer/protobuf/pbGo";
+
+// RoleInfo 角色完整数据，玩家登录时使用
+message heroInfo {
+  uint32 heroId = 1; // 对应配置表id
+  bool unlock = 2;  //是否解锁
+}
+
+
+// 购买人物 2003
+message buyHeroRep {
+  uint32 heroId = 1; // 对应配置表id
+}
+message buyHeroResp {
+  repeated heroInfo heroInfoList = 1;
+}

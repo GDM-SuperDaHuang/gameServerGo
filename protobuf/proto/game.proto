@@ -1,0 +1,94 @@
+syntax = "proto3";
+package hero;
+option go_package = "gameServer/protobuf/pbGo";
+import "player.proto";
+import "item.proto";
+
+// 匹配请求 1001
+message startMatchReq{
+  uint32 roomType = 1; // 房间类型,对应配置表roomId
+  uint32 heroId = 2; // 选择的人物
+  repeated item.itemInfo itemInfoList = 3;//选择的道具
+}
+message startMatchResp {
+}
+
+// 匹配信息推送 1002
+message MatchInfoPush{
+  uint32 roomType = 1; // 对应配置表id
+  repeated player.playerInfo playerInfoList = 2;
+}
+
+// 取消匹配 1003
+message cancelMatchReq{
+}
+message cancelMatchResp {
+}
+
+// 竞拍请求 1004
+message betReq {
+  repeated item.itemInfo betInfo = 1;
+  int32 operation = 2; // 操作类型，0:竞拍，1弃权
+}
+message betResp {
+  player.playerInfo playerInfo = 1;
+}
+
+// 轮数信息推送 1005
+message  roundInfoPush {
+  int64 endTimeOut = 1;//本局结束倒计时，时间戳毫秒
+  uint32 roundIndex = 2;//第几轮
+  bool isFinish = 3;//是否结束
+  screenInfo changeScreenInfo = 4;//上局的所有的信息
+  repeated hint hintList = 6;// 提示信息,包含词条，人物的
+  RoomSettlementInfo SettlementInfo = 7;//结算信息，如果 isFinish=true 时有值
+}
+
+// 使用道具请求 1006
+message useItemReq{
+  item.itemInfo item = 1;//使用的道具
+}
+message useItemResp {
+  repeated item.itemInfo itemInfoList = 1;//剩余的道具
+  screenInfo changeScreenInfo = 2;//新变化的信息
+  repeated hint hintList = 3;// 提示信息,包含词条，人物的
+}
+
+
+// 提示信息
+message  hint {
+  uint32 id = 1; // 提示id,对应 ability的id
+  uint32 hintType = 2; // 0：人物提示，1：词条提示
+  uint64 value = 3;//总价值,平均价值,的值等,已经扩大1000分比
+  uint32 valueType = 4;//0：没有值，1：总价值,2:平均价值等,的值等，已经扩大1000分比
+}
+
+
+// 屏幕信息
+message  screenInfo {
+  repeated Grid GridList = 1;//品质变化
+  repeated goods allGoods = 2;
+  repeated player.playerInfo playerInfoList = 3;//玩家竞拍信息
+}
+
+// 物品信息
+message  goods {
+  uint32 itemId = 1; // 产品id
+  uint32 index = 2; // 位置
+  uint32 showAll = 3;//图片是否全显示效果，0:隐藏，回合数index，等于当前回合数则是当前局变化的，小于则是之前局变化的,0代表不显示，回合:1~5,
+  uint32 showContour = 4;//轮廓是否显示效果，0:隐藏回合数index，等于当前回合数则是当前局变化的，小于则是之前局变化的,0代表不显示，回合:1~5,
+}
+
+// 一个格子信息
+message  Grid {
+  uint32 indexId = 1; // 位置
+  uint32 showQuality = 2;//品质是否显示效果，回合数index，等于当前回合数则是当前局变化的，小于则是之前局变化的,0代表不显示，回合:1~5,
+  uint32 qualityType = 3;//品质是否显示效果，回合数index，等于当前回合数则是当前局变化的，小于则是之前局变化的,0代表不显示，回合:1~5,
+}
+
+// 房间结算信息
+message RoomSettlementInfo{
+  player.playerInfo playerInfo = 1;//结算玩家
+  item.itemInfo expenses = 2;//花费
+  item.itemInfo profit = 3;//利润
+}

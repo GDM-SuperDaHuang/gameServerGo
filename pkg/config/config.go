@@ -3,7 +3,8 @@ package config
 import (
 	"errors"
 	"fmt"
-	"gameServer/pkg/logger/log1"
+	"gameServer/pkg/logger/log2"
+	"strconv"
 	"strings"
 
 	"github.com/fsnotify/fsnotify"
@@ -91,7 +92,7 @@ func New(nodeName, serviceName, filePath, fileName, fileType string) (*Config, e
 	viper.OnConfigChange(func(_ fsnotify.Event) {
 		c.read(v, nodeName, serviceName)
 
-		log1.Get().Info("config reload")
+		log2.Get().Info("config reload")
 	})
 
 	return c, nil
@@ -195,6 +196,11 @@ func (c *Config) CacheAddress() string {
 	return c.common.GetString("cacheaddress")
 }
 
+// CacheAddress 缓存地址
+func (c *Config) RedisAddress() string {
+	return c.common.GetString("redisAddr")
+}
+
 // CacheDB 缓存数据库，redis 0-15
 func (c *Config) CacheDB() int {
 	return c.common.GetInt("cachedb")
@@ -282,3 +288,40 @@ func (c *Config) PProfAddress() string {
 func (c *Config) GameConfigFilePath() string {
 	return c.common.GetString("gameconfigpath")
 }
+
+// =======================================================ssdb=================================================================
+// ssdb 游戏配置文件路径
+func (c *Config) GameSSDBHost() string {
+	return c.common.GetString("ssdbHost")
+}
+
+func (c *Config) GameSSDBPort() int {
+	str := c.common.GetString("ssdbPost")
+	if str == "" {
+		panic(errors.New("ssdbPost is empty"))
+		return 0
+	}
+	v, err := strconv.Atoi(str)
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
+func (c *Config) GameSSDBMaxPoolSize() int {
+	str := c.common.GetString("ssdbMaxPoolSize")
+	if str == "" {
+		panic(errors.New("ssdbPost is empty"))
+		return 0
+	}
+	v, err := strconv.Atoi(str)
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
+
+func (c *Config) GameSSDBPassword() string {
+	return c.common.GetString("ssdbPassword")
+}
+
+// =======================================================ssdb=================================================================

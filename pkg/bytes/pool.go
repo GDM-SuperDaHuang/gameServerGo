@@ -3,7 +3,7 @@ package bytes
 import (
 	"bytes"
 	"fmt"
-	"gameServer/pkg/logger/log1"
+	"gameServer/pkg/logger/log2"
 	"gameServer/pkg/utils"
 	"reflect"
 	"sync"
@@ -337,7 +337,7 @@ func (tp *TypePools) ResetTypeStats(t reflect.Type) {
 // LogStats 输出对象池统计信息到日志
 // logs the usage statistics of the pool
 func (p *BufferPool) LogStats() {
-	log := log1.Get()
+	log := log2.Get()
 	if log == nil {
 		return
 	}
@@ -360,7 +360,7 @@ func (p *BufferPool) LogStats() {
 // LogStats 输出对象池统计信息到日志
 // logs the usage statistics of the pool
 func (c *Pool[T]) LogStats() {
-	log := log1.Get()
+	log := log2.Get()
 	if log == nil {
 		return
 	}
@@ -406,7 +406,7 @@ func (c *Pool[T]) Close() {
 // LogStats 输出所有类型对象池统计信息到日志
 // logs the usage statistics of all type pools
 func (tp *TypePools) LogStats() {
-	log := log1.Get()
+	log := log2.Get()
 	if log == nil {
 		return
 	}
@@ -426,7 +426,7 @@ func StartStatsLogger(interval time.Duration) {
 		interval = 5 * time.Minute // 默认5分钟记录一次
 	}
 
-	log := log1.Get()
+	log := log2.Get()
 	if log == nil {
 		return
 	}
@@ -448,23 +448,24 @@ func StartStatsLogger(interval time.Duration) {
 	}()
 }
 
+// 对象池统计
 func logStatus(poolType, typeName string, getCount, putCount uint64) {
 	if getCount == putCount {
-		log1.Get().Info(poolType,
+		log2.Get().Info(poolType,
 			zap.String("POOL_STATUS", "OK"),
 			zap.String("type", typeName),
 			zap.Uint64("get_count", getCount),
 			zap.Uint64("put_count", putCount),
 			zap.Int64("diff", int64(getCount-putCount)))
 	} else if getCount > putCount {
-		log1.Get().Warn(poolType,
+		log2.Get().Warn(poolType,
 			zap.String("POOL_STATUS", "OK"),
 			zap.String("type", typeName),
 			zap.Uint64("get_count", getCount),
 			zap.Uint64("put_count", putCount),
 			zap.Int64("diff", int64(getCount-putCount)))
 	} else {
-		log1.Get().Error(poolType,
+		log2.Get().Error(poolType,
 			zap.String("POOL_STATUS", "OK"),
 			zap.String("type", typeName),
 			zap.Uint64("get_count", getCount),

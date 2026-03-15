@@ -14,12 +14,12 @@ import (
 // DefaultSelector 选择特定版本，如果没有选择最新的版本，（如果退出登录再次请求，回选择最新的版本,否则用户选择旧的版本）
 type DefaultSelector struct {
 	mu      sync.RWMutex //可能并发
-	servers []*serverInfo
+	Servers []*serverInfo
 }
 type serverInfo struct {
-	id      uint32
+	Id      uint32
 	groupId uint32
-	address string
+	Address string
 
 	maxVersion uint32
 	curVersion uint32
@@ -30,28 +30,27 @@ type serverInfo struct {
 // NewRandomSelector 创建随机选择器
 //func NewDefaultSelector() *DefaultSelector {
 //	return &DefaultSelector{
-//		servers: make([]*serverInfo, 0),
+//		Servers: make([]*serverInfo, 0),
 //	}
 //}
 
 // Select 随机选择一个服务器，由 rpcx 调用
 func (s *DefaultSelector) Select(ctx context.Context, servicePath, serviceMethod string, _ /** args */ any) string {
-	if len(s.servers) == 0 {
+
+	if len(s.Servers) == 0 {
 		return ""
 	}
 	m, ok := ctx.Value(share.ResMetaDataKey).(map[string]string)
-	//id, _ := ctx.Value("Id").(uint32)
-	//m, ok := ctx.Value(share.ReqMetaDataKey).(map[string]string)
 	if !ok {
 		return ""
 	}
 	// 选择一台目标机器
 	oneServer := getServerInfo(m)
-	if oneServer.groupId == 1 && oneServer.id == 0 { //远程到来的，空网关直接返回
+	if oneServer.groupId == 1 && oneServer.Id == 0 { //远程到来的，空网关直接返回
 		return ""
 	}
 	address := ""
-	for _, server := range s.servers {
+	for _, server := range s.Servers {
 		// 假设 game-1 存在两个版本的进程
 		// v1: 线上版本
 		// v2: 新开发功能，发布前测试版本
@@ -60,10 +59,10 @@ func (s *DefaultSelector) Select(ctx context.Context, servicePath, serviceMethod
 		//
 		// 此时，versionMin = 2, versionMax = 2
 		// 就会匹配到 v2 版本
-		if oneServer.id == 0 { //没有数据,则按平均分配服务器
+		if oneServer.Id == 0 { //没有数据,则按平均分配服务器
 			if server.groupId == oneServer.groupId && server.curVersion == server.maxVersion { //没有则返回最大版本
 				serverList := make([]*serverInfo, 0) //相同组的所有版本
-				for _, tempServer := range s.servers {
+				for _, tempServer := range s.Servers {
 					if server.groupId == tempServer.groupId && tempServer.curVersion == tempServer.maxVersion {
 						serverList = append(serverList, tempServer)
 					}
@@ -71,14 +70,14 @@ func (s *DefaultSelector) Select(ctx context.Context, servicePath, serviceMethod
 				// 从 serverList 选择一个
 				targetServer := serverList[rand.Intn(len(serverList))]
 				// 写入返回数据
-				ctx = context.WithValue(ctx, share.ResMetaDataKey, map[string]string{
-					"id": strconv.Itoa(int(targetServer.id)),
-				})
-				return targetServer.address
+				//ctx = context.WithValue(ctx, share.ResMetaDataKey, map[string]string{
+				//	"Id": strconv.Itoa(int(targetServer.Id)),
+				//})
+				return targetServer.Address
 			}
 		} else {
-			if server.id == oneServer.id {
-				return server.address
+			if server.Id == oneServer.Id {
+				return server.Address
 			}
 		}
 
@@ -92,12 +91,12 @@ func (s *DefaultSelector) UpdateServer(servers map[string]string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if len(servers) == 0 {
-		fmt.Println("servers is empty")
+		fmt.Println("Servers is empty")
 		return
 	}
 
 	// 更新版本
-	s.servers = make([]*serverInfo, 0)
+	s.Servers = make([]*serverInfo, 0)
 	groupIdMaxVersionMap := make(map[uint32]uint32)
 	for address, metadata := range servers {
 		serverMetadata := parseServerMetadata(metadata, address)
@@ -106,17 +105,17 @@ func (s *DefaultSelector) UpdateServer(servers map[string]string) {
 		}
 		// 排重
 		flag := false
-		for _, info := range s.servers {
-			if info.id == serverMetadata.id {
+		for _, info := range s.Servers {
+			if info.Id == serverMetadata.Id {
 				flag = true
 				break
 			}
 		}
 		if !flag {
-			s.servers = append(s.servers, serverMetadata)
+			s.Servers = append(s.Servers, serverMetadata)
 		}
 	}
-	for _, info := range s.servers { //todo？？？
+	for _, info := range s.Servers { //todo？？？
 		info.maxVersion = groupIdMaxVersionMap[info.groupId]
 	}
 }
@@ -125,6 +124,8 @@ func getServerInfo(metadata map[string]string) *serverInfo {
 	var (
 		id, _         = strconv.Atoi(metadata["id"])
 		curVersion, _ = strconv.Atoi(metadata["curVersion"])
+		groupId, _    = strconv.Atoi(metadata["groupId"])
+
 		//versionMax, _ = strconv.Atoi(metadata["versionMax"])
 		roomStatus, _ = strconv.Atoi(metadata["roomStatus"])
 	)
@@ -132,8 +133,9 @@ func getServerInfo(metadata map[string]string) *serverInfo {
 	// todo 对象池优化
 	//v := clientMetadataPool.Get()
 	return &serverInfo{
-		id:         uint32(id),
+		Id:         uint32(id),
 		curVersion: uint32(curVersion),
+		groupId:    uint32(groupId), //？？？
 		//maxVersion: uint32(versionMax),
 		roomStatus: uint8(roomStatus),
 	}
@@ -141,7 +143,7 @@ func getServerInfo(metadata map[string]string) *serverInfo {
 
 func parseServerMetadata(metadata, address string) *serverInfo {
 	out := &serverInfo{
-		address: address,
+		Address: address,
 	}
 
 	l1 := strings.Split(metadata, "&")
@@ -150,7 +152,7 @@ func parseServerMetadata(metadata, address string) *serverInfo {
 		switch key {
 		case "id":
 			t, _ := strconv.Atoi(value)
-			out.id = uint32(t)
+			out.Id = uint32(t)
 		case "groupId":
 			t, _ := strconv.Atoi(value)
 			out.groupId = uint32(t)

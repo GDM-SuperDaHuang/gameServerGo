@@ -3,10 +3,10 @@ chcp 65001 >nul
 setlocal
 
 :: protoc.exe 路径
-set "PROTOC_BIN=E:\Softstore\protoc-28.2-win64\bin\protoc.exe"
+set "PROTOC_BIN=D:\Program Files\protoc-33.4-win64\bin\protoc.exe"
 
 :: protoc-gen-go 必须在 PATH
-set "PATH=%PATH%;E:\gowork\bin"
+set "PATH=%PATH%;D:\work\bin"
 
 echo 当前路径: %cd%
 echo.

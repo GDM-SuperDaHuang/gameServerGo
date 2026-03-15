@@ -1,5 +1,5 @@
 syntax = "proto3";
-package user;
+package test;
 option go_package = "gameServer/protobuf/pbGo";
 
 // RoleInfo 角色完整数据，玩家登录时使用
@@ -11,4 +11,14 @@ message testRpcRep {
 message testRpcResp {
   uint64 id = 1;
   string name = 2;
+}
+
+
+// 100
+message testAddItemRep {
+  uint64 id = 1;
+  uint64 count = 2;
+  uint64 userId = 3;
+}
+message testAddItemResp {
 }

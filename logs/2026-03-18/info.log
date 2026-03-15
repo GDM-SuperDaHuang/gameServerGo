@@ -1,0 +1,11 @@
+{"level":"info","ts":"2026-03-18T23:59:03.655+0800","caller":"home/main.go:50","msg":"pprof listen","address":":7061"}
+{"level":"info","ts":"2026-03-18T23:59:03.695+0800","caller":"rpc/forward.go:90","msg":"[game.forward.register] success","num":5}
+{"level":"info","ts":"2026-03-18T23:59:03.695+0800","caller":"node/nodeImp.go:37","msg":"[gate] create success","id":2000,"node":"home-1","version":0}
+{"level":"info","ts":"2026-03-18T23:59:08.709+0800","caller":"server/serverImp.go:79","msg":"etcd Register==","address=":"tcp@172.28.112.1:58327","etcd =":[":12379",":22329",":32329"]}
+{"level":"info","ts":"2026-03-18T23:59:08.725+0800","caller":"node/rpc.go:35","msg":"[initRPC] server start","info":"home-1(id: 2000)[version: 0][listen: tcp@172.28.112.1:58327]"}
+{"level":"info","ts":"2026-03-18T23:59:08.726+0800","caller":"node/nodeImp.go:86","msg":"[account] started"}
+{"level":"info","ts":"2026-03-19T00:03:36.264+0800","caller":"node/nodeImp.go:109","msg":"received signal: interrupt"}
+{"level":"info","ts":"2026-03-19T00:03:36.265+0800","caller":"node/nodeImp.go:113","msg":"close signal .. shufhown server .."}
+{"level":"info","ts":"2026-03-19T00:03:36.275+0800","caller":"node/nodeImp.go:98","msg":"[account] closed"}
+{"level":"info","ts":"2026-03-19T00:03:36.275+0800","caller":"node/nodeImp.go:135","msg":"service: home-1(2000) closed successfully"}
+{"level":"info","ts":"2026-03-19T00:03:36.275+0800","caller":"node/nodeImp.go:137","msg":"all services closed"}

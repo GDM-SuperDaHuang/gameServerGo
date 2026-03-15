@@ -3,7 +3,7 @@ package common
 import (
 	"gameServer/pkg/bytes"
 	"gameServer/pkg/config"
-	"gameServer/pkg/logger/log1"
+	"gameServer/pkg/logger/log2"
 	"net"
 	"sync"
 	"time"
@@ -39,7 +39,7 @@ type Session struct {
 	remoteAddr string
 
 	PingTime time.Time
-	//readChan  chan struct{}
+	ReadChan chan struct{}
 	//closeChan chan struct{}
 
 	// ready 是否准备好
@@ -54,13 +54,6 @@ type Session struct {
 	closeOnce sync.Once
 	lock      sync.RWMutex
 }
-
-//type Player struct {
-//	accountID    uint64
-//	realServerID uint32 // 角色当前所在的区服 id
-//	serverID     uint32 // 角色归属区服 id
-//	RoleID       uint64 // 角色 id
-//}
 
 // -------------------------------------- 外部 --------------------------------------
 
@@ -106,6 +99,7 @@ func (s *Session) WriteCb(b []byte, cb func()) error {
 	//if len(b) > 0 {
 	//	fmt.Printf("Send %d bytes:\n%s\n", len(b), hex.Dump(b))
 	//}
+
 	return s.conn.AsyncWrite(b, func(_ gnet.Conn, err error) error {
 		if cb != nil {
 			cb()
@@ -114,6 +108,7 @@ func (s *Session) WriteCb(b []byte, cb func()) error {
 		if err == net.ErrClosed {
 			err = nil
 		}
+
 		return err
 	})
 }
@@ -130,10 +125,11 @@ func (s *Session) WriteCb(b []byte, cb func()) error {
 func (s *Session) Reset() {
 	s.conn = nil
 	s.remoteAddr = ""
+	s.ReadChan = nil
 
 	s.shareKey = ""
 	if s.Player != nil {
-		playerPool.Put(s.Player)
+		PlayerPool.Put(s.Player)
 		s.Player = nil
 	}
 	//s.version = nil
@@ -147,7 +143,7 @@ func NewSession(c gnet.Conn) *Session {
 
 	s.conn = c
 	// 客户端请求并发数目前设置为 1
-	//s.readChan = make(chan struct{}, 1)
+	s.ReadChan = make(chan struct{}, 1)
 	//s.closeChan = make(chan struct{})
 	s.remoteAddr = s.RemoteAddrString()
 	return s
@@ -184,7 +180,7 @@ func (s *Session) incrementAndCheckRetries(n *int, maxN int) bool {
 	*n++
 	if *n > maxN {
 		if err := s.conn.Close(); err != nil {
-			log1.Get().Error("[gate.session.start] checkHeart failed then conn.Close failed", zap.Error(err))
+			log2.Get().Error("[gate.session.start] checkHeart failed then conn.Close failed", zap.Error(err))
 		}
 		return true
 	}
@@ -210,7 +206,7 @@ func (s *Session) reset() {
 	s.conn = nil
 	s.remoteAddr = ""
 	s.PingTime = time.Time{}
-	//s.readChan = nil
+	s.ReadChan = nil
 	//s.closeChan = nil
 	s.shareKey = ""
 	s.Player = nil
@@ -223,12 +219,12 @@ func (s *Session) shutdown() {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
-	log1.Get().Debug(
+	log2.Get().Debug(
 		"[gate.session.shutdown] exit",
 		zap.String("address", s.RemoteAddrString()),
 		zap.Uint64("account", s.accountID()),
 		zap.Uint32("server", s.serverID()),
-		zap.Uint64("role", s.roleID()),
+		zap.Uint64("role", uint64(s.UserID())),
 	)
 
 	// TODO 玩家已登录处理
@@ -274,14 +270,14 @@ func (s *Session) serverID() uint32 {
 	return s.Player.serverID
 }
 
-func (s *Session) roleID() uint64 {
+func (s *Session) UserID() uint64 {
 	if s.Player == nil {
 		return 0
 	}
 	return s.Player.UserId
 }
 
-var playerPool = bytes.NewPool(func() *Player {
+var PlayerPool = bytes.NewPool(func() *Player {
 	return &Player{}
 })
 
