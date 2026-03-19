@@ -2,7 +2,6 @@ package config
 
 import (
 	"gameServer/common/config"
-	"math/rand"
 )
 
 // 能力配置表
@@ -25,22 +24,23 @@ type Ability struct {
 
 // 房间配置
 type Room struct {
-	RoomType         uint32            `excel:"roomType"`         //房间类型
-	Consume          map[int]uint64    `excel:"consume"`          // 消耗
-	Limit            map[uint64]uint64 `excel:"limit"`            // 限制
-	CapacityLimit    int               `excel:"capacityLimit"`    // 人数限制
-	EntryList        []int             `excel:"entryList"`        // 词条集合
-	EntryRound       []uint8           `excel:"entryRound"`       // 词条参与的局索引
-	Timeout          int64             `excel:"timeout"`          // 操作超时
-	RoundLimit       uint8             `excel:"roundLimit"`       // 最大局数
-	ItemList         []int             `excel:"itemList"`         // 藏品id集合
-	ItemSum          uint32            `excel:"itemSum"`          // 藏品随机数量
-	EarlyTermination []int             `excel:"earlyTermination"` // 藏品随机数量
+	RoomType         uint32           `excel:"roomType"`         //房间类型
+	Consume          map[int]int64    `excel:"consume"`          // 消耗
+	Limit            map[uint64]int64 `excel:"limit"`            // 限制
+	CapacityLimit    int              `excel:"capacityLimit"`    // 人数限制
+	EntryList        []int            `excel:"entryList"`        // 词条集合
+	EntryRound       []int8           `excel:"entryRound"`       // 词条参与的局索引
+	Timeout          int              `excel:"timeout"`          // 操作超时
+	RoundLimit       uint8            `excel:"roundLimit"`       // 最大局数
+	ItemList         []int            `excel:"itemList"`         // 藏品id集合
+	ItemSum          uint32           `excel:"itemSum"`          // 藏品随机数量
+	EarlyTermination []int            `excel:"earlyTermination"` // 藏品随机数量
+	RobotList        []uint8          `excel:"robotList"`        // 机器人id list
 }
 
 type Robot struct {
-	RobotType     uint8    `excel:"robotType"`     //机器人类型
-	RoomTypeList  []uint32 `excel:"roomTypeList"`  //房间
+	RobotType uint8 `excel:"robotType"` //机器人类型
+
 	CharacterList []uint32 `excel:"characterList"` //人物
 	JoinTimes     []int    `excel:"joinTimes"`     //加入时间
 	ThinkTimes    []int    `excel:"thinkTimes"`    //思考时间
@@ -70,6 +70,22 @@ var (
 		"robot":   &robotList,
 	}
 )
+
+func GetRobotById(id uint8) *Robot {
+	all, ok := allStructMap["robot"]
+	if !ok {
+		return nil
+	}
+	prt := all.(*[]*Robot)
+	infos := *prt
+
+	for _, info := range infos {
+		if info.RobotType == id {
+			return info
+		}
+	}
+	return nil
+}
 
 func GetAllExcelConfig() map[string]interface{} {
 	return allStructMap
@@ -160,24 +176,4 @@ func GetAllItemConfigById() []*config.Item {
 	prt := roomInfo.(*[]*config.Item)
 	infos := *prt
 	return infos
-}
-
-func GetRobotConfigByRoomType(roomType uint32) *Robot {
-	all, ok := allStructMap["robot"]
-	if !ok {
-		return nil
-	}
-	prt := all.(*[]*Robot)
-	infos := *prt
-
-	robotTypeList := make([]*Robot, 0, 1)
-	for _, info := range infos {
-		for _, rt := range info.RoomTypeList {
-			if rt == roomType {
-				robotTypeList = append(robotTypeList, info)
-				break
-			}
-		}
-	}
-	return robotTypeList[rand.Intn(len(robotTypeList))]
 }

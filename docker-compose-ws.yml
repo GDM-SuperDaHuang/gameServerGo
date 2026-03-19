@@ -1,0 +1,12 @@
+services:
+  websockify:
+    image: novnc/websockify:latest
+    container_name: websockify   # 可选，指定容器名称
+    ports:
+      - "7001:80"                # 映射主机 7001 端口到容器 80 端口
+    command: ["80", "192.168.1.102:8821"]
+    networks:
+      - ldl_network
+networks:
+  ldl_network:
+    external: true

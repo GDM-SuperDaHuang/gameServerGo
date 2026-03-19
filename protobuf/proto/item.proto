@@ -5,7 +5,7 @@ option go_package = "gameServer/protobuf/pbGo";
 // RoleInfo 角色完整数据，玩家登录时使用
 message itemInfo {
   uint64 itemId = 1; // 道具id
-  uint64 count = 2;  //道具数量
+  int64 count = 2;  //道具数量
 }
 
 // 查询自身道具 2001

@@ -1,0 +1,16 @@
+services:
+  node-room-1:
+    image: gameservergo-node-room-1
+    container_name: node-room-1
+    ports:
+      - "7071:7071"
+    volumes:
+      - ./config:/app/config
+      - ./logs:/app/logs
+      - ./excels:/app/excels
+    networks:
+      - ldl_network
+
+networks:
+  ldl_network:
+    external: true

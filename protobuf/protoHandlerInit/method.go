@@ -6,7 +6,7 @@ var ProtoIdToMethodMap = map[uint16]string{
 	// 房间游戏
 	1001: "StartMatchHandler", //开始匹配
 	//1002: "MatchInfoPush",
-	1003: "cancelMatchHandler", //取消匹配
+	1003: "CancelMatchHandler", //取消匹配
 	1004: "BetHandler",         //竞拍
 	// 1005: roundInfoPush //推送竞拍
 	1006: "UseItemHandler", //道具使用竞拍

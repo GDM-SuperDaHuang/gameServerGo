@@ -3,11 +3,11 @@ services:
     image: gate1.0
     container_name: node-gate-1
     ports:
-      - "7001:7001"
+      - "8001:8001"
     volumes:
-      - ./config:/config
-      - ./logs:/logs
-      - ./excels:/excels
+      - ./config:/app/config
+      - ./logs:/app/logs
+      - ./excels:/app/excels
     networks:
       - ldl_network
 

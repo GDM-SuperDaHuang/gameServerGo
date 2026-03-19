@@ -29,7 +29,7 @@ FROM prepare AS builder
 COPY . .
 # 在指定文件夹./service/app/node，输出文件名testNode，testNode.exe（Windows）， testNode（Linux）
 # -s 去掉符号表（symbol table），-w 去掉调试信息（debug info）
-RUN go build -ldflags="-s -w" -o testNode ./service/app/node
+RUN go build -ldflags="-s -w" -o room ./app/room
 
 # # 安装压缩工具，golang:1.24 时安装报错，因此替换为 golang:1.24-alpine
 # RUN echo "https://mirrors.aliyun.com/alpine/v3.20/main/" > /etc/apk/repositories \
@@ -66,9 +66,8 @@ RUN echo "https://mirrors.aliyun.com/alpine/v3.20/main/" > /etc/apk/repositories
     # && echo Asia/Shanghai > /etc/timezone \
     && apk del tzdata
 
-COPY --from=builder /app/testNode  /app/testNode
+COPY --from=builder /app/room  /app/room
 
-RUN mkdir -p  /app/logs
+RUN mkdir -p  /logs
 
-# CMD ["/app/testNode", "--configPath", "/app/config", "--configName", "config.docker", "--configType", "toml", "--logPath", "/app/logs", "--logLevel", "debug", "--node", "testNode-1"]
-CMD ["/app/testNode"]
+CMD ["/app/room"]

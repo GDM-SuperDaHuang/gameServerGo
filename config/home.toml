@@ -1,19 +1,21 @@
 [common]
 # etcd 地址
-#etcdaddress = ":12379;:22329;:32329"
-etcdaddress = "etcd1:2379;etcd2:2379;etcd3:2379"
+etcdaddress = ":12379;:22329;:32329"
+#etcdaddress = "etcd1:2379;etcd2:2379;etcd3:2379"
 # etcd 前缀
 etcdprefix = "node"
 # rpc 心跳间隔，秒
 rpcheart = 10
 
 # ssdb 信息
-ssdbHost = "172.16.0.9"
-ssdbPost = 23840
+ssdbHost = "127.0.0.1"
+#ssdbHost = "ldl.ssdb1"
+ssdbPost = 8888
 ssdbMaxPoolSize = 1000
-ssdbPassword="b8a31963bb4907fbe2e5ea388a3f5aa9"
+ssdbPassword=""
 
-redisAddr = "ldl.redis:6379"
+#redisAddr = "ldl.redis:6379"
+redisAddr = "127.0.0.1:16379"
 
 [home]
 [home-1]

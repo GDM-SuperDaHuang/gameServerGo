@@ -3,13 +3,13 @@ package room
 import (
 	"context"
 	"gameServer/app/room/hander/config"
+	"gameServer/app/room/hander/roomF"
+	"gameServer/common/constValue"
 	"gameServer/common/db/items"
 	"gameServer/common/errorCode"
 	"gameServer/pkg/logger/log2"
 	"gameServer/protobuf/pbGo"
-	"gameServer/protobuf/protoHandlerInit"
 	"gameServer/service/common"
-	"gameServer/service/services/node"
 
 	"go.uber.org/zap"
 )
@@ -44,82 +44,45 @@ func (h *HandlerRoom) StartMatchHandler(_ context.Context, player *common.Player
 	}
 	// 立马响应条件满足
 	resp = &pbGo.StartMatchResp{}
-	itemMap := make(map[uint64]uint64)
+	itemMap := make(map[int]int64)
 	for _, info := range req.ItemInfoList {
-		itemMap[info.ItemId] = info.Count
+		itemMap[int(info.ItemId)] = info.Count
 	}
 	// 进入匹配
-	MatchPlayer(roomConfig, &PlayerInfo{
-		heroId:  req.HeroId,
-		itemMap: itemMap,
-		player:  player,
-	})
+	roomF.StartMatch(&roomF.PlayerInfo{
+		HeroId:        req.HeroId,
+		ChoiceItemMap: itemMap,
+		Player:        player,
+	}, roomConfig)
 	return nil
 }
 
 // 取消匹配 1003
-func (h *HandlerRoom) CancelMatchRespHandler(_ context.Context, player *common.Player, _ *pbGo.CancelMatchReq, resp *pbGo.CancelMatchResp) *common.ErrorInfo {
-	ok := RemoveHasJoinPlayer(player)
-	if !ok {
-		return &common.ErrorInfo{
-			Code: errorCode.ErrorCode_NotJoinRoom,
-		}
-	}
-
+func (h *HandlerRoom) CancelMatchHandler(_ context.Context, player *common.Player, _ *pbGo.CancelMatchReq, resp *pbGo.CancelMatchResp) *common.ErrorInfo {
+	roomF.CancelMatch(player.UserId)
+	//if !ok {
+	//	return &common.ErrorInfo{
+	//		Code: errorCode.ErrorCode_NotJoinRoom,
+	//	}
+	//}
 	resp = &pbGo.CancelMatchResp{}
 	return nil
 }
 
 // 竞拍 1004
 func (h *HandlerRoom) BetHandler(_ context.Context, player *common.Player, req *pbGo.BetReq, resp *pbGo.BetResp) *common.ErrorInfo {
+	count := int64(0)
 	// 如果在房间中
-	room := FindHasJoinedRoom(player.UserId)
-	if room == nil || room.roomStatus == Matching {
-		return &common.ErrorInfo{
-			Code: errorCode.ErrorCode_NotJoinRoom,
+	for _, info := range req.BetInfo {
+		if info.ItemId == uint64(constValue.GoldItemId) {
+			count = info.Count
 		}
 	}
-	code := room.roundList.getCurRoundOp(player.UserId)
+	code := roomF.BetOp(player.UserId, count)
 	if code > 0 {
 		return &common.ErrorInfo{
 			Code: code,
 		}
-	}
-	// 正式操作
-
-	consume := map[int]uint64{}
-	for _, info := range req.BetInfo {
-		consume[int(info.ItemId)] = info.Count
-	}
-
-	//2. 检查是否满足条件
-	ok := items.VerifyItem(player.UserId, consume)
-	if !ok {
-		return &common.ErrorInfo{
-			Code: errorCode.ErrorCode_ItemNotEnough,
-		}
-	}
-
-	ok = PlayerOperate(&Operation{
-		userId:    player.UserId,
-		operation: opBet,
-		consume:   consume,
-	})
-	if !ok {
-		return &common.ErrorInfo{
-			Code: errorCode.ErrorCode_NotJoinRoom,
-		}
-	}
-
-	for _, one := range room.playerInfos.playerInfos {
-		if one.player.UserId == player.UserId {
-			continue
-		}
-		node.Push(one.player, protoHandlerInit.BetPush, &pbGo.BetResp{
-			PlayerInfo: &pbGo.PlayerInfo{
-				UserId: player.UserId,
-			},
-		})
 	}
 
 	// 立马响应条件满足
@@ -132,19 +95,14 @@ func (h *HandlerRoom) BetHandler(_ context.Context, player *common.Player, req *
 
 // 使用道具 1006
 func (h *HandlerRoom) UseItemHandler(_ context.Context, player *common.Player, req *pbGo.UseItemReq, resp *pbGo.UseItemResp) *common.ErrorInfo {
-	room := FindHasJoinedRoom(player.UserId)
-	item := req.Item
-	if item == nil {
-		return &common.ErrorInfo{
-			Code: errorCode.ErrorCode_UseNullItem,
-		}
-	}
-	msg, code := room.UserItem(player.UserId, int(item.ItemId), item.Count)
-	if code > 0 {
+	respData, code := roomF.UserItem(player.UserId, int(req.Item.ItemId), req.Item.Count)
+	if code != 0 {
 		return &common.ErrorInfo{
 			Code: code,
 		}
 	}
-	resp.ChangeScreenInfo = msg
+	resp.ChangeScreenInfo = respData.ChangeScreenInfo
+	resp.HintList = respData.HintList
+	resp.ItemInfoList = respData.ItemInfoList
 	return nil
 }

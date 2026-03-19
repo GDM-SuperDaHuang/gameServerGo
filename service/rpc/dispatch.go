@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"gameServer/common/errorCode"
 	"gameServer/service/common"
-	"time"
 )
 
 var sum = 0
@@ -14,7 +13,7 @@ var sum = 0
 // Dispatch 网关发生的消息派遣
 func (f *Forward) Dispatch(ctx context.Context, req *common.RpcMessage, resp *common.Resp) error {
 	sum++
-	start := time.Now().UnixMilli()
+	//start := time.Now().UnixMilli()
 	if req == nil {
 		resp = &common.Resp{}
 		resp.Code = errorCode.ErrorCode_GateReqNull
@@ -43,9 +42,9 @@ func (f *Forward) Dispatch(ctx context.Context, req *common.RpcMessage, resp *co
 
 	err := protocolMethod.Call(ctx, req.Player, req, resp)
 	// 计算耗时
-	end := time.Now().UnixMilli()
-	fmt.Printf("rpc Dispatch:函数运行时间: %v\n", end-start)
-	fmt.Printf("rpc Dispatch:函数运行时间: %d\n", sum)
+	//end := time.Now().UnixMilli()
+	//fmt.Printf("rpc Dispatch:函数运行时间: %v\n", end-start)
+	//fmt.Printf("rpc Dispatch:函数运行时间: %d\n", sum)
 
 	return err
 }

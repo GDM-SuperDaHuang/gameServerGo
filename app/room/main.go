@@ -12,14 +12,11 @@ import (
 	"gameServer/service/rpc"
 	"gameServer/service/services/node"
 	"net/http"
-	"os"
-	"path/filepath"
 	"time"
 
 	_ "gameServer/app/room/hander/inits"
 
 	"github.com/seefan/gossdb/v2/conf"
-	"github.com/spf13/pflag"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -29,16 +26,20 @@ import (
 
 func main() {
 
-	configPath := pflag.String("configPath", filepath.Join(filepath.Dir(os.Args[0]), "config"), "配置文件路径") // ./config/
-	configName := pflag.String("configName", "room", "配置文件名称，不带后缀")                                       // gate.toml
-	logPath := pflag.String("logPath", filepath.Join(filepath.Dir(os.Args[0]), "logs"), "日志路径")           // ./logs/
-	//logLevel := pflag.String("logLevel", "debug", "日志等级 debug info warn error fatal")
-	nodeName := pflag.String("node", "room-1", "节点名称")
-	pflag.Parse()
+	//configPath := pflag.String("configPath", filepath.Join(filepath.Dir(os.Args[0]), "config"), "配置文件路径") // ./config/
+	//configName := pflag.String("configName", "room", "配置文件名称，不带后缀")                                       // gate.toml
+	//logPath := pflag.String("logPath", filepath.Join(filepath.Dir(os.Args[0]), "logs"), "日志路径")           // ./logs/
+	////logLevel := pflag.String("logLevel", "debug", "日志等级 debug info warn error fatal")
+	//nodeName := pflag.String("node", "room-1", "节点名称")
+	//pflag.Parse()
 
-	log2.Init(log2.Config{Level: zapcore.DebugLevel, LogDir: *logPath, IsDocker: false})
+	configPath := "./config/" // ./config/
+	logPath := "./logs/"      // ./logs/
+	nodeName := "room-1"
 
-	if err := config.Init(*nodeName, "room", *configPath, *configName, "toml"); err != nil {
+	log2.Init(log2.Config{Level: zapcore.DebugLevel, LogDir: logPath, IsDocker: false})
+
+	if err := config.Init(nodeName, "room", configPath, "room", "toml"); err != nil {
 		panic(err)
 	}
 	// pprof

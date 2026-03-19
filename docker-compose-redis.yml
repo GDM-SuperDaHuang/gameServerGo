@@ -12,4 +12,4 @@ services:
       - ldl_network
 networks:
   ldl_network:
-    external: true
+    driver: bridge

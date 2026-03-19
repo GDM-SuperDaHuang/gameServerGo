@@ -25,12 +25,14 @@ cacheminidle = 1
 # redis 最大激活连接数
 cachemaxactive = 10
 redisAddr = "127.0.0.1:16379"
+#redisAddr = "ldl.redis:6379"
+
 
 # jaeger agent 地址
 # jaegeraddress = ":6831"
 
 # etcd 地址 打包docker需要切换
-# etcdaddress = "etcd1:2379;etcd2:2379;etcd3:2379"
+#etcdaddress = "etcd1:2379;etcd2:2379;etcd3:2379"
 etcdaddress = ":12379;:22329;:32329"
 # etcd 前缀
 etcdprefix = "node"
@@ -39,13 +41,14 @@ rpcheart = 10
 
 # ssdb 信息
 ssdbHost = "127.0.0.1"
+#ssdbHost = "ldl.ssdb1"
 ssdbPost = 8888
 ssdbMaxPoolSize = 1000
-ssdbPassword="test12345678"
+ssdbPassword=""
 
 # 游戏配置文件路径
 # 本地开发
-gameconfigpath = "internal/gameconfig/json/gameconfig.json"
+#gameconfigpath = "internal/gameconfig/json/gameconfig.json"
 # docker 镜像
 # gameconfigpath = "/app/gameconfig/gameconfig.json"
 
@@ -71,7 +74,7 @@ name = "gate-1"
 # 版本号
 version = 0
 # 监听地址
-Address = ":7001"
+Address = ":17001"
 # 性能监控地址
 pprofaddr = ":7051"
 

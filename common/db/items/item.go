@@ -21,7 +21,7 @@ var (
 type Item struct {
 	ItemId   int
 	ItemType int
-	Count    uint64
+	Count    int64
 }
 
 func getItemKey(userId uint64) string {
@@ -61,7 +61,7 @@ func GetAllItems(userId uint64) (map[int]*Item, error) {
 }
 
 // 验证自身道具是否充足
-func VerifyItem(userId uint64, itemMap map[int]uint64) bool {
+func VerifyItem(userId uint64, itemMap map[int]int64) bool {
 	itemInfos, err := GetAllItems(userId)
 	if err != nil {
 		log2.Get().Warn("get ItemInfo false", zap.Any("err:", err))
@@ -103,7 +103,7 @@ func GetItemNoCache(userId uint64, itemId int) (*Item, error) {
 	return &item, err
 }
 
-func RewardItem(userId uint64, itemMap map[int]uint64) bool {
+func RewardItem(userId uint64, itemMap map[int]int64) bool {
 	itemMapDb := make(map[string]interface{}) //db
 	itemInfos, err := GetAllItems(userId)
 	for itemId, chanceValue := range itemMap {
@@ -135,7 +135,7 @@ func RewardItem(userId uint64, itemMap map[int]uint64) bool {
 	return true
 }
 
-func ConsumeItem(userId uint64, itemMap map[int]uint64) bool {
+func ConsumeItem(userId uint64, itemMap map[int]int64) bool {
 	itemInfos, err := GetAllItems(userId)
 	itemMapDb := make(map[string]interface{}) // id - info
 	for itemId, chanceValue := range itemMap {

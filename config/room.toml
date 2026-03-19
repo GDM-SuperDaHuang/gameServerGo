@@ -9,8 +9,10 @@ rpcheart = 10
 
 # ssdb 信息
 ssdbHost = "127.0.0.1"
+#ssdbHost = "ldl.ssdb1"
 ssdbPost = 8888
 ssdbMaxPoolSize = 1000
+#redisAddr = "ldl.redis:6379"
 redisAddr = "127.0.0.1:16379"
 
 [room]

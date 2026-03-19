@@ -42,6 +42,8 @@ message  roundInfoPush {
   screenInfo changeScreenInfo = 4;//上局的所有的信息
   repeated hint hintList = 6;// 提示信息,包含词条，人物的
   RoomSettlementInfo SettlementInfo = 7;//结算信息，如果 isFinish=true 时有值
+
+//  int32 roomId = 8;//test
 }
 
 // 使用道具请求 1006

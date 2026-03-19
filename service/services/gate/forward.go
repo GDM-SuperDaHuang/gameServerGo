@@ -128,15 +128,11 @@ func ForwardTarget(session *common.Session, message *common.Message, rpcClient r
 	fmt.Printf("gate:函数运行时间: %v\n", end-start)
 
 	if err != nil {
-		//log2.Get().Error(
-		//	"ForwardTarget call Dispatch failed",
-		//	zap.String("target", rpcclient.Name()),
-		//	zap.Uint32("realServerID", rpcReq.Player.UserId),
-		//	zap.Uint32("serverID", req.ServerId),
-		//	zap.Uint64("roleID", req.RoleId),
-		//	zap.Uint16("protocol", uint16(req.Protocol)),
-		//	zap.Error(err),
-		//)
+		log2.Get().Error("ForwardTarget call Dispatch failed",
+			zap.Uint16("ProtocolId:", rpcReq.Data.Head.Protocol),
+			zap.Uint64("userId:", rpcReq.Player.UserId),
+			zap.Error(err),
+		)
 		//todo 如果失败，也更新session,删除id
 		for i := len(session.Player.ServerIds) - 1; i >= 0; i-- {
 			if session.Player.ServerIds[i] == uint32(id) {
@@ -197,5 +193,8 @@ func (g *Gate) Receive(_ context.Context, req *common.RpcMessage, resp *common.R
 	//	//}
 	//}
 	resp.Body = req.Data.Body
+	if req.Data.Head.Protocol == 1005 {
+		log2.Get().Info(" ==================  1005    ===", zap.Uint64("userId:", req.Player.UserId))
+	}
 	return g.tcpServer.write(session, resp, req.Data)
 }

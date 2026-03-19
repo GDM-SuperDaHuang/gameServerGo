@@ -1,0 +1,164 @@
+# If you prefer the allow list template instead of the deny list, see community template:
+# https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
+#
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Code coverage profiles and other test artifacts
+*.out
+coverage.*
+*.coverprofile
+profile.cov
+
+# Dependency directories (remove the comment below to include it)
+# vendor/
+
+# Go workspace file
+go.work
+go.work.sum
+
+# env file
+.env
+
+# Editor/IDE
+# .idea/
+# .vscode/
+
+
+# ==========================================
+# Go
+# ==========================================
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Go workspace
+go.work
+go.work.sum
+
+# Dependencies
+vendor/
+
+# Build outputs
+/bin/
+/dist/
+/build/
+/release/
+
+# ==========================================
+# GoLand / IntelliJ IDEA
+# ==========================================
+.idea/
+*.iml
+*.iws
+.idea_modules/
+
+# 本地历史
+.idea/.idea/
+
+# 文件系统缓存
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf
+
+# 生成的文件
+.idea/**/contentModel.xml
+.idea/**/dataSources/
+.idea/**/dataSources.ids
+.idea/**/dataSources.local.xml
+.idea/**/sqlDataSources.xml
+.idea/**/dynamic.xml
+.idea/**/uiDesigner.xml
+.idea/**/dbnavigator.xml
+
+# Gradle（如果使用）
+.idea/**/gradle.xml
+.idea/**/libraries
+
+# Mongo Explorer 插件
+.idea/**/mongoSettings.xml
+
+# ==========================================
+# OS 生成文件
+# ==========================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+*.stackdump
+[Dd]esktop.ini
+
+# Linux
+*~
+.nfs*
+
+# ==========================================
+# 日志和临时文件
+# ==========================================
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# ==========================================
+# 测试和覆盖率
+# ==========================================
+coverage/
+coverage.html
+*.cover
+*.cov
+
+# ==========================================
+# 环境配置（敏感信息）
+# ==========================================
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.*.local
+*.pem
+*.key
+secrets.yaml
+secrets.yml
+secrets.json
+
+# ==========================================
+# 其他工具
+# ==========================================
+# Air（热重载工具）
+tmp/
+
+# Delve 调试器
+__debug_bin
+__debug_bin*
+
+# Swagger 生成（如果自动生成）
+docs/swagger.json
+docs/swagger.yaml
+
+# Proto 生成文件（可选）
+*.pb.go
+*.pb.validate.go

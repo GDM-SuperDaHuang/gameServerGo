@@ -26,14 +26,14 @@ func GetAllReceiveAwardConfig() []*config.ReceiveAward {
 	return ls
 }
 
-func GetInitLoginConfigReward() (map[int]uint64, []int) {
+func GetInitLoginConfigReward() (map[int]int64, []int) {
 	initLoginInfo, ok := allStructMap["receiveAward"]
 	if !ok {
 		return nil, nil
 	}
 	loginsPtr := initLoginInfo.(*[]*config.ReceiveAward)
 	logins := *loginsPtr // 解引用获取切片本身
-	rewardMap := make(map[int]uint64)
+	rewardMap := make(map[int]int64)
 	idList := make([]int, 0)
 
 	for _, info := range logins {

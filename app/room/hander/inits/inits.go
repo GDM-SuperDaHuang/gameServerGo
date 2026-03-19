@@ -2,11 +2,14 @@ package inits
 
 import (
 	"gameServer/app/room/hander/config"
-	"gameServer/app/room/hander/room"
 	"gameServer/pkg/excel/reader"
+	"time"
+
+	"golang.org/x/exp/rand"
 )
 
 func init() {
+	rand.Seed(uint64(time.Now().UnixNano()))
 	// 创建读取器（指向excels目录）
 	r := reader.NewExcelReader("./excels")
 	allData, err := r.ReadAllExcels()
@@ -23,5 +26,5 @@ func init() {
 			panic(err)
 		}
 	}
-	room.InitRoomConfig()
+	//room.InitRoomConfig()
 }
