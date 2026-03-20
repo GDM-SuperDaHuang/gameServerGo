@@ -1,8 +1,9 @@
 package maxRects
 
-import "fmt"
-
-const BoardWidth = 10
+import (
+	"fmt"
+	"gameServer/common/constValue"
+)
 
 type Item struct {
 	Id     int
@@ -44,7 +45,7 @@ type Quality struct {
 func Pack(items []Item) []*Placement {
 
 	freeRects := []rect{
-		{0, 0, BoardWidth, ^uint32(0) / 2},
+		{0, 0, constValue.WIDE, ^uint32(0) / 2},
 	}
 
 	var result []*Placement

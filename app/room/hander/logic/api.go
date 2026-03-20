@@ -1,4 +1,4 @@
-package roomF
+package logic
 
 import (
 	"gameServer/app/room/hander/config"
@@ -620,7 +620,7 @@ func (room *Room) pushRoundInfo(roomConfig *config.Room, roomSettlementInfo *pbG
 
 // 索引
 func getIndexByXY(x, y uint32) uint32 {
-	return x*constValue.WIDE + y
+	return y*constValue.WIDE + x
 }
 func getXYByIndex(index uint32) (x, y uint32) {
 	x = index / constValue.WIDE

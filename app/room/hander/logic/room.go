@@ -1,4 +1,4 @@
-package roomF
+package logic
 
 import (
 	"fmt"
@@ -366,7 +366,7 @@ func (r *Room) handleAction(c *ActionCmd) {
 		if round.timer != nil {
 			round.timer.Stop() // 停止上一轮的计时
 		}
-		r.nextRound(c.roomConfig)
+		r.nextRound(c.roomConfig, round)
 	}
 }
 
@@ -402,7 +402,7 @@ func (r *Room) handleTimeout(c *timeoutCmd) {
 		//round.Op[userId].operation = PlayerOpAbstain
 	}
 
-	r.nextRound(c.roomConfig)
+	r.nextRound(c.roomConfig, round)
 }
 
 // ================= 离开 =================
@@ -453,19 +453,20 @@ func (r *Room) startGame(roomConfig *config.Room) {
 	}
 
 	r.roundList = []*Round{}
-	r.nextRound(roomConfig) //推送首轮
+	r.nextRound(roomConfig, nil) //推送首轮
 	go r.startRobotActions(roomConfig)
 }
 
 // ================= 下一回合 =================
-func (r *Room) nextRound(roomConfig *config.Room) {
+func (r *Room) nextRound(roomConfig *config.Room, lastRound *Round) {
 
-	// ❗ 判断是否达到最大回合
-	if uint8(len(r.roundList)) >= r.maxRound {
+	earlyFinish := isEarlyFinish(roomConfig, lastRound)
+	if uint8(len(r.roundList)) >= r.maxRound || earlyFinish {
 		r.finishGame(roomConfig)
 		return
 	}
 
+	// 生成新的下一轮
 	var (
 		// 从1开始
 		index = int8(len(r.roundList) + 1)
@@ -476,9 +477,7 @@ func (r *Room) nextRound(roomConfig *config.Room) {
 		}
 	)
 
-	//
-	if len(r.roundList) != 0 {
-		lastRound := r.getCurrentRound()
+	if lastRound != nil {
 		for userId, op := range lastRound.Op { //为弃权玩家填充默认操作
 			if op.operation == PlayerOpAbstain {
 				round.Op[userId] = &Operation{
@@ -494,12 +493,49 @@ func (r *Room) nextRound(roomConfig *config.Room) {
 
 	r.pushRoundInfo(roomConfig, nil)
 
-	//r.broadcast("round_start", index)
-
 	// 启动超时
 	round.timer = time.AfterFunc(time.Duration(roomConfig.Timeout)*time.Second, func() {
 		r.cmdChan <- &timeoutCmd{RoundIndex: index, roomConfig: roomConfig} //发送信息通知
 	})
+}
+
+func isEarlyFinish(roomConfig *config.Room, lastRound *Round) bool {
+	if lastRound == nil {
+		return false
+	}
+	if len(lastRound.Op) < roomConfig.CapacityLimit {
+		return false
+	}
+
+	maxIndex := int8(len(roomConfig.EarlyTermination) - 1)
+	if maxIndex < 0 {
+		return false
+	}
+
+	// ❗判断是否达到最大回合,或者提前结束
+	max1 := int64(0)
+	max2 := int64(0)
+	for _, op := range lastRound.Op {
+		count := op.goldValue
+		if count > max1 {
+			// 当前值大于最大值，更新 max1 和 max2
+			max2 = max1  // 原来的最大值变成第二大值
+			max1 = count // 当前值成为新的最大值
+		} else if count > max2 && count != max1 {
+			// 当前值介于 max2 和 max1 之间，且不等于 max1
+			max2 = count
+		}
+	}
+	termination := 0                  //百分比
+	index := lastRound.RoundIndex - 1 //
+	if index > maxIndex {
+		index = maxIndex
+	}
+	termination = roomConfig.EarlyTermination[index]
+	if 100*int(max1)-int(max2)*(100+termination) >= 0 {
+		return true
+	}
+	return false
 }
 
 // ================= 结束游戏 =================

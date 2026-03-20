@@ -251,6 +251,7 @@ func (ts *gNetServer) handleMessage(session *common.Session, req *common.Message
 
 	// 返回结果
 	resp := ts.gate.forward(session, req)
+	//time.Sleep(100 * time.Millisecond)
 	// request->response 模式
 	_ = ts.write(session, resp, req)
 

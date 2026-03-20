@@ -34,7 +34,7 @@ type Room struct {
 	RoundLimit       uint8            `excel:"roundLimit"`       // 最大局数
 	ItemList         []int            `excel:"itemList"`         // 藏品id集合
 	ItemSum          uint32           `excel:"itemSum"`          // 藏品随机数量
-	EarlyTermination []int            `excel:"earlyTermination"` // 藏品随机数量
+	EarlyTermination []int            `excel:"earlyTermination"` // 提取结束
 	RobotList        []uint8          `excel:"robotList"`        // 机器人id list
 }
 

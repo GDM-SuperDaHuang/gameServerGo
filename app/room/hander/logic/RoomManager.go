@@ -1,4 +1,4 @@
-package roomF
+package logic
 
 import (
 	"context"
@@ -146,9 +146,8 @@ func (rm *RoomManager) matchWorker() {
 							minTime = info.matchStartTime
 						}
 					}
-
 					// 至少10s 匹配机器人
-					if now-minTime < 10 {
+					if now-minTime < rand.Int63n(5)+8 { //随机 8~12 s
 						continue
 					}
 					lack := need - len(ms)

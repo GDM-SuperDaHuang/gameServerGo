@@ -1,4 +1,4 @@
-package roomF
+package logic
 
 type Operation struct {
 	userId    uint64

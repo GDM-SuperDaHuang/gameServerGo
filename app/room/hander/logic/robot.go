@@ -1,4 +1,4 @@
-package roomF
+package logic
 
 import (
 	"gameServer/app/room/hander/config"

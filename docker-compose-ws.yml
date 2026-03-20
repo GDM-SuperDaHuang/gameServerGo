@@ -1,12 +1,14 @@
 services:
   websockify:
     image: novnc/websockify:latest
-    container_name: websockify   # 可选，指定容器名称
-    ports:
-      - "7001:80"                # 映射主机 7001 端口到容器 80 端口
-    command: ["80", "192.168.1.102:8821"]
+    # 使用多进程或调整缓冲区（如果版本支持）
+    command: ["80", "192.168.1.102:17001"]
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 6553
     networks:
       - ldl_network
 networks:
   ldl_network:
-    external: true
+    driver: bridge

@@ -3,7 +3,7 @@ package room
 import (
 	"context"
 	"gameServer/app/room/hander/config"
-	"gameServer/app/room/hander/roomF"
+	"gameServer/app/room/hander/logic"
 	"gameServer/common/constValue"
 	"gameServer/common/db/items"
 	"gameServer/common/errorCode"
@@ -49,7 +49,7 @@ func (h *HandlerRoom) StartMatchHandler(_ context.Context, player *common.Player
 		itemMap[int(info.ItemId)] = info.Count
 	}
 	// 进入匹配
-	roomF.StartMatch(&roomF.PlayerInfo{
+	logic.StartMatch(&logic.PlayerInfo{
 		HeroId:        req.HeroId,
 		ChoiceItemMap: itemMap,
 		Player:        player,
@@ -59,7 +59,7 @@ func (h *HandlerRoom) StartMatchHandler(_ context.Context, player *common.Player
 
 // 取消匹配 1003
 func (h *HandlerRoom) CancelMatchHandler(_ context.Context, player *common.Player, _ *pbGo.CancelMatchReq, resp *pbGo.CancelMatchResp) *common.ErrorInfo {
-	roomF.CancelMatch(player.UserId)
+	logic.CancelMatch(player.UserId)
 	//if !ok {
 	//	return &common.ErrorInfo{
 	//		Code: errorCode.ErrorCode_NotJoinRoom,
@@ -78,7 +78,7 @@ func (h *HandlerRoom) BetHandler(_ context.Context, player *common.Player, req *
 			count = info.Count
 		}
 	}
-	code := roomF.BetOp(player.UserId, count)
+	code := logic.BetOp(player.UserId, count)
 	if code > 0 {
 		return &common.ErrorInfo{
 			Code: code,
@@ -95,7 +95,7 @@ func (h *HandlerRoom) BetHandler(_ context.Context, player *common.Player, req *
 
 // 使用道具 1006
 func (h *HandlerRoom) UseItemHandler(_ context.Context, player *common.Player, req *pbGo.UseItemReq, resp *pbGo.UseItemResp) *common.ErrorInfo {
-	respData, code := roomF.UserItem(player.UserId, int(req.Item.ItemId), req.Item.Count)
+	respData, code := logic.UserItem(player.UserId, int(req.Item.ItemId), req.Item.Count)
 	if code != 0 {
 		return &common.ErrorInfo{
 			Code: code,

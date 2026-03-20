@@ -1,0 +1,19 @@
+services:
+  websocket-bridge:
+    image: node:20-alpine
+    container_name: websocket-bridge
+    restart: always
+    working_dir: /app
+    volumes:
+      - ./bridge.js:/app/bridge.js:ro
+    command: sh -c "npm install ws && node bridge.js"
+#    extra_hosts:
+#      - "host.docker.internal:host-gateway"
+    ports:
+      - "7001:7001"
+    networks:
+      - ldl_network
+
+networks:
+  ldl_network:
+    external: true

@@ -1,4 +1,4 @@
-package roomF
+package logic
 
 func init() {
 	roomManager = NewRoomManager()
