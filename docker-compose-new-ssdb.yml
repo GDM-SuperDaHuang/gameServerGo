@@ -2,7 +2,7 @@ services:
   shard-1-server-1:
     image: leobuskin/ssdb-docker
     container_name: shard1.ssdb1
-    hostname: shard-1-server-1
+    hostname: shard-1-server-
     ports:
       - 18888:8888
     volumes:
@@ -14,4 +14,4 @@ services:
 
 networks:
   ldl_network:
-    external: true
+    driver: bridge

@@ -48,12 +48,12 @@ func init() {
 
 	//rankGold()
 	crontab.Start()
-	//crontab.AddFunc("0 0 0 * * *", func() { //每天晚上12点一次
-	//	RankGold()
-	//})
-	crontab.AddFunc("*/5 * * * * *", func() { //每天晚上12点一次
+	crontab.AddFunc("0 0 0 * * *", func() { //每天晚上12点一次
 		RankGold()
 	})
+	//crontab.AddFunc("*/5 * * * * *", func() { //每5s一次
+	//	RankGold()
+	//})
 
 }
 
