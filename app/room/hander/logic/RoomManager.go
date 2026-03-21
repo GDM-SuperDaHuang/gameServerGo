@@ -81,9 +81,10 @@ func (rm *RoomManager) roomRecycleWorker() {
 		room := rm.FindRoom(roomId)
 		if room != nil {
 			for userId := range room.playerInfos {
-				//log2.Get().Warn("roomRecycleWorker delPlayerRoom Start !!!========== ", zap.Int32("roomId:= ", room.roomId), zap.Uint64("userId:= ", userId))
 				pRoom := rm.FindRoomByUserId(userId)
-				//log2.Get().Warn("roomRecycleWorker delPlayerRoom !!!========== ", zap.Int32("roomId:= ", rrr.roomId), zap.Uint64("userId:= ", userId))
+				if pRoom == nil {
+					continue
+				}
 				if pRoom.roomId == room.roomId {
 					rm.delPlayerRoom(userId)
 				}
@@ -208,7 +209,7 @@ func (rm *RoomManager) createRoomWithPlayers(cfg *config.Room, reqs []*MatchRequ
 			// ❗ 再次检查 cancel（非常关键）
 			select {
 			case <-req.ctx.Done():
-				rm.cleanPlayer(uid)
+				rm.cleanPlayer(uid) // 玩家可能取消
 				continue
 			default:
 			}

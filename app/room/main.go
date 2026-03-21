@@ -68,6 +68,7 @@ func main() {
 		MaxPoolSize: config.Get().GameSSDBMaxPoolSize(),
 		Encoding:    true, // 支持非基本数据类型
 		AutoClose:   true,
+		Password:    config.Get().GameSSDBPassword(),
 		// 更多配置可参考pkg文档
 	}
 	err := ssdb.Init(cfg)

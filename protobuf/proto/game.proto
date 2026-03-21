@@ -39,7 +39,7 @@ message  roundInfoPush {
   int64 endTimeOut = 1;//本局结束倒计时，时间戳毫秒
   uint32 roundIndex = 2;//第几轮
   bool isFinish = 3;//是否结束
-  screenInfo changeScreenInfo = 4;//上局的所有的信息
+  screenInfo changeScreenInfo = 4;//屏幕的信息
   repeated hint hintList = 6;// 提示信息,包含词条，人物的
   RoomSettlementInfo SettlementInfo = 7;//结算信息，如果 isFinish=true 时有值
 
@@ -94,3 +94,16 @@ message RoomSettlementInfo{
   item.itemInfo expenses = 2;//花费
   item.itemInfo profit = 3;//利润
 }
+
+//message  testRoundInfoReq {
+//}
+//message  testRoundInfoPush {
+//  int64 endTimeOut = 1;//本局结束倒计时，时间戳毫秒
+//  uint32 roundIndex = 2;//第几轮
+//  bool isFinish = 3;//是否结束
+//  screenInfo changeScreenInfo = 4;//上局的所有的信息
+//  repeated hint hintList = 6;// 提示信息,包含词条，人物的
+//  RoomSettlementInfo SettlementInfo = 7;//结算信息，如果 isFinish=true 时有值
+//
+//  //  int32 roomId = 8;//test
+//}

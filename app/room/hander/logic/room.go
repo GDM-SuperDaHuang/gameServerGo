@@ -32,8 +32,26 @@ const (
 	PlayerOpBet     = 1 //发牌
 	PlayerOpAbstain = 2 //弃权
 	PlayerOpUseItem = 3 //使用道具
-
 )
+
+var (
+	tickerTest = time.NewTicker(1 * time.Second)
+	endTime    = int64(0)
+)
+
+func TestInit() {
+
+	// 按房间类型分桶
+	//buckets := make(map[uint32][]*MatchRequest) //房间类型-匹配请求
+	for {
+		select {
+		// 定时撮合
+		case <-tickerTest.C:
+			ttt := endTime - time.Now().Unix()
+			fmt.Printf("剩余时间，===========: %d\n", ttt)
+		}
+	}
+}
 
 // ================= 玩家 =================
 type PlayerInfo struct {
@@ -263,7 +281,7 @@ func (r *Room) handleAction(c *ActionCmd) {
 
 	round.Op[userId].operation = c.op.operation
 
-	if c.op.operation == PlayerOpBet {
+	if c.op.operation == PlayerOpBet { //竞拍
 		round.Op[userId].isBet = true
 		round.Op[userId].goldValue = c.op.goldValue
 
@@ -286,7 +304,7 @@ func (r *Room) handleAction(c *ActionCmd) {
 			})
 		}
 
-	} else if c.op.operation == PlayerOpAbstain {
+	} else if c.op.operation == PlayerOpAbstain { //弃拍
 		round.Op[userId].operation = PlayerOpAbstain
 	} else if c.op.operation == PlayerOpUseItem { //使用道具
 		if r.playerInfos[userId].ChoiceItemMap == nil {
@@ -297,6 +315,18 @@ func (r *Room) handleAction(c *ActionCmd) {
 		_, ok = r.playerInfos[userId].ChoiceItemMap[c.op.itemId]
 		if !ok {
 			resp.Code = errorCode.ErrorCode_ItemNotEnough
+			c.Resp <- resp
+			return
+		}
+
+		if c.op.itemId == 0 { //使用空
+			resp.Code = errorCode.ErrorCode_UseNullItem
+			c.Resp <- resp
+			return
+		}
+
+		if r.playerInfos[userId].UserItemMap[c.op.itemId] > 0 { //重复使用
+			resp.Code = errorCode.ErrorCode_ReusingItem
 			c.Resp <- resp
 			return
 		}
@@ -345,7 +375,6 @@ func (r *Room) handleAction(c *ActionCmd) {
 		data.HintList = HintList
 
 		// 广播
-		resp.Code = errorCode.ErrorCode_GetConfigFailed
 		resp.Data = data
 
 		//消耗
@@ -358,11 +387,18 @@ func (r *Room) handleAction(c *ActionCmd) {
 			return
 		}
 		r.playerInfos[userId].UserItemMap[c.op.itemId] = round.RoundIndex
+		round.Op[userId].itemId = c.op.itemId
 	}
 	c.Resp <- resp
 
-	// 全员完成，提前推进
-	if len(round.Op) == len(r.playerInfos) { // 所有都操作了
+	need := 0
+	for _, info := range round.Op {
+		if info.isBet || info.operation == PlayerOpAbstain {
+			need++
+		}
+	}
+	// 全员完成，提前推进`
+	if need == len(r.playerInfos) { // 所有都操作了
 		if round.timer != nil {
 			round.timer.Stop() // 停止上一轮的计时
 		}
@@ -460,8 +496,19 @@ func (r *Room) startGame(roomConfig *config.Room) {
 // ================= 下一回合 =================
 func (r *Room) nextRound(roomConfig *config.Room, lastRound *Round) {
 
-	earlyFinish := isEarlyFinish(roomConfig, lastRound)
-	if uint8(len(r.roundList)) >= r.maxRound || earlyFinish {
+	// 全是机器人则结束
+	earlyFinish := true
+	// 至少还有一个真实玩家在玩
+	for _, info := range r.playerInfos {
+		if info.playerType == 0 && info.status == PlayerStatusNormal {
+			earlyFinish = false
+			break
+		}
+	}
+	if !earlyFinish {
+		earlyFinish = isEarlyFinish(roomConfig, lastRound)
+	}
+	if uint8(len(r.roundList)) >= r.maxRound || earlyFinish { //圆满或者提前结束
 		r.finishGame(roomConfig)
 		return
 	}
@@ -493,12 +540,17 @@ func (r *Room) nextRound(roomConfig *config.Room, lastRound *Round) {
 
 	r.pushRoundInfo(roomConfig, nil)
 
+	// test
+	now := time.Now().Unix()
+	endTime = now + int64(roomConfig.Timeout)
+
 	// 启动超时
 	round.timer = time.AfterFunc(time.Duration(roomConfig.Timeout)*time.Second, func() {
 		r.cmdChan <- &timeoutCmd{RoundIndex: index, roomConfig: roomConfig} //发送信息通知
 	})
 }
 
+// 因为差距提前结束
 func isEarlyFinish(roomConfig *config.Room, lastRound *Round) bool {
 	if lastRound == nil {
 		return false
@@ -661,6 +713,10 @@ func (r *Room) Join(p *PlayerInfo, cfg *config.Room) error {
 		Resp:       resp,
 	}
 	return <-resp
+}
+
+func (r *Room) GettestG() []*maxRects.Placement {
+	return *r.gridInfo
 }
 
 func (r *Room) Action(roomConfig *config.Room, op *Operation) *ActionResp {

@@ -2,16 +2,15 @@ services:
   ssdb1:
     image: tsl0922/ssdb:latest
     container_name: ldl.ssdb1
-    command: ssdb-server /data/ssdb.conf
     environment:
       - SSDB_AUTH="123"  # 部分镜像支持
     volumes:
-      - ./storage/ssdb:/data
+      - ./storage/ssdb:/var/lib/ssdb
     ports:
-      - "18888:18888"
+      - "8888:8888"
     networks:
       - ldl_network
 
 networks:
   ldl_network:
-    external: true
+    driver: bridge

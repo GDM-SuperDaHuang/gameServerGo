@@ -70,6 +70,7 @@ func BetOp(userId uint64, count int64) uint16 {
 	resp := room.Action(roomConfig, &Operation{
 		userId:    userId,
 		operation: PlayerOpBet,
+		isBet:     true,
 		goldValue: count,
 	})
 	if resp == nil {
@@ -112,6 +113,10 @@ func CancelMatch(userId uint64) {
 	if cancel, ok := roomManager.playerCancel[userId]; ok {
 		cancel() // ✅ 触发取消
 		delete(roomManager.playerCancel, userId)
+	}
+	room := roomManager.playerRoom[userId]
+	if room != nil {
+		room.Leave(userId)
 	}
 
 	if roomManager.playerState[userId] == StateMatching {

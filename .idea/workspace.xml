@@ -5,63 +5,35 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0210bdac-a28d-412f-b3da-7837bed304cd" name="Changes" comment="1">
-      <change afterPath="$PROJECT_DIR$/app/room/hander/roomF/room.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/home/hander/HomeHander.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/home/hander/HomeHander.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/room/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/app/room/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/room/hander/config/models.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/room/hander/config/models.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/gate/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/app/gate/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/home/hander/inits/ints.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/home/hander/inits/ints.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/room/hander/inits/inits.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/room/hander/inits/inits.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/room/hander/logic/RoomManager.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/room/hander/logic/RoomManager.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/room/hander/logic/api.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/room/hander/logic/api.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/room/hander/logic/logic.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/room/hander/logic/logic.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/room/hander/logic/robot.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/room/hander/logic/robot.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/room/hander/logic/room.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/room/hander/logic/room.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/room/hander/maxRects/maxRects.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/room/hander/maxRects/maxRects.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/room/hander/maxRects/test/grid_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/room/hander/maxRects/test/grid_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/room/hander/room/HanderRoom.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/room/hander/room/HanderRoom.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/room/hander/room/bidding.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/room/hander/room/bidding.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/room/hander/room/logic.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/room/hander/room/logic.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/room/hander/room/playerInfo.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/room/hander/room/playerInfo.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/room/hander/room/robot.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/room/hander/room/robot.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/room/hander/room/roomManager.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/room/hander/room/roomManager.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/room/hander/room/round.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/room/hander/room/round.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/room/hander/testHander.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/room/hander/testHander.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/room/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/room/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/room/test/grid_test.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/config/models.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/config/models.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/room/test/xxx.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bridge.js" beforeDir="false" afterPath="$PROJECT_DIR$/bridge.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/db/items/item.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/db/items/item.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/gate.toml" beforeDir="false" afterPath="$PROJECT_DIR$/config/gate.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/home.toml" beforeDir="false" afterPath="$PROJECT_DIR$/config/home.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/room.toml" beforeDir="false" afterPath="$PROJECT_DIR$/config/room.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose-gate.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose-gate.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose-internal.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose-internal.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose-redis.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose-redis.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose-ssdb.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose-ssdb.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose-ww.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose-ww.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/excels/game.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/excels/game.xlsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/2026-03-05/info.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/2026-03-06/info.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/2026-03-09/error.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/2026-03-09/info.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/2026-03-10/error.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/2026-03-10/info.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/2026-03-11/error.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/2026-03-11/info.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/2026-03-12/error.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/2026-03-12/info.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/2026-03-13/error.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/2026-03-13/info.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/2026-03-14/error.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/2026-03-14/info.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/2026-03-15/error.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/2026-03-15/info.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/2026-03-16/info.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/2026-03-17/info.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/2026-03-17/info.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/2026-03-18/info.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/2026-03-18/info.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/2026-03-19/error.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/2026-03-19/error.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/2026-03-19/info.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/2026-03-19/info.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/gate-1.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/room-1.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/protobuf/pbGo/item.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/protobuf/pbGo/item.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/protobuf/proto/game.proto" beforeDir="false" afterPath="$PROJECT_DIR$/protobuf/proto/game.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protobuf/proto/item.proto" beforeDir="false" afterPath="$PROJECT_DIR$/protobuf/proto/item.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protobuf/proto/pb.zip" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/protobuf/protoHandlerInit/method.go" beforeDir="false" afterPath="$PROJECT_DIR$/protobuf/protoHandlerInit/method.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/rpc/dispatch.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/rpc/dispatch.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/services/gate/excelConfig/models.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/gate/excelConfig/models.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/services/gate/forward.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/gate/forward.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/redis/dump.rdb" beforeDir="false" afterPath="$PROJECT_DIR$/storage/redis/dump.rdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/common/message.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/common/message.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/services/gate/handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/services/gate/handler.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -128,12 +100,22 @@
     &quot;Docker.docker-compose-redis.yml: Compose 部署.executor&quot;: &quot;Run&quot;,
     &quot;Docker.docker-compose-ssdb.yml.ssdb-admin: Compose 部署.executor&quot;: &quot;Run&quot;,
     &quot;Docker.docker-compose-ssdb.yml.ssdb1: Compose 部署.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose-ssdb2.yml.shard-1-server-1: Compose 部署.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose-ssdb2.yml.shard-1-server-2: Compose 部署.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose-ssdb2.yml: Compose 部署.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose-ws.yml.websockify: Compose 部署.executor&quot;: &quot;Run&quot;,
     &quot;Docker.docker-compose-wsc.yml.wstunnel: Compose 部署.executor&quot;: &quot;Run&quot;,
     &quot;Docker.docker-compose-wsc.yml: Compose 部署.executor&quot;: &quot;Run&quot;,
     &quot;Docker.docker-compose-wss.yml.wstunnel-client: Compose 部署.executor&quot;: &quot;Run&quot;,
     &quot;Docker.docker-compose-wss.yml.wstunnel-server: Compose 部署.executor&quot;: &quot;Run&quot;,
     &quot;Docker.docker-compose-wss.yml.wstunnel: Compose 部署.executor&quot;: &quot;Run&quot;,
     &quot;Docker.docker-compose-wss.yml: Compose 部署.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose-ww.yml.websocat: Compose 部署.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose-ww.yml.websocket-bridge: Compose 部署.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose-ww.yml.wstunnel: Compose 部署.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose-ww.yml.wstunnelC: Compose 部署.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose-ww.yml.wstunnelS: Compose 部署.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose-ww.yml: Compose 部署.executor&quot;: &quot;Run&quot;,
     &quot;Docker.docker-compose.yml.etcd1: Compose Deployment.executor&quot;: &quot;Run&quot;,
     &quot;Docker.docker-compose.yml.etcd1: Compose 部署.executor&quot;: &quot;Run&quot;,
     &quot;Docker.docker-compose.yml: Compose Deployment.executor&quot;: &quot;Run&quot;,
@@ -155,6 +137,10 @@
     &quot;Go 测试.gameServer/app/node/hander/test 中的 TestRun.executor&quot;: &quot;Debug&quot;,
     &quot;Go 测试.gameServer/app/node/test 中的 TestRun (1).executor&quot;: &quot;Debug&quot;,
     &quot;Go 测试.gameServer/app/node/test 中的 TestRun.executor&quot;: &quot;Debug&quot;,
+    &quot;Go 测试.gameServer/app/room/hander/maxRects/test 中的 TestRun (1).executor&quot;: &quot;Debug&quot;,
+    &quot;Go 测试.gameServer/app/room/hander/maxRects/test 中的 TestRun.executor&quot;: &quot;Debug&quot;,
+    &quot;Go 测试.gameServer/app/room/hander/maxRects/test 中的 TestRun2.executor&quot;: &quot;Debug&quot;,
+    &quot;Go 测试.gameServer/common/db/items/test 中的 TestRun2.executor&quot;: &quot;Debug&quot;,
     &quot;Go 测试.gameServer/pkg/cache/ssdb/test 中的 TestHashRun.executor&quot;: &quot;Debug&quot;,
     &quot;Go 测试.gameServer/pkg/cache/ssdb/test 中的 TestRun (1).executor&quot;: &quot;Debug&quot;,
     &quot;Go 测试.gameServer/pkg/cache/ssdb/test 中的 TestRun.executor&quot;: &quot;Debug&quot;,
@@ -178,30 +164,30 @@
     &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
     &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/work/gameServerGo/app/room&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/work/gameServerGo/storage&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;onboarding.tips.debug.path&quot;: &quot;E:/gowork/gameServer/main.go&quot;,
     &quot;run.configurations.included.in.services&quot;: &quot;true&quot;,
     &quot;service.view.auto.scroll.to.source&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.goide.configuration.GoLibrariesConfigurableProvider&quot;
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
   }
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="D:\work\gameServerGo\app\room" />
+      <recent name="D:\work\gameServerGo\storage" />
       <recent name="D:\work\gameServerGo" />
+      <recent name="D:\work\gameServerGo\app\room\hander\test" />
+      <recent name="D:\work\gameServerGo\app\room" />
       <recent name="D:\work\gameServerGo\pkg\redis" />
-      <recent name="D:\work\gameServerGo\pkg" />
-      <recent name="D:\work\gameServerGo\config" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\work\gameServerGo\storage\slave" />
+      <recent name="D:\work\gameServerGo\storage\master" />
+      <recent name="D:\work\gameServerGo\app\room\hander\maxRects\test" />
       <recent name="D:\work\gameServerGo\pkg\redis\test" />
       <recent name="D:\work\gameServerGo\common\db" />
-      <recent name="D:\work\gameServerGo" />
-      <recent name="D:\work\gameServerGo\app\node\hander\room" />
-      <recent name="D:\work\gameServerGo\common\errorCode" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -224,7 +210,7 @@
       </map>
     </option>
   </component>
-  <component name="RunManager" selected="Docker.gate/Dockerfile">
+  <component name="RunManager" selected="Go 测试.gameServer/common/db/items/test 中的 TestRun2">
     <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
       <module name="gameServer" />
       <working_directory value="$PROJECT_DIR$" />
@@ -342,6 +328,18 @@
       <framework value="gotest" />
       <method v="2" />
     </configuration>
+    <configuration name="gameServer/common/db/items/test 中的 TestRun2" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="gameServer" />
+      <working_directory value="$PROJECT_DIR$/common/db/items/test" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="gameServer/common/db/items/test" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestRun2\E$" />
+      <method v="2" />
+    </configuration>
     <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
       <deployment type="docker-compose.yml">
         <settings />
@@ -354,44 +352,33 @@
       </deployment>
       <method v="2" />
     </configuration>
-    <configuration name="gate/Dockerfile" type="docker-deploy" factoryName="dockerfile" temporary="true" server-name="Docker">
-      <deployment type="dockerfile">
+    <configuration name="docker-compose-ssdb.yml.ssdb1: Compose 部署" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
         <settings>
-          <option name="imageTag" value="gate1.8" />
-          <option name="buildOnly" value="true" />
-          <option name="containerName" value="" />
-          <option name="contextFolderPath" value="." />
-          <option name="sourceFilePath" value="app/gate/Dockerfile" />
-        </settings>
-      </deployment>
-      <method v="2" />
-    </configuration>
-    <configuration name="room/Dockerfile" type="docker-deploy" factoryName="dockerfile" temporary="true" server-name="Docker">
-      <deployment type="dockerfile">
-        <settings>
-          <option name="imageTag" value="room2.3" />
-          <option name="buildOnly" value="true" />
-          <option name="containerName" value="" />
-          <option name="contextFolderPath" value="." />
-          <option name="sourceFilePath" value="app/room/Dockerfile" />
+          <option name="services">
+            <list>
+              <option value="ssdb1" />
+            </list>
+          </option>
+          <option name="sourceFilePath" value="docker-compose-ssdb.yml" />
         </settings>
       </deployment>
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="Docker.docker-compose-ssdb.yml.ssdb1: Compose 部署" />
       <item itemvalue="Go 构建.go build gameServer/app/gate" />
       <item itemvalue="Go 构建.go build gameServer/app/home" />
       <item itemvalue="Go 构建.go build gameServer/app/room" />
-      <item itemvalue="Docker.gate/Dockerfile" />
-      <item itemvalue="Docker.room/Dockerfile" />
+      <item itemvalue="Go 测试.gameServer/common/db/items/test 中的 TestRun2" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Docker.gate/Dockerfile" />
-        <item itemvalue="Go 构建.go build gameServer/app/gate" />
-        <item itemvalue="Go 构建.go build gameServer/app/room" />
-        <item itemvalue="Docker.room/Dockerfile" />
+        <item itemvalue="Go 测试.gameServer/common/db/items/test 中的 TestRun2" />
+        <item itemvalue="Docker.docker-compose-ssdb.yml.ssdb1: Compose 部署" />
         <item itemvalue="Go 构建.go build gameServer/app/home" />
+        <item itemvalue="Go 构建.go build gameServer/app/room" />
+        <item itemvalue="Go 构建.go build gameServer/app/gate" />
       </list>
     </recent_temporary>
   </component>
@@ -418,6 +405,7 @@
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.toml" />
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.conf" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -451,11 +439,6 @@
           <url>file://$PROJECT_DIR$/pkg/utils/ip.go</url>
           <line>30</line>
           <option name="timeStamp" value="142" />
-        </line-breakpoint>
-        <line-breakpoint type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/service/services/gate/gateImp.go</url>
-          <line>223</line>
-          <option name="timeStamp" value="225" />
         </line-breakpoint>
         <line-breakpoint type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/pkg/excel/excel1/api.go</url>
@@ -503,29 +486,9 @@
           <option name="timeStamp" value="456" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/app/room/hander/maxRects/test/grid_test.go</url>
-          <line>34</line>
-          <option name="timeStamp" value="531" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/../pkg/mod/github.com/seefan/gossdb/v2@v2.0.1/client/client.go</url>
           <line>67</line>
           <option name="timeStamp" value="622" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/../pkg/mod/github.com/seefan/gossdb/v2@v2.0.1/ssdbclient/ssdb_client.go</url>
-          <line>154</line>
-          <option name="timeStamp" value="625" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/../pkg/mod/github.com/seefan/gossdb/v2@v2.0.1/ssdbclient/ssdb_client.go</url>
-          <line>108</line>
-          <option name="timeStamp" value="626" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/../pkg/mod/github.com/seefan/gossdb/v2@v2.0.1/ssdbclient/ssdb_client.go</url>
-          <line>112</line>
-          <option name="timeStamp" value="628" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/../pkg/mod/github.com/seefan/gossdb/v2@v2.0.1/ssdbclient/connection.go</url>
@@ -538,59 +501,19 @@
           <option name="timeStamp" value="950" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/app/home/hander/HomeHander.go</url>
-          <line>241</line>
-          <option name="timeStamp" value="984" />
+          <url>file://$PROJECT_DIR$/app/room/hander/logic/room.go</url>
+          <line>389</line>
+          <option name="timeStamp" value="1465" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/app/room/hander/room/robot.go</url>
-          <line>281</line>
-          <option name="timeStamp" value="1066" />
+          <url>file://$PROJECT_DIR$/app/room/hander/logic/room.go</url>
+          <line>328</line>
+          <option name="timeStamp" value="1470" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/app/room/hander/room/robot.go</url>
-          <line>276</line>
-          <option name="timeStamp" value="1067" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/app/room/hander/room/robot.go</url>
-          <line>272</line>
-          <option name="timeStamp" value="1068" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/app/room/hander/room/robot.go</url>
-          <line>267</line>
-          <option name="timeStamp" value="1072" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/app/room/hander/room/bidding.go</url>
-          <line>405</line>
-          <option name="timeStamp" value="1220" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/app/room/hander/roomF/logic.go</url>
-          <line>109</line>
-          <option name="timeStamp" value="1238" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/app/room/hander/roomF/logic.go</url>
-          <line>112</line>
-          <option name="timeStamp" value="1239" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/app/room/hander/roomF/room.go</url>
-          <line>648</line>
-          <option name="timeStamp" value="1376" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/app/room/hander/roomF/logic.go</url>
-          <line>33</line>
-          <option name="timeStamp" value="1384" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/app/room/hander/roomF/RoomManager.go</url>
-          <line>159</line>
-          <option name="timeStamp" value="1429" />
+          <url>file://$PROJECT_DIR$/app/room/hander/maxRects/test/grid_test.go</url>
+          <line>223</line>
+          <option name="timeStamp" value="1479" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

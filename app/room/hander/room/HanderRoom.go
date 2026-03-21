@@ -43,7 +43,7 @@ func (h *HandlerRoom) StartMatchHandler(_ context.Context, player *common.Player
 		}
 	}
 	// 立马响应条件满足
-	resp = &pbGo.StartMatchResp{}
+	//resp = &pbGo.StartMatchResp{}
 	itemMap := make(map[int]int64)
 	for _, info := range req.ItemInfoList {
 		itemMap[int(info.ItemId)] = info.Count
@@ -53,6 +53,7 @@ func (h *HandlerRoom) StartMatchHandler(_ context.Context, player *common.Player
 		HeroId:        req.HeroId,
 		ChoiceItemMap: itemMap,
 		Player:        player,
+		UserItemMap:   make(map[int]int8),
 	}, roomConfig)
 	return nil
 }
@@ -65,7 +66,6 @@ func (h *HandlerRoom) CancelMatchHandler(_ context.Context, player *common.Playe
 	//		Code: errorCode.ErrorCode_NotJoinRoom,
 	//	}
 	//}
-	resp = &pbGo.CancelMatchResp{}
 	return nil
 }
 

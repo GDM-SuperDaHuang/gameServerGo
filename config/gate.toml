@@ -42,9 +42,9 @@ rpcheart = 10
 # ssdb 信息
 ssdbHost = "127.0.0.1"
 #ssdbHost = "ldl.ssdb1"
-ssdbPost = 8888
+ssdbPost = 18888
 ssdbMaxPoolSize = 1000
-ssdbPassword=""
+ssdbPassword="dsafgasfgnliqwrasdgaseghbcuabzavfaf"
 
 # 游戏配置文件路径
 # 本地开发

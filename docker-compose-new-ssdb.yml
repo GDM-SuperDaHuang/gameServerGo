@@ -1,0 +1,17 @@
+services:
+  shard-1-server-1:
+    image: leobuskin/ssdb-docker
+    container_name: shard1.ssdb1
+    hostname: shard-1-server-1
+    ports:
+      - 18888:8888
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ./storage/master/ssdb.conf:/ssdb/ssdb.conf
+      - ./storage/master/ssdb:/ssdb/var  # 数据目录映射
+    networks:
+      - ldl_network
+
+networks:
+  ldl_network:
+    external: true

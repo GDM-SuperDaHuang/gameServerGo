@@ -78,9 +78,9 @@ func Pack(items []Item) []*Placement {
 
 		tryPlace(item.Length, item.Width, false)
 
-		if item.Length != item.Width {
-			tryPlace(item.Width, item.Length, true)
-		}
+		//if item.Length != item.Width {
+		//	tryPlace(item.Width, item.Length, true)
+		//}
 
 		node := best
 

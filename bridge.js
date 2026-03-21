@@ -1,79 +1,134 @@
 const WebSocket = require('ws');
 const net = require('net');
 
+const WS_PORT = 7001;
+const TCP_HOST = 'host.docker.internal';
+// const TCP_HOST = 'node-gate-1';
+const TCP_PORT = 17001;
+
+// 协议常量
+const HEAD_LEN = 12;
+
 const wss = new WebSocket.Server({
-    port: 7001,//对外监听端口
+    port: WS_PORT,
     maxPayload: 10000 * 1024 * 1024,
     perMessageDeflate: false
 });
 
-wss.on('connection', (ws) => {
+console.log(`桥接器启动成功，端口 ${WS_PORT}`);
+
+wss.on('connection', (ws, req) => {
+    const clientIp = req.socket.remoteAddress;
+    console.log(`[${new Date().toISOString()}] WS连接: ${clientIp}`);
+
     const tcp = net.createConnection({
-        // host: 'host.docker.internal',
-        host:'node-gate-1',
-        port: 17001,
+        host: TCP_HOST,
+        port: TCP_PORT,
         noDelay: true
     });
 
-    // 发送队列，带确认
-    let sendQueue = [];
-    let currentResolve = null;
-    let timeout = null;
+    let isClosed = false;
 
-    // 发送并等待确认（通过TCP回复确认）
-    function sendAndWait(data) {
-        return new Promise((resolve, reject) => {
-            // 设置超时
-            timeout = setTimeout(() => {
-                reject(new Error('发送超时'));
-            }, 5000);
+    // ====== TCP 粘包处理缓存 ======
+    let recvBuffer = Buffer.alloc(0);
 
-            currentResolve = () => {
-                clearTimeout(timeout);
-                resolve();
-            };
+    // ====== 清理 ======
+    function cleanup() {
+        if (isClosed) return;
+        isClosed = true;
 
-            // 发送
-            tcp.write(data);
-        });
+        recvBuffer = Buffer.alloc(0);
+
+        try { tcp.destroy(); } catch {}
+        try { ws.close(); } catch {}
     }
 
-    // 处理队列
-    async function processQueue() {
-        while (sendQueue.length > 0) {
-            const data = sendQueue[0];
-            try {
-                await sendAndWait(data);
-                sendQueue.shift(); // 成功才出队
-                console.log('发送成功，剩余', sendQueue.length);
-            } catch (err) {
-                console.error('发送失败，重试:', err);
-                // 重试，不出队
-                await new Promise(r => setTimeout(r, 100));
+    // ====== WS -> TCP ======
+    ws.on('message', (data) => {
+        if (isClosed) return;
+
+        const buf = Buffer.isBuffer(data) ? data : Buffer.from(data);
+
+        console.log(`[${new Date().toISOString()}] WS -> TCP, ${buf.length} bytes`);
+
+        // 直接写（不做确认机制）
+        const ok = tcp.write(buf);
+
+        // backpressure（很关键）
+        if (!ok) {
+            console.warn(`[${new Date().toISOString()}] TCP写缓冲满，暂停WS读取`);
+            ws._socket.pause();
+
+            tcp.once('drain', () => {
+                console.log(`[${new Date().toISOString()}] TCP恢复写入`);
+                ws._socket.resume();
+            });
+        }
+    });
+
+    // ====== TCP -> WS（带拆包） ======
+    tcp.on('data', (data) => {
+        if (isClosed) return;
+
+        console.log(`[${new Date().toISOString()}] TCP 收到 ${data.length} bytes`);
+
+        // 1. 拼接缓存
+        recvBuffer = Buffer.concat([recvBuffer, data]);
+
+        // 2. 循环拆包
+        while (true) {
+            // 头不够
+            if (recvBuffer.length < HEAD_LEN) {
+                return;
+            }
+
+            // 解析头
+            const bodyLen = recvBuffer.readUInt16BE(0);
+            const totalLen = HEAD_LEN + bodyLen;
+
+            // 包不完整
+            if (recvBuffer.length < totalLen) {
+                return;
+            }
+
+            // 取完整包
+            const packet = recvBuffer.slice(0, totalLen);
+
+            // 剩余数据
+            recvBuffer = recvBuffer.slice(totalLen);
+
+            // 打印部分信息（可选）
+            const protocol = packet.readUInt16BE(10);
+            console.log(`[${new Date().toISOString()}] 完整包: len=${totalLen}, protocol=${protocol}`);
+
+            // 转发给 WS（按消息边界发送）
+            if (ws.readyState === WebSocket.OPEN) {
+                ws.send(packet);
             }
         }
-    }
-
-    ws.on('message', (data) => {
-        const buf = Buffer.isBuffer(data) ? data : Buffer.from(data);
-        sendQueue.push(buf);
-        processQueue();
     });
 
-    // TCP回复作为确认（假设服务器会回显或回复）
-    tcp.on('data', (data) => {
-        // 转发给WebSocket
-        ws.send(data);
-
-        // 触发确认（简单策略：有数据回来就认为上一条成功了）
-        if (currentResolve) {
-            currentResolve();
-            currentResolve = null;
-        }
+    tcp.on('connect', () => {
+        console.log(`[${new Date().toISOString()}] TCP连接成功 ${TCP_HOST}:${TCP_PORT}`);
     });
 
-    ws.on('close', () => tcp.end());
-    tcp.on('end', () => ws.close());
+    tcp.on('error', (err) => {
+        console.error(`[${new Date().toISOString()}] TCP错误:`, err.message);
+        cleanup();
+    });
+
+    tcp.on('close', () => {
+        console.log(`[${new Date().toISOString()}] TCP关闭`);
+        cleanup();
+    });
+
+    ws.on('close', () => {
+        console.log(`[${new Date().toISOString()}] WS断开: ${clientIp}`);
+        cleanup();
+    });
+
+    ws.on('error', (err) => {
+        console.error(`[${new Date().toISOString()}] WS错误:`, err.message);
+        cleanup();
+    });
 });
-
-console.log('确认机制桥接器启动，端口 7001');

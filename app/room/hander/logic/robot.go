@@ -108,29 +108,29 @@ func (r *Room) robotRoutine(robot *PlayerInfo, roomConfig *config.Room, curRound
 	r.Action(roomConfig, robotOp)
 }
 
-func (r *Room) robotOp(roomConfig *config.Room) {
-	round := r.getCurrentRound()
-
-	var robotOp *Operation
-	for userId, info := range r.playerInfos {
-		if info.playerType == 0 {
-			continue
-		}
-		op := round.Op[userId]
-		if op != nil {
-			continue
-		}
-		robotOp = &Operation{
-			userId:    userId,
-			goldValue: rand.Int63n(20000),
-			isBet:     true,
-			operation: PlayerOpBet,
-		}
-	}
-	if robotOp == nil {
-		return
-	}
-
-	// 执行操作
-	r.Action(roomConfig, robotOp)
-}
+//func (r *Room) robotOp(roomConfig *config.Room) {
+//	round := r.getCurrentRound()
+//
+//	var robotOp *Operation
+//	for userId, info := range r.playerInfos {
+//		if info.playerType == 0 {
+//			continue
+//		}
+//		op := round.Op[userId]
+//		if op != nil {
+//			continue
+//		}
+//		robotOp = &Operation{
+//			userId:    userId,
+//			goldValue: rand.Int63n(20000),
+//			isBet:     true,
+//			operation: PlayerOpBet,
+//		}
+//	}
+//	if robotOp == nil {
+//		return
+//	}
+//
+//	// 执行操作
+//	r.Action(roomConfig, robotOp)
+//}

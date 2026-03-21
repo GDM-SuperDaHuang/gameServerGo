@@ -167,10 +167,10 @@ func (g *Gate) loginHandler(session *common.Session, message *common.Message) *c
 	}
 	itemList = make([]*pbGo.ItemInfo, len(allItems))
 	i := 0
-	for id, info := range allItems {
+	for id, count := range allItems {
 		itemList[i] = &pbGo.ItemInfo{
 			ItemId: uint64(id),
-			Count:  info.Count,
+			Count:  count,
 		}
 		i++
 	}

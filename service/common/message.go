@@ -3,7 +3,7 @@ package common
 import "gameServer/pkg/bytes"
 
 type MessageHead struct {
-	// Len 消息体长度
+	// Len 消息体Body的长度
 	Len uint16 //2
 	// Flag 标记
 	Flag uint16 //2

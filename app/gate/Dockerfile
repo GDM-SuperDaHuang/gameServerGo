@@ -18,7 +18,6 @@ ADD go.mod .
 ADD go.sum .
 RUN go mod download && go mod tidy && go mod verify && go mod vendor
 
-
 #
 # STAGE 2: build
 #

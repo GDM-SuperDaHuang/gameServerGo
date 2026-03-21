@@ -16,6 +16,8 @@ var ProtoIdToMethodMap = map[uint16]string{
 	2003: "BuyHeroHandler",
 	2004: "ReceiveAwardHandler",
 	2005: "RankInfoHandler",
+
+	//1099: "TestMaxHandler",
 }
 
 // 推送信息 协议id

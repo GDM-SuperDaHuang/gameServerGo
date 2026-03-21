@@ -27,4 +27,8 @@ func init() {
 		}
 	}
 	//room.InitRoomConfig()
+
+	//go logic.TestInit()
+	//
+	//go logic.TestInit222()
 }

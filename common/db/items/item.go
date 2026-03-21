@@ -15,49 +15,20 @@ import (
 
 var (
 	itemCache = cache.New(20*time.Second, 10*time.Second) // <int,map[int]*Item>
-	itemKey   = "item:UserId:%d"                          //道具表,<getItemKey,map[string(ItemId)]*Item>
+	//itemKey   = "item:UserId:%d"                          //道具表,<getItemKey,map[string(ItemId)]*Item>
+	itemKey = "item:UserId:%d" //道具表,<getItemKey,map[string]int64>
+
 )
 
-type Item struct {
-	ItemId   int
-	ItemType int
-	Count    int64
-}
+//type Item struct {
+//	ItemId   int
+//	ItemType int
+//	Count    int64
+//	Version  int64 // 新增
+//}
 
 func getItemKey(userId uint64) string {
 	return fmt.Sprintf(itemKey, userId)
-}
-
-// 获取所有的道具
-func GetAllItems(userId uint64) (map[int]*Item, error) {
-	cacheKey := getItemKey(userId)
-	if v, ok := itemCache.Get(cacheKey); ok {
-		return v.(map[int]*Item), nil
-	}
-
-	// miss -> 查询SSDB
-	vals, err := ssdb.GetClient().HGetAll(cacheKey)
-	if err != nil {
-		return nil, err
-	}
-	items := make(map[int]*Item)
-	for k, v := range vals {
-		empty := v.IsEmpty()
-		if empty { //空数据
-			continue
-		}
-		itemId, _ := strconv.Atoi(k)
-		var item Item
-		err = v.As(&item)
-		if err != nil {
-			log2.Get().Error("dbItem as to Item err", zap.Error(err))
-			return nil, err
-		}
-		items[itemId] = &item
-	}
-	itemCache.Set(cacheKey, items, cache.DefaultExpiration)
-
-	return items, nil
 }
 
 // 验证自身道具是否充足
@@ -68,104 +39,112 @@ func VerifyItem(userId uint64, itemMap map[int]int64) bool {
 		return false
 	}
 	for itemId, chanceValue := range itemMap {
-		info, ok := itemInfos[itemId]
+		count, ok := itemInfos[itemId]
 		if !ok {
 			return false
 		}
-		if info.Count < chanceValue {
+		if count < chanceValue {
 			return false
 		}
 	}
 	return true
 }
 
-func GetItem(userId uint64, itemId int) (*Item, error) {
+func GetItem(userId uint64, itemId int) (int64, error) {
 	items, err := GetAllItems(userId)
 	if v, ok := items[itemId]; ok {
 		return v, nil
 	}
-	return nil, err
+	return 0, err
 }
 
-func GetItemNoCache(userId uint64, itemId int) (*Item, error) {
+func GetItemNoCache(userId uint64, itemId int) (int64, error) {
+	//value, err := ssdb.GetClient().HGet(getItemKey(userId), strconv.Itoa(itemId))
 	value, err := ssdb.GetClient().HGet(getItemKey(userId), strconv.Itoa(itemId))
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
 	if value.IsEmpty() {
-		return nil, nil
+		return 0, nil
 	}
-	var item Item
-	err = value.As(&item)
-	if err != nil {
-		return nil, err
-	}
-	return &item, err
+	return value.Int64(), nil
 }
 
 func RewardItem(userId uint64, itemMap map[int]int64) bool {
-	itemMapDb := make(map[string]interface{}) //db
-	itemInfos, err := GetAllItems(userId)
-	for itemId, chanceValue := range itemMap {
-		_, ok := itemInfos[itemId]
-		if !ok {
-			itemInfos[itemId] = &Item{
-				ItemId: itemId,
-				Count:  chanceValue,
-			}
-		} else {
-			itemInfos[itemId].Count += chanceValue
+	for itemId, delta := range itemMap {
+		_, err := AddItem(userId, itemId, delta)
+		if err != nil {
+			return false
 		}
-		itemMapDb[strconv.Itoa(itemId)] = itemInfos[itemId]
-	}
-	//
-	key := getItemKey(userId)
-	err = ssdb.GetClient().MultiHSet(key, itemMapDb)
-	if err != nil {
-		return false
-	}
-	// 更新缓存
-	itemCache.Set(key, itemInfos, cache.DefaultExpiration)
-
-	// 发布信息
-	err = redis.PublishMessage(cacheChanel.ItemChanel, getItemKey(userId))
-	if err != nil {
-		log2.Get().Warn("redis PublishCacheDelete item err", zap.Error(err))
 	}
 	return true
 }
 
-func ConsumeItem(userId uint64, itemMap map[int]int64) bool {
-	itemInfos, err := GetAllItems(userId)
-	itemMapDb := make(map[string]interface{}) // id - info
-	for itemId, chanceValue := range itemMap {
-		item, ok := itemInfos[itemId]
-		if !ok {
-			return false
-		}
-		if item == nil {
-			return false
-		}
-		if item.Count < chanceValue {
-			return false
-		}
-		item.Count -= chanceValue
-		itemMapDb[strconv.Itoa(itemId)] = item
-	}
+func GetAllItems(userId uint64) (map[int]int64, error) {
 	key := getItemKey(userId)
-	err = ssdb.GetClient().MultiHSet(key, itemMapDb)
-	if err != nil {
-		return false
+	//  本地缓存（返回副本）
+	if v, ok := itemCache.Get(key); ok {
+		return cloneMap(v.(map[int]int64)), nil
 	}
-	// 更新缓存
-	itemCache.Set(key, itemInfos, cache.DefaultExpiration)
 
-	// 发布信息
-	err = redis.PublishMessage(cacheChanel.ItemChanel, getItemKey(userId))
+	// miss -> 查SSDB
+	vals, err := ssdb.GetClient().HGetAll(key)
 	if err != nil {
-		log2.Get().Warn("redis PublishCacheDelete item err", zap.Error(err))
+		return nil, err
+	}
+
+	result := make(map[int]int64)
+	for k, v := range vals {
+		if v.IsEmpty() {
+			continue
+		}
+		itemId, _ := strconv.Atoi(k)
+		count := v.Int64()
+		result[itemId] = count
+	}
+
+	//  写缓存（存原始，返回副本）
+	itemCache.Set(key, result, cache.DefaultExpiration)
+	return cloneMap(result), nil
+}
+
+func AddItem(userId uint64, itemId int, delta int64) (int64, error) {
+	key := getItemKey(userId)
+	newCount, err := ssdb.GetClient().HIncr(
+		key,
+		strconv.Itoa(itemId),
+		delta,
+	)
+	if err != nil {
+		return 0, err
+	}
+
+	// 删除本地缓存
+	itemCache.Delete(key)
+	// 广播
+	err = redis.PublishMessage(cacheChanel.ItemChanel, key)
+	if err != nil {
+		log2.Get().Warn("Publish item cache delete err", zap.Error(err))
+	}
+	return newCount, nil
+}
+
+func ConsumeItem(userId uint64, itemMap map[int]int64) bool {
+	for itemId, delta := range itemMap {
+		_, err := AddItem(userId, itemId, -delta)
+		if err != nil {
+			return false
+		}
 	}
 	return true
+}
+
+func cloneMap(src map[int]int64) map[int]int64 {
+	dst := make(map[int]int64, len(src))
+	for k, v := range src {
+		dst[k] = v
+	}
+	return dst
 }
 
 // 监听Item

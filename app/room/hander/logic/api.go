@@ -1,6 +1,7 @@
 package logic
 
 import (
+	"fmt"
 	"gameServer/app/room/hander/config"
 	"gameServer/app/room/hander/maxRects"
 	"gameServer/common/constValue"
@@ -8,6 +9,7 @@ import (
 	"gameServer/protobuf/pbGo"
 	"gameServer/protobuf/protoHandlerInit"
 	"gameServer/service/services/node"
+	"time"
 
 	"go.uber.org/zap"
 	"golang.org/x/exp/rand"
@@ -19,6 +21,24 @@ type Hint struct {
 	HintType  uint32 // 0：人物提示，1：词条提示
 	Value     int64  //总价值,平均价值,的值等
 	ValueType uint32 //0：没有值，1：总价值,2:平均价值等,的值等
+}
+
+var (
+	endTime22 = int64(0)
+)
+
+func TestInit222() {
+
+	// 按房间类型分桶
+	//buckets := make(map[uint32][]*MatchRequest) //房间类型-匹配请求
+	for {
+		select {
+		// 定时撮合
+		case <-tickerTest.C:
+			ttt := endTime22 - time.Now().Unix()
+			fmt.Printf("push ---剩余时间，===========: %d\n", ttt)
+		}
+	}
 }
 
 // 应用能力
@@ -583,26 +603,32 @@ func (room *Room) pushRoundInfo(roomConfig *config.Room, roomSettlementInfo *pbG
 		// 填充上回合的玩家信息
 		// 竞拍金额
 		var betInfo []*pbGo.ItemInfo
-
 		lastRound := room.getLastRound()
 		if lastRound != nil {
-			betInfo = make([]*pbGo.ItemInfo, 0)
-			for _, pInfo := range lastRound.Op {
+
+			for oneUserId, pInfo := range lastRound.Op {
+				betInfo = make([]*pbGo.ItemInfo, 0, 2)
 				betInfo = append(betInfo, &pbGo.ItemInfo{
 					ItemId: uint64(constValue.GoldItemId),
 					Count:  pInfo.goldValue,
 				})
+				if pInfo.itemId > 0 {
+					betInfo = append(betInfo, &pbGo.ItemInfo{
+						ItemId: uint64(pInfo.itemId),
+						Count:  1,
+					})
+				}
+				// 玩家信息
+				heroId := room.playerInfos[oneUserId].HeroId
+				changeScreenInfo.PlayerInfoList = append(changeScreenInfo.PlayerInfoList, &pbGo.PlayerInfo{
+					UserId:  userId,
+					HeroId:  heroId,
+					BetInfo: betInfo,
+				})
 			}
 		}
 
-		// 玩家信息
-		heroId := room.playerInfos[userId].HeroId
-
-		changeScreenInfo.PlayerInfoList = append(changeScreenInfo.PlayerInfoList, &pbGo.PlayerInfo{
-			UserId:  userId,
-			HeroId:  heroId,
-			BetInfo: betInfo,
-		})
+		endTime22 = curRound.creatTime + int64(roomConfig.Timeout)
 
 		log2.Get().Info("[pushRoundInfo End ]", zap.Uint64("userId：", userId), zap.Int32("roomId：", room.roomId))
 		node.Push(info.Player, protoHandlerInit.RoundInfoPush, &pbGo.RoundInfoPush{
