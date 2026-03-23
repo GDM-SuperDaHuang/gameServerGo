@@ -58,7 +58,7 @@ type PlayerInfo struct {
 	//PlayerId uint64
 	Player        *common.Player //网关
 	playerType    uint8          //0:真实玩家，>0:机器人
-	HeroId        uint32         //选择的人物
+	HeroId        int            //选择的人物
 	ChoiceItemMap map[int]int64  //选择的道具
 	UserItemMap   map[int]int8   //使用了道具
 
@@ -467,7 +467,7 @@ func (r *Room) startGame(roomConfig *config.Room) {
 	for userId, p := range r.playerInfos {
 		playerInfoList = append(playerInfoList, &pbGo.PlayerInfo{
 			UserId:  userId,
-			HeroId:  p.HeroId,
+			HeroId:  uint32(p.HeroId),
 			BetInfo: make([]*pbGo.ItemInfo, 0),
 		})
 		if p.playerType > 0 {
@@ -653,7 +653,7 @@ func (r *Room) calcResult() *pbGo.RoomSettlementInfo {
 	// 响应
 	roomSettlementInfo.PlayerInfo = &pbGo.PlayerInfo{
 		UserId:  targetUserId,
-		HeroId:  heroId,
+		HeroId:  uint32(heroId),
 		BetInfo: betInfo,
 	}
 	profit := &pbGo.ItemInfo{

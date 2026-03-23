@@ -1,18 +1,14 @@
 package gate
 
 import (
-	"fmt"
 	"gameServer/common/db/heros"
 	"gameServer/common/db/items"
 	"gameServer/common/db/reward"
 	"gameServer/common/db/user"
 	"gameServer/common/errorCode"
-	cachex "gameServer/pkg/cache/cacheX"
 	"gameServer/pkg/config"
 	"gameServer/pkg/logger/log2"
 	"gameServer/pkg/loginSdk"
-	"gameServer/pkg/random/salt"
-	"gameServer/pkg/random/snowflake"
 	"gameServer/pkg/utils"
 	"gameServer/protobuf/pbGo"
 	"gameServer/service/common"
@@ -25,12 +21,12 @@ import (
 )
 
 var (
-	roleCache = cachex.NewCacheX[*user.UserInfo](true, 10*time.Minute, 5*time.Minute)
-	olCache   = cachex.NewCacheX[*user.OL](true, 10*time.Minute, 5*time.Minute)
+	//roleCache = cachex.NewCacheX[*user.UserInfo](true, 10*time.Minute, 5*time.Minute)
+	//olCache   = cachex.NewCacheX[*user.OL](true, 10*time.Minute, 5*time.Minute)
 	//allCache  = cachex.NewCacheX[*user.AllUser](true, 10*time.Minute, 5*time.Minute)
 
-	node = snowflake.NewNode(1)
-	sum  = 0
+	//node = snowflake.NewNode(1)
+	sum = 0
 )
 
 // heartHandler 心跳处理
@@ -47,8 +43,8 @@ func (g *Gate) heartHandler(session *common.Session, message *common.Message) *c
 // loginHandler 登录
 func (g *Gate) loginHandler(session *common.Session, message *common.Message) *common.Resp {
 	sum++
-	fmt.Println("=====%d", message.Head.SN)
-	fmt.Println("sum=%d", sum)
+	//fmt.Println("=====%d", message.Head.SN)
+	//fmt.Println("sum=%d", sum)
 
 	//t := time.Now()
 	//session.pingTime = t
@@ -85,54 +81,32 @@ func (g *Gate) loginHandler(session *common.Session, message *common.Message) *c
 	}
 
 	// ol 查询
-	err, ol = user.FindUserByOL(*openid, loginType, olCache)
+	err, ol = user.FindOL(*openid, loginType)
+	if err != nil {
+		return proto.Errorf1(errorCode.ErrorCode_LoginFailed)
+	}
 	if ol == nil {
-		userId := node.Generate()
-		ol = &user.OL{
-			UserId: userId,
-		}
-		err, ol = user.AddUserToOL(*openid, loginType, ol, olCache)
+		userInfo, err = user.CreateUser(*openid, loginType)
 		if err != nil {
 			log2.Get().Error("loginHandler AddUserToOL failed ", zap.Any("openid", openid))
 			return proto.Errorf1(errorCode.ErrorCode_LoginFailed)
 		}
-	}
-
-	userInfo, err = user.FindUser(ol.UserId, roleCache)
-	if err != nil {
-		log2.Get().Error("loginHandler FindUser failed ", zap.Any("openid", openid))
-		return proto.Errorf1(errorCode.ErrorCode_LoginFailed)
-	}
-
-	// 创建用户
-	if userInfo == nil {
-		userInfo = &user.UserInfo{
-			UserId:         ol.UserId,
-			Salt:           salt.Lower(32),
-			LoginType:      cliReq.LoginType,
-			Openid:         *openid,
-			CreatTimestamp: uint64(time.Now().UnixMilli()),
-		}
-		err = user.AddUser(ol.UserId, userInfo, roleCache)
-		if err != nil {
-			log2.Get().Warn("loginHandler AddUser failed ", zap.Any("err", err))
-			return proto.Errorf1(errorCode.ErrorCode_CreatUserFailed)
-		}
-
 		userId := userInfo.UserId
-
 		// 初始化奖励
 		rewardMap, idList := excelConfig.GetInitLoginConfigReward()
 		if rewardMap == nil || len(idList) == 0 {
 			log2.Get().Error("user loginHandler GetInitLoginConfigReward failed ", zap.Any("userId:", userId))
 			return proto.Errorf1(errorCode.ErrorCode_LoginFailed)
 		}
-		ok := reward.SaveRewardInfo(userId, idList)
-		if !ok {
-			log2.Get().Error(" save SaveRewardInfo is false ", zap.Any("idList:", idList))
-			return proto.Errorf1(errorCode.ErrorCode_LoginFailed)
+		for _, id := range idList {
+			ok := reward.SaveRewardInfo(userId, id)
+			if !ok {
+				log2.Get().Error(" save SaveRewardInfo is false ", zap.Any("idList:", idList))
+				return proto.Errorf1(errorCode.ErrorCode_LoginFailed)
+			}
 		}
-		ok = items.RewardItem(userId, rewardMap)
+
+		ok := items.RewardItem(userId, rewardMap)
 		if !ok {
 			log2.Get().Error("user loginHandler InitLoginConfig failed ", zap.Any("userId:", userId))
 			return proto.Errorf1(errorCode.ErrorCode_LoginFailed)
@@ -147,6 +121,13 @@ func (g *Gate) loginHandler(session *common.Session, message *common.Message) *c
 		ok = heros.UnLockCharacter(userId, characterList)
 		if !ok {
 			log2.Get().Error("user loginHandler UnLockCharacter failed ", zap.Any("userId:", userId), zap.Any("characterList:", characterList))
+			return proto.Errorf1(errorCode.ErrorCode_LoginFailed)
+		}
+
+	} else {
+		userInfo, err = user.FindUser(ol.UserId)
+		if err != nil {
+			log2.Get().Error("loginHandler FindUser failed ", zap.Any("UserId：", ol.UserId))
 			return proto.Errorf1(errorCode.ErrorCode_LoginFailed)
 		}
 	}
@@ -179,7 +160,7 @@ func (g *Gate) loginHandler(session *common.Session, message *common.Message) *c
 	heroList = make([]*pbGo.HeroInfo, len(characterList))
 	for ii, info := range characterList {
 		heroList[ii] = &pbGo.HeroInfo{
-			HeroId: info.Id,
+			HeroId: uint32(info.Id),
 			Unlock: true,
 		}
 	}

@@ -37,10 +37,10 @@ func GetInitLoginConfigReward() (map[int]int64, []int) {
 	idList := make([]int, 0)
 
 	for _, info := range logins {
-		if info.RewardType != 1 {
+		if info.RewardType != 1 { //注册类型
 			continue
 		}
-		idList = append(idList, int(info.Id))
+		idList = append(idList, info.Id)
 		for k, v := range info.RewardMap {
 			rewardMap[k] = v
 		}
@@ -48,7 +48,7 @@ func GetInitLoginConfigReward() (map[int]int64, []int) {
 	return rewardMap, idList
 }
 
-func GetInitCharacterListReward() []uint32 {
+func GetInitCharacterListReward() []int {
 	initLoginInfo, ok := allStructMap["heros"]
 	if !ok {
 		return nil
@@ -56,7 +56,7 @@ func GetInitCharacterListReward() []uint32 {
 	ptr := initLoginInfo.(*[]*config.Heros)
 	infos := *ptr
 
-	idList := make([]uint32, 0)
+	idList := make([]int, 0)
 	for _, info := range infos {
 		if info.Lock {
 			continue

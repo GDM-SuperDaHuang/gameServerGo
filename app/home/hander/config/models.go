@@ -34,7 +34,7 @@ func GetAllExcelConfig() map[string]interface{} {
 	return allStructMap
 }
 
-func GetHeroConfigById(id uint32) *config.Heros {
+func GetHeroConfigById(id int) *config.Heros {
 	all, ok := allStructMap["heros"]
 	if !ok {
 		return nil

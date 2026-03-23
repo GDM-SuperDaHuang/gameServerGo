@@ -48,12 +48,12 @@ func init() {
 
 	//rankGold()
 	crontab.Start()
-	crontab.AddFunc("0 0 0 * * *", func() { //每天晚上12点一次
-		RankGold()
-	})
-	//crontab.AddFunc("*/5 * * * * *", func() { //每5s一次
+	//crontab.AddFunc("0 0 0 * * *", func() { //每天晚上12点一次
 	//	RankGold()
 	//})
+	crontab.AddFunc("*/5 * * * * *", func() { //每5s一次
+		RankGold()
+	})
 
 }
 
@@ -66,7 +66,7 @@ func RankGold() {
 	if allUser == nil {
 		return
 	}
-	if len(allUser.UserIdList) == 0 {
+	if len(allUser) == 0 {
 		return
 	}
 
@@ -76,7 +76,7 @@ func RankGold() {
 		log2.Get().Error("RankServer ClearRank failed ", zap.Any("err:", err))
 		return
 	}
-	for _, userId := range allUser.UserIdList {
+	for userId, _ := range allUser {
 		count, err := items.GetItemNoCache(userId, constValue.GoldItemId)
 		if err != nil {
 			log2.Get().Error("RankServer GetItemNoCache failed ", zap.Any("err:", err))

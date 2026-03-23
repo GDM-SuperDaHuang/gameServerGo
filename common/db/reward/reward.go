@@ -2,18 +2,17 @@ package reward
 
 import (
 	"fmt"
-	"gameServer/common/db/cacheChanel"
-	cachex "gameServer/pkg/cache/cacheX"
-	"gameServer/pkg/logger/log2"
-	"gameServer/pkg/redis"
+	"gameServer/pkg/cache/ssdb"
+	"strconv"
 	"time"
 
-	"go.uber.org/zap"
+	"github.com/patrickmn/go-cache"
 )
 
 var (
-	cache = cachex.NewCacheX[[]*reward](true, 10*time.Minute, 5*time.Minute)
-	dbKey = "reward:UserId:%d" //道具表,<getItemKey,map[string(ItemId)]*Item>
+	//cache     = cachex.NewCacheX[[]*reward](true, 10*time.Minute, 5*time.Minute)
+	dbKey       = "reward:UserId:%d"                        //道具表,<getItemKey,map[string(ItemId)]*Item>
+	rewardCache = cache.New(20*time.Second, 10*time.Second) // <int,map[int]*Item>
 )
 
 type reward struct {
@@ -26,66 +25,42 @@ func getKey(userId uint64) string {
 }
 
 // 奖励
-func SaveRewardInfo(userId uint64, idList []int) bool {
+func SaveRewardInfo(userId uint64, id int) bool {
 	key := getKey(userId)
-	infos, err := cache.Get(key)
+	r := reward{Id: id, Timestamp: time.Now().Unix()}
+	err := ssdb.GetClient().HSet(key, strconv.Itoa(id), r)
 	if err != nil {
-		log2.Get().Error("get rewardDb Info false", zap.Any("err:", err))
 		return false
 	}
-	if infos == nil {
-		infos = make([]*reward, 0)
-	}
-
-	ls := make([]int, 0)
-	for _, id := range idList {
-		flag := false
-		for _, info := range infos {
-			if info.Id == id {
-				info.Timestamp = time.Now().Unix()
-				flag = true
-				break
-			}
-		}
-		if !flag {
-			ls = append(ls, id)
-		}
-	}
-	for _, id := range ls {
-		infos = append(infos, &reward{Id: id, Timestamp: time.Now().Unix()})
-	}
-	//存储
-	err = cache.Set(key, infos)
-	if err != nil {
-		log2.Get().Warn("rewardDb save false", zap.Any("err:", err))
-		return false
-	}
+	rewardCache.Delete(key)
 	// 发布信息
-	err = redis.PublishMessage(cacheChanel.ItemChanel, getKey(userId))
+	//err = redis.PublishMessage(cacheChanel.ItemChanel, getKey(userId))
 	return true
 }
 
-func GetAllRewardInfo(userId uint64) []*reward {
+func GetAllRewardInfo(userId uint64) map[int]*reward {
 	key := getKey(userId)
-	infos, err := cache.Get(key)
-	if err != nil {
-		log2.Get().Warn(" GetAllRewardDbInfo Info false", zap.Any("err:", err))
-		return nil
-	}
-	return infos
-}
-
-func GetRewardInfoById(userId uint64, id int) *reward {
-	key := getKey(userId)
-	infos, err := cache.Get(key)
-	if err != nil {
-		log2.Get().Warn(" GetAllRewardDbInfo Info false", zap.Any("err:", err))
-		return nil
-	}
-	for _, info := range infos {
-		if info.Id == id {
-			return info
+	infos, ok := rewardCache.Get(key)
+	if ok {
+		if val, ok := infos.(map[int]*reward); ok {
+			return val
 		}
+		return nil
 	}
-	return nil
+	val, err := ssdb.GetClient().HGetAll(key)
+	if err != nil {
+		return nil
+	}
+	all := make(map[int]*reward, len(val))
+	for dbId, dbVal := range val {
+		id, err := strconv.ParseInt(dbId, 10, 64)
+		if err != nil {
+			return nil
+		}
+		var r reward
+		err = dbVal.As(&r)
+		all[int(id)] = &r
+	}
+	rewardCache.Set(key, all, cache.DefaultExpiration)
+	return all
 }

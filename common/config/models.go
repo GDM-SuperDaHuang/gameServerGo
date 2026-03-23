@@ -2,8 +2,8 @@ package config
 
 // 人物表
 type Heros struct {
-	Test   []int             `excel:"test"`   // 自动解析逗号分隔: tag1,tag2,tag3
-	Id     uint32            `excel:"id"`     //人物唯一id
+	//Test   []int             `excel:"test"`   // 自动解析逗号分隔: tag1,tag2,tag3
+	Id     int               `excel:"id"`     //人物唯一id
 	Lock   bool              `excel:"lock"`   //是否解锁
 	RAsMap map[int8][]uint32 `excel:"rAsMap"` //回合-能力list
 	Price  map[int]int64     `excel:"price"`  // 自动解析逗号分隔: tag1,tag2,tag3

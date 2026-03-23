@@ -87,7 +87,7 @@ func (h *HomeHandler) BuyItemHandler(_ context.Context, player *common.Player, r
 
 // 2003
 func (h *HomeHandler) BuyHeroHandler(_ context.Context, player *common.Player, req *pbGo.BuyHeroRep, resp *pbGo.BuyHeroResp) *common.ErrorInfo {
-	hero := config.GetHeroConfigById(req.HeroId)
+	hero := config.GetHeroConfigById(int(req.HeroId))
 	if hero == nil {
 		log2.Get().Error("GetHeroConfigById is null ", zap.Any("HeroId:", req.HeroId))
 		return &common.ErrorInfo{
@@ -103,7 +103,7 @@ func (h *HomeHandler) BuyHeroHandler(_ context.Context, player *common.Player, r
 		}
 	}
 	for _, info := range ls {
-		if info.Id == req.HeroId {
+		if info.Id == int(req.HeroId) {
 			return &common.ErrorInfo{
 				Code: errorCode.ErrorCode_RepeatBuyHero,
 			}
@@ -125,7 +125,7 @@ func (h *HomeHandler) BuyHeroHandler(_ context.Context, player *common.Player, r
 		}
 	}
 
-	ok = heros.UnLockCharacter(player.UserId, []uint32{req.HeroId})
+	ok = heros.UnLockCharacter(player.UserId, []int{int(req.HeroId)})
 	if !ok {
 		log2.Get().Debug("BuyHeroRepHandler ConsumeItem fail", zap.Uint64("UserId", player.UserId))
 		return &common.ErrorInfo{
@@ -136,7 +136,7 @@ func (h *HomeHandler) BuyHeroHandler(_ context.Context, player *common.Player, r
 	heroInfoList := make([]*pbGo.HeroInfo, 0, len(ls))
 	for _, info := range ls {
 		heroInfoList = append(heroInfoList, &pbGo.HeroInfo{
-			HeroId: info.Id,
+			HeroId: uint32(info.Id),
 			Unlock: true,
 		})
 	}
@@ -162,14 +162,8 @@ func (h *HomeHandler) ReceiveAwardHandler(_ context.Context, player *common.Play
 
 	rewardInfo := reward.GetAllRewardInfo(player.UserId)
 	timestamp := int64(0)
-	if rewardInfo == nil { //直接奖励
-		timestamp = 0
-	} else {
-		for _, r := range rewardInfo {
-			if r.Id == int(req.Id) {
-				timestamp = r.Timestamp
-			}
-		}
+	if rewardInfo != nil { //直接奖励
+		timestamp = rewardInfo[int(req.Id)].Timestamp
 	}
 
 	infos := make([]*pbGo.ItemInfo, 0)
@@ -180,7 +174,7 @@ func (h *HomeHandler) ReceiveAwardHandler(_ context.Context, player *common.Play
 			}
 		}
 
-		ok := reward.SaveRewardInfo(player.UserId, []int{int(req.Id)})
+		ok := reward.SaveRewardInfo(player.UserId, int(req.Id))
 		if !ok {
 			log2.Get().Error(" save SaveRewardInfo is false ", zap.Any("id:", req.Id))
 			return &common.ErrorInfo{
@@ -204,13 +198,12 @@ func (h *HomeHandler) ReceiveAwardHandler(_ context.Context, player *common.Play
 
 	} else if awardConfig.RewardType == 3 { //每天
 		rewardTimestamp := int64(0)
-		rewardInfoDb := reward.GetRewardInfoById(player.UserId, int(req.Id))
-		if rewardInfoDb != nil {
-			rewardTimestamp = rewardInfoDb.Timestamp
+		if rewardInfo != nil {
+			rewardTimestamp = rewardInfo[int(req.Id)].Timestamp
 		}
 		isToday := utils.IsToday(rewardTimestamp)
 		if !isToday {
-			ok := reward.SaveRewardInfo(player.UserId, []int{int(req.Id)})
+			ok := reward.SaveRewardInfo(player.UserId, int(req.Id))
 			if !ok {
 				log2.Get().Error(" save RewardDb is false ", zap.Any("id:", req.Id))
 				return &common.ErrorInfo{

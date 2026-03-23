@@ -4,13 +4,23 @@ import (
 	"fmt"
 	cachex "gameServer/pkg/cache/cacheX"
 	"gameServer/pkg/cache/ssdb"
+	"gameServer/pkg/random/salt"
+	"gameServer/pkg/random/snowflake"
+	"strconv"
+	"time"
+)
+
+const (
+	allUser     = "AllUser"
+	userInfoKey = "UserInfo:UserId:%d"
+	oLKey       = "OL:{Openid:%s,LoginType:%s}" //复合索引
+	//oLCache       = cachex.NewCacheX[*OL](true, 2*time.Minute, 1*time.Minute)
 )
 
 var (
-	allUser       = "AllUser"
-	mainUserIdKey = "UserInfo:UserId:%d"
-	oLKey         = "OL:{Openid:%s,LoginType:%s}" //复合索引
-	//oLCache       = cachex.NewCacheX[*OL](true, 2*time.Minute, 1*time.Minute)
+	olCache       = cachex.NewCacheX[*OL](true, 10*time.Minute, 5*time.Minute)
+	userInfoCache = cachex.NewCacheX[*UserInfo](true, 10*time.Minute, 5*time.Minute)
+	node          = snowflake.NewNode(1)
 )
 
 // 用户信息
@@ -24,12 +34,14 @@ type UserInfo struct {
 	OutTimestamp   uint64 //退出登录时间戳
 	Status         int    //账号状态 0 正常，1 封号 等
 }
-type AllUser struct { //索引
-	UserIdList []uint64 //游戏用户唯一id
-}
+
+// 所有的userId
+//type AllUser struct { //索引 Hash 结构
+//	UserIdList []uint64 //游戏用户唯一id
+//}
 
 // 第三方信息
-type OL struct { //索引
+type OL struct { //key 索引
 	UserId uint64 //游戏用户唯一id
 }
 
@@ -38,51 +50,23 @@ func GetOLKey(openid, loginType string) string {
 	return fmt.Sprintf(oLKey, openid, loginType)
 }
 
-// 用户基本数据
-func getMainKey(userId uint64) string {
-	return fmt.Sprintf(mainUserIdKey, userId)
-}
-
-// 建立表数据 第三方信息
-func AddUserToOL(openid, loginType string, ol *OL, olCache *cachex.CacheX[*OL]) (error, *OL) {
-	// 创建
-	err := olCache.Set(GetOLKey(openid, loginType), ol)
-	if err != nil {
-		return err, nil
-	}
-	err = addUser(ol.UserId)
-	if err != nil {
-		return err, nil
-	}
-	return nil, ol
+func getUserInfoKey(userId uint64) string {
+	return fmt.Sprintf(userInfoKey, userId)
 }
 
 // 查 ol
-func FindUserByOL(openid, loginType string, olCache *cachex.CacheX[*OL]) (error, *OL) {
+func FindOL(openid, loginType string) (error, *OL) {
 	ol, err := olCache.Get(GetOLKey(openid, loginType))
-	if ol == nil {
-		return nil, nil
-	}
 	if err != nil {
 		return err, nil
 	}
 	return nil, ol
 }
 
-// 添加一个用户 userid
-func AddUser(userId uint64, userInfo *UserInfo, userCache *cachex.CacheX[*UserInfo]) error {
-	userIdKey := getMainKey(userId)
-	err := userCache.Set(userIdKey, userInfo)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 // 查表数据 userid
-func FindUser(userId uint64, userCache *cachex.CacheX[*UserInfo]) (*UserInfo, error) {
-	userIdKey := getMainKey(userId)
-	userInfo, err := userCache.Get(userIdKey)
+func FindUser(userId uint64) (*UserInfo, error) {
+	userIdKey := getUserInfoKey(userId)
+	userInfo, err := userInfoCache.Get(userIdKey)
 	if err != nil {
 		return nil, err
 	}
@@ -90,58 +74,63 @@ func FindUser(userId uint64, userCache *cachex.CacheX[*UserInfo]) (*UserInfo, er
 }
 
 // 获取所有的 userid
-func GetAllUser(userCache *cachex.CacheX[*AllUser]) (*AllUser, error) {
-	userList, err := userCache.Get(allUser)
-	if err != nil {
-		return nil, err
-	}
-	return userList, nil
-}
+//func GetAllUser(userCache *cachex.CacheX[*AllUser]) (*AllUser, error) {
+//	userList, err := userCache.Get(allUser)
+//	if err != nil {
+//		return nil, err
+//	}
+//	return userList, nil
+//}
 
-func GetAllUserNoCache() (*AllUser, error) {
-	dbVal, err := ssdb.GetClient().Get(allUser)
+func GetAllUserNoCache() (map[uint64]struct{}, error) {
+	dbVal, err := ssdb.GetClient().HGetAll(allUser)
 	if err != nil {
 		return nil, err
 	}
-	var val AllUser
-	err = dbVal.As(&val)
-	if err != nil {
-		return nil, err
-	}
-	return &val, nil
-}
-
-// KV结构，可能分布式，添加一个用户,不走缓存
-func addUser(userId uint64) error {
-	dbVal, err := ssdb.GetClient().Get(allUser)
-	if err != nil {
-		return err
-	}
-	if dbVal.IsEmpty() {
-		val := &AllUser{
-			UserIdList: make([]uint64, 0),
-		}
-		val.UserIdList = append(val.UserIdList, userId)
-		// 写入 SSDB
-		if err = ssdb.GetClient().Set(allUser, val); err != nil {
-			return err
-		}
-	} else {
-		var val AllUser
-		err = dbVal.As(&val)
+	allUserMap := make(map[uint64]struct{}, len(dbVal))
+	for dbUid, _ := range dbVal {
+		userId, err := strconv.ParseUint(dbUid, 10, 64)
 		if err != nil {
-			return err
+			return nil, err
 		}
-		//防止重复
-		for _, uid := range val.UserIdList {
-			if uid == userId {
-				return nil
-			}
-		}
-		val.UserIdList = append(val.UserIdList, userId)
-		if err = ssdb.GetClient().Set(allUser, val); err != nil {
-			return err
-		}
+		allUserMap[userId] = struct{}{}
 	}
-	return nil
+
+	return allUserMap, nil
+}
+
+func CreateUser(openid, loginType string) (*UserInfo, error) {
+	olKey := GetOLKey(openid, loginType)
+	userId := node.Generate()
+	ol := &OL{
+		UserId: userId,
+	}
+	fLoginType, err := strconv.ParseUint(loginType, 10, 32)
+	if err != nil {
+		return nil, err
+	}
+
+	userInfo := &UserInfo{
+		UserId:         ol.UserId,
+		Salt:           salt.Lower(32),
+		LoginType:      int32(fLoginType),
+		Openid:         openid,
+		CreatTimestamp: uint64(time.Now().UnixMilli()),
+	}
+	// 写入ol
+	err = olCache.SetNX(olKey, ol)
+	if err != nil {
+		return nil, err
+	}
+	err = userInfoCache.SetNX(getUserInfoKey(userId), userInfo)
+	if err != nil {
+		return nil, err
+	}
+
+	// 4. 加入 AllUser（Hash模拟Set）
+	err = ssdb.GetClient().HSet(allUser, strconv.FormatUint(ol.UserId, 10), 1)
+	if err != nil {
+		return nil, err
+	}
+	return userInfo, nil
 }

@@ -24,9 +24,41 @@ func (c *CacheX[T]) Set(key string, val T, ttl ...int64) error {
 		}
 	} else {
 		// 写入 SSDB
-		if err := ssdb.GetClient().Set(key, val); err != nil {
+		_, err := ssdb.GetClient().GetSet(key, val)
+		if err != nil {
 			return err
 		}
+		//if err := ssdb.GetClient().Set(key, val); err != nil {
+		//	return err
+		//}
+	}
+	// 写入本地缓存
+	c.Local.Set(key, val, cache.DefaultExpiration)
+	return nil
+}
+
+// Set 写入缓存，val 可以是基础类型或 struct，ttl 可选，单位秒
+func (c *CacheX[T]) SetNX(key string, val T, ttl ...int64) error {
+	//  是否写入 SSDB
+	//if !c.dbFlag {
+	//	return nil
+	//}
+	var ssdbTTL int64
+	if len(ttl) > 0 {
+		ssdbTTL = ttl[0]
+		// 写入 SSDB
+		if err := ssdb.GetClient().Set(key, val, ssdbTTL); err != nil {
+			return err
+		}
+	} else {
+		// 写入 SSDB
+		_, err := ssdb.GetClient().SetNX(key, val)
+		if err != nil {
+			return err
+		}
+		//if err := ssdb.GetClient().Set(key, val); err != nil {
+		//	return err
+		//}
 	}
 	// 写入本地缓存
 	c.Local.Set(key, val, cache.DefaultExpiration)
@@ -52,6 +84,7 @@ func (c *CacheX[T]) Get(key string) (T, error) {
 	if err != nil {
 		return val, err
 	}
+
 	err = dbVal.As(&val)
 	if err != nil {
 		return val, err

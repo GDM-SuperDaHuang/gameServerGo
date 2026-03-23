@@ -138,7 +138,7 @@ func GetAbilityConfigById(id uint32) *Ability {
 //	return nil
 //}
 
-func GetHeroConfigById(id uint32) *config.Heros {
+func GetHeroConfigById(id int) *config.Heros {
 	roomInfo, ok := allStructMap["heros"]
 	if !ok {
 		return nil

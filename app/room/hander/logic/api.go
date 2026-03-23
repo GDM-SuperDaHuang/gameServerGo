@@ -622,7 +622,7 @@ func (room *Room) pushRoundInfo(roomConfig *config.Room, roomSettlementInfo *pbG
 				heroId := room.playerInfos[oneUserId].HeroId
 				changeScreenInfo.PlayerInfoList = append(changeScreenInfo.PlayerInfoList, &pbGo.PlayerInfo{
 					UserId:  userId,
-					HeroId:  heroId,
+					HeroId:  uint32(heroId),
 					BetInfo: betInfo,
 				})
 			}

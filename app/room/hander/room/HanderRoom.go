@@ -50,7 +50,7 @@ func (h *HandlerRoom) StartMatchHandler(_ context.Context, player *common.Player
 	}
 	// 进入匹配
 	logic.StartMatch(&logic.PlayerInfo{
-		HeroId:        req.HeroId,
+		HeroId:        int(req.HeroId),
 		ChoiceItemMap: itemMap,
 		Player:        player,
 		UserItemMap:   make(map[int]int8),
