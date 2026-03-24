@@ -1,0 +1,17 @@
+services:
+  websocket-bridge:
+    image: gowt1.0
+    container_name: node-gowt-1
+    ports:
+      - "7001:7001"
+    environment:
+      - WS_ADDR=:7001
+      - TCP_ADDR=host.docker.internal:17001
+    restart: always
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - ldl_network
+networks:
+  ldl_network:
+    driver: bridge

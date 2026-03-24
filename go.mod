@@ -7,6 +7,7 @@ require (
 	github.com/bytedance/douyin-openapi-sdk-go v1.0.3
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/fsnotify/fsnotify v1.9.0
+	github.com/gobwas/ws v1.4.0
 	github.com/lxzan/gws v1.8.9
 	github.com/panjf2000/ants/v2 v2.11.5
 	github.com/panjf2000/gnet/v2 v2.9.7
@@ -22,6 +23,7 @@ require (
 	go.uber.org/zap v1.27.1
 	golang.org/x/exp v0.0.0-20250128144449-3edf0e91c1ae
 	golang.org/x/tools v0.41.0
+	gonum.org/v1/gonum v0.16.0
 	google.golang.org/protobuf v1.36.11
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
@@ -54,6 +56,8 @@ require (
 	github.com/go-resty/resty/v2 v2.12.0 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
+	github.com/gobwas/httphead v0.1.0 // indirect
+	github.com/gobwas/pool v0.2.1 // indirect
 	github.com/godzie44/go-uring v0.0.0-20220926161041-69611e8b13d5 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect

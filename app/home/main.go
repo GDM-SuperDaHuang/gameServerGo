@@ -26,7 +26,7 @@ import (
 func main() {
 	configPath := "./config/" // ./config/
 	logPath := "./logs/"      // ./logs/
-	nodeName := "home-1"
+	nodeName := "home-2"
 
 	log2.Init(log2.Config{Level: zapcore.DebugLevel, LogDir: logPath, IsDocker: true})
 	if err := config.Init(nodeName, "home", configPath, "home", "toml"); err != nil {

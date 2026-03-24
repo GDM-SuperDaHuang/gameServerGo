@@ -2,6 +2,7 @@ package config
 
 import (
 	"gameServer/common/config"
+	"strconv"
 )
 
 // 能力配置表
@@ -48,6 +49,25 @@ type Robot struct {
 	Vibration uint8 `excel:"vibration"` //波动百分比
 }
 
+type RoomItemAllocation struct {
+	Id           int               `excel:"id"`           //机器人类型
+	ItemTypeRate map[uint32]uint32 `excel:"itemTypeRate"` //道具类型
+	TNDList      []string          `excel:"NDList"`       //正太发布
+	//NDList       []*ND    //正太发布
+}
+
+type FRoomItemAllocation struct {
+	id           int               //机器人类型
+	itemTypeRate map[uint32]uint32 //道具类型
+	ndList       []*ND             //正太发布
+}
+
+type ND struct {
+	P     float64 `excel:"id"`                 //机器人类型
+	Upper int64   `excel:"itemTypeRate"`       //道具类型
+	Lower int64   `excel:"normalDistribution"` //正太发布
+}
+
 // 词条
 //type Entry struct {
 //	RoomType      uint32 `excel:"id"` //词条唯一id
@@ -56,18 +76,20 @@ type Robot struct {
 
 // 注册
 var (
-	characterList = []*config.Heros{}
-	itemList      = []*config.Item{}
-	abilityList   = []*Ability{}
-	roomList      = []*Room{}
-	robotList     = []*Robot{}
+	characterList          = []*config.Heros{}
+	itemList               = []*config.Item{}
+	abilityList            = []*Ability{}
+	roomList               = []*Room{}
+	robotList              = []*Robot{}
+	roomItemAllocationList = []*RoomItemAllocation{}
 
 	allStructMap = map[string]interface{}{
-		"heros":   &characterList,
-		"item":    &itemList,
-		"ability": &abilityList,
-		"room":    &roomList,
-		"robot":   &robotList,
+		"heros":              &characterList,
+		"item":               &itemList,
+		"ability":            &abilityList,
+		"room":               &roomList,
+		"robot":              &robotList,
+		"roomItemAllocation": &roomItemAllocationList,
 	}
 )
 
@@ -168,7 +190,7 @@ func GetItemConfigById(id int) *config.Item {
 	return nil
 }
 
-func GetAllItemConfigById() []*config.Item {
+func GetAllItemConfig() []*config.Item {
 	roomInfo, ok := allStructMap["item"]
 	if !ok {
 		return nil
@@ -176,4 +198,59 @@ func GetAllItemConfigById() []*config.Item {
 	prt := roomInfo.(*[]*config.Item)
 	infos := *prt
 	return infos
+}
+
+func GetRoomItemAllocationConfigById(id int) *FRoomItemAllocation {
+	roomInfo, ok := allStructMap["roomItemAllocation"]
+	if !ok {
+		return nil
+	}
+	prt := roomInfo.(*[]*FRoomItemAllocation)
+	infos := *prt
+	for _, info := range infos {
+		if info.id == id {
+			return info
+		}
+	}
+	return nil
+}
+
+func InitRoomItemAllocationConfig() {
+	roomInfo, ok := allStructMap["roomItemAllocation"]
+	if !ok {
+		panic("roomItemAllocation init fail")
+	}
+	prt := roomInfo.(*[]*RoomItemAllocation)
+	infos := *prt
+	all := make([]*FRoomItemAllocation, 0, len(infos))
+	for _, info := range infos {
+		one := &FRoomItemAllocation{
+			id:           int(info.Id),
+			itemTypeRate: info.ItemTypeRate,
+			ndList:       make([]*ND, 0),
+		}
+		list := info.TNDList
+		for i := 0; i < len(list); i++ {
+			value1, err := strconv.ParseInt(list[i], 10, 64)
+			if err != nil {
+				panic(err)
+			}
+			value2, err := strconv.ParseInt(list[i+1], 10, 64)
+			if err != nil {
+				panic(err)
+			}
+			value3, err := strconv.ParseInt(list[i+2], 10, 64)
+			if err != nil {
+				panic(err)
+			}
+			i = i + 2
+			one.ndList = append(one.ndList, &ND{
+				P:     float64(value1) / float64(100),
+				Upper: value2,
+				Lower: value3,
+			})
+		}
+		all = append(all, one)
+	}
+	allStructMap["roomItemAllocation"] = all
 }

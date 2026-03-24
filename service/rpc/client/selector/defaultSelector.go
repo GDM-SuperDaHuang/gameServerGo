@@ -77,6 +77,7 @@ func (s *DefaultSelector) Select(ctx context.Context, servicePath, serviceMethod
 			}
 		} else {
 			if server.Id == oneServer.Id {
+				//log2.Get().Info("version======", zap.Uint32("curVersion:", server.curVersion))
 				return server.Address
 			}
 		}
@@ -97,7 +98,7 @@ func (s *DefaultSelector) UpdateServer(servers map[string]string) {
 
 	// 更新版本
 	s.Servers = make([]*serverInfo, 0)
-	groupIdMaxVersionMap := make(map[uint32]uint32)
+	groupIdMaxVersionMap := make(map[uint32]uint32) //各个服务的最大版本
 	for address, metadata := range servers {
 		serverMetadata := parseServerMetadata(metadata, address)
 		if groupIdMaxVersionMap[serverMetadata.groupId] <= serverMetadata.curVersion {
@@ -159,7 +160,7 @@ func parseServerMetadata(metadata, address string) *serverInfo {
 		//case "maxVersion":
 		//	t, _ := strconv.Atoi(value)
 		//	out.curVersion = uint32(t)
-		case "curVersion":
+		case "version":
 			t, _ := strconv.Atoi(value)
 			out.curVersion = uint32(t)
 		case "roomStatus":

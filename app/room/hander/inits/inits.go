@@ -26,6 +26,7 @@ func init() {
 			panic(err)
 		}
 	}
+	config.InitRoomItemAllocationConfig()
 	//room.InitRoomConfig()
 
 	//go logic.TestInit()

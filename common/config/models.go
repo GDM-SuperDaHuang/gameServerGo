@@ -27,3 +27,14 @@ type ReceiveAward struct {
 	RewardMap  map[int]int64 `excel:"rewardMap"`  // 价值
 	RewardType int           `excel:"rewardType"` // 奖励类型，1 登录初始化， 2：一次性奖励 3：每天奖励 4：每月
 }
+
+type NormalDistribution struct {
+	P     float64 `excel:"p"`     // 道具唯一id
+	upper int     `excel:"upper"` // 范围下限
+	Lower int     `excel:"Lower"` // 范围上限
+}
+
+type item struct {
+	id        int `excel:"id"`        // 道具唯一id
+	itemValue int `excel:"itemValue"` // 价值
+}

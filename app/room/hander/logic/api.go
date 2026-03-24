@@ -543,6 +543,9 @@ func (room *Room) pushRoundInfo(roomConfig *config.Room, roomSettlementInfo *pbG
 		for _, index := range roomConfig.EntryRound {
 			if curRound.RoundIndex == index {
 				hintList = make([]*pbGo.Hint, 0, 2)
+				if len(roomConfig.EntryList) == 0 {
+					continue
+				}
 				// 需要排重
 				entryAbilityId := uint32(roomConfig.EntryList[rand.Intn(len(roomConfig.EntryList))])
 				//词条能力

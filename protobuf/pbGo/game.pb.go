@@ -353,7 +353,7 @@ type RoundInfoPush struct {
 	EndTimeOut       int64               `protobuf:"varint,1,opt,name=endTimeOut,proto3" json:"endTimeOut,omitempty"`            //本局结束倒计时，时间戳毫秒
 	RoundIndex       uint32              `protobuf:"varint,2,opt,name=roundIndex,proto3" json:"roundIndex,omitempty"`            //第几轮
 	IsFinish         bool                `protobuf:"varint,3,opt,name=isFinish,proto3" json:"isFinish,omitempty"`                //是否结束
-	ChangeScreenInfo *ScreenInfo         `protobuf:"bytes,4,opt,name=changeScreenInfo,proto3" json:"changeScreenInfo,omitempty"` //上局的所有的信息
+	ChangeScreenInfo *ScreenInfo         `protobuf:"bytes,4,opt,name=changeScreenInfo,proto3" json:"changeScreenInfo,omitempty"` //屏幕的信息
 	HintList         []*Hint             `protobuf:"bytes,6,rep,name=hintList,proto3" json:"hintList,omitempty"`                 // 提示信息,包含词条，人物的
 	SettlementInfo   *RoomSettlementInfo `protobuf:"bytes,7,opt,name=SettlementInfo,proto3" json:"SettlementInfo,omitempty"`     //结算信息，如果 isFinish=true 时有值
 }
@@ -863,6 +863,127 @@ func (x *RoomSettlementInfo) GetProfit() *ItemInfo {
 	return nil
 }
 
+type TestRoundInfoReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *TestRoundInfoReq) Reset() {
+	*x = TestRoundInfoReq{}
+	mi := &file_game_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TestRoundInfoReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TestRoundInfoReq) ProtoMessage() {}
+
+func (x *TestRoundInfoReq) ProtoReflect() protoreflect.Message {
+	mi := &file_game_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TestRoundInfoReq.ProtoReflect.Descriptor instead.
+func (*TestRoundInfoReq) Descriptor() ([]byte, []int) {
+	return file_game_proto_rawDescGZIP(), []int{15}
+}
+
+type TestRoundInfoPush struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	EndTimeOut       int64               `protobuf:"varint,1,opt,name=endTimeOut,proto3" json:"endTimeOut,omitempty"`            //本局结束倒计时，时间戳毫秒
+	RoundIndex       uint32              `protobuf:"varint,2,opt,name=roundIndex,proto3" json:"roundIndex,omitempty"`            //第几轮
+	IsFinish         bool                `protobuf:"varint,3,opt,name=isFinish,proto3" json:"isFinish,omitempty"`                //是否结束
+	ChangeScreenInfo *ScreenInfo         `protobuf:"bytes,4,opt,name=changeScreenInfo,proto3" json:"changeScreenInfo,omitempty"` //上局的所有的信息
+	HintList         []*Hint             `protobuf:"bytes,6,rep,name=hintList,proto3" json:"hintList,omitempty"`                 // 提示信息,包含词条，人物的
+	SettlementInfo   *RoomSettlementInfo `protobuf:"bytes,7,opt,name=SettlementInfo,proto3" json:"SettlementInfo,omitempty"`     //结算信息，如果 isFinish=true 时有值
+}
+
+func (x *TestRoundInfoPush) Reset() {
+	*x = TestRoundInfoPush{}
+	mi := &file_game_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TestRoundInfoPush) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TestRoundInfoPush) ProtoMessage() {}
+
+func (x *TestRoundInfoPush) ProtoReflect() protoreflect.Message {
+	mi := &file_game_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TestRoundInfoPush.ProtoReflect.Descriptor instead.
+func (*TestRoundInfoPush) Descriptor() ([]byte, []int) {
+	return file_game_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *TestRoundInfoPush) GetEndTimeOut() int64 {
+	if x != nil {
+		return x.EndTimeOut
+	}
+	return 0
+}
+
+func (x *TestRoundInfoPush) GetRoundIndex() uint32 {
+	if x != nil {
+		return x.RoundIndex
+	}
+	return 0
+}
+
+func (x *TestRoundInfoPush) GetIsFinish() bool {
+	if x != nil {
+		return x.IsFinish
+	}
+	return false
+}
+
+func (x *TestRoundInfoPush) GetChangeScreenInfo() *ScreenInfo {
+	if x != nil {
+		return x.ChangeScreenInfo
+	}
+	return nil
+}
+
+func (x *TestRoundInfoPush) GetHintList() []*Hint {
+	if x != nil {
+		return x.HintList
+	}
+	return nil
+}
+
+func (x *TestRoundInfoPush) GetSettlementInfo() *RoomSettlementInfo {
+	if x != nil {
+		return x.SettlementInfo
+	}
+	return nil
+}
+
 var File_game_proto protoreflect.FileDescriptor
 
 var file_game_proto_rawDesc = []byte{
@@ -966,9 +1087,28 @@ var file_game_proto_rawDesc = []byte{
 	0x66, 0x6f, 0x52, 0x08, 0x65, 0x78, 0x70, 0x65, 0x6e, 0x73, 0x65, 0x73, 0x12, 0x26, 0x0a, 0x06,
 	0x70, 0x72, 0x6f, 0x66, 0x69, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0e, 0x2e, 0x69,
 	0x74, 0x65, 0x6d, 0x2e, 0x69, 0x74, 0x65, 0x6d, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x06, 0x70, 0x72,
-	0x6f, 0x66, 0x69, 0x74, 0x42, 0x1a, 0x5a, 0x18, 0x67, 0x61, 0x6d, 0x65, 0x53, 0x65, 0x72, 0x76,
-	0x65, 0x72, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x70, 0x62, 0x47, 0x6f,
-	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6f, 0x66, 0x69, 0x74, 0x22, 0x12, 0x0a, 0x10, 0x74, 0x65, 0x73, 0x74, 0x52, 0x6f, 0x75, 0x6e,
+	0x64, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x65, 0x71, 0x22, 0x97, 0x02, 0x0a, 0x11, 0x74, 0x65, 0x73,
+	0x74, 0x52, 0x6f, 0x75, 0x6e, 0x64, 0x49, 0x6e, 0x66, 0x6f, 0x50, 0x75, 0x73, 0x68, 0x12, 0x1e,
+	0x0a, 0x0a, 0x65, 0x6e, 0x64, 0x54, 0x69, 0x6d, 0x65, 0x4f, 0x75, 0x74, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x03, 0x52, 0x0a, 0x65, 0x6e, 0x64, 0x54, 0x69, 0x6d, 0x65, 0x4f, 0x75, 0x74, 0x12, 0x1e,
+	0x0a, 0x0a, 0x72, 0x6f, 0x75, 0x6e, 0x64, 0x49, 0x6e, 0x64, 0x65, 0x78, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x0d, 0x52, 0x0a, 0x72, 0x6f, 0x75, 0x6e, 0x64, 0x49, 0x6e, 0x64, 0x65, 0x78, 0x12, 0x1a,
+	0x0a, 0x08, 0x69, 0x73, 0x46, 0x69, 0x6e, 0x69, 0x73, 0x68, 0x18, 0x03, 0x20, 0x01, 0x28, 0x08,
+	0x52, 0x08, 0x69, 0x73, 0x46, 0x69, 0x6e, 0x69, 0x73, 0x68, 0x12, 0x3c, 0x0a, 0x10, 0x63, 0x68,
+	0x61, 0x6e, 0x67, 0x65, 0x53, 0x63, 0x72, 0x65, 0x65, 0x6e, 0x49, 0x6e, 0x66, 0x6f, 0x18, 0x04,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x68, 0x65, 0x72, 0x6f, 0x2e, 0x73, 0x63, 0x72, 0x65,
+	0x65, 0x6e, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x10, 0x63, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x53, 0x63,
+	0x72, 0x65, 0x65, 0x6e, 0x49, 0x6e, 0x66, 0x6f, 0x12, 0x26, 0x0a, 0x08, 0x68, 0x69, 0x6e, 0x74,
+	0x4c, 0x69, 0x73, 0x74, 0x18, 0x06, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x68, 0x65, 0x72,
+	0x6f, 0x2e, 0x68, 0x69, 0x6e, 0x74, 0x52, 0x08, 0x68, 0x69, 0x6e, 0x74, 0x4c, 0x69, 0x73, 0x74,
+	0x12, 0x40, 0x0a, 0x0e, 0x53, 0x65, 0x74, 0x74, 0x6c, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x49, 0x6e,
+	0x66, 0x6f, 0x18, 0x07, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x68, 0x65, 0x72, 0x6f, 0x2e,
+	0x52, 0x6f, 0x6f, 0x6d, 0x53, 0x65, 0x74, 0x74, 0x6c, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x49, 0x6e,
+	0x66, 0x6f, 0x52, 0x0e, 0x53, 0x65, 0x74, 0x74, 0x6c, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x49, 0x6e,
+	0x66, 0x6f, 0x42, 0x1a, 0x5a, 0x18, 0x67, 0x61, 0x6d, 0x65, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72,
+	0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x70, 0x62, 0x47, 0x6f, 0x62, 0x06,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -983,7 +1123,7 @@ func file_game_proto_rawDescGZIP() []byte {
 	return file_game_proto_rawDescData
 }
 
-var file_game_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
+var file_game_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
 var file_game_proto_goTypes = []any{
 	(*StartMatchReq)(nil),      // 0: hero.startMatchReq
 	(*StartMatchResp)(nil),     // 1: hero.startMatchResp
@@ -1000,32 +1140,37 @@ var file_game_proto_goTypes = []any{
 	(*Goods)(nil),              // 12: hero.goods
 	(*Grid)(nil),               // 13: hero.Grid
 	(*RoomSettlementInfo)(nil), // 14: hero.RoomSettlementInfo
-	(*ItemInfo)(nil),           // 15: item.itemInfo
-	(*PlayerInfo)(nil),         // 16: player.playerInfo
+	(*TestRoundInfoReq)(nil),   // 15: hero.testRoundInfoReq
+	(*TestRoundInfoPush)(nil),  // 16: hero.testRoundInfoPush
+	(*ItemInfo)(nil),           // 17: item.itemInfo
+	(*PlayerInfo)(nil),         // 18: player.playerInfo
 }
 var file_game_proto_depIdxs = []int32{
-	15, // 0: hero.startMatchReq.itemInfoList:type_name -> item.itemInfo
-	16, // 1: hero.MatchInfoPush.playerInfoList:type_name -> player.playerInfo
-	15, // 2: hero.betReq.betInfo:type_name -> item.itemInfo
-	16, // 3: hero.betResp.playerInfo:type_name -> player.playerInfo
+	17, // 0: hero.startMatchReq.itemInfoList:type_name -> item.itemInfo
+	18, // 1: hero.MatchInfoPush.playerInfoList:type_name -> player.playerInfo
+	17, // 2: hero.betReq.betInfo:type_name -> item.itemInfo
+	18, // 3: hero.betResp.playerInfo:type_name -> player.playerInfo
 	11, // 4: hero.roundInfoPush.changeScreenInfo:type_name -> hero.screenInfo
 	10, // 5: hero.roundInfoPush.hintList:type_name -> hero.hint
 	14, // 6: hero.roundInfoPush.SettlementInfo:type_name -> hero.RoomSettlementInfo
-	15, // 7: hero.useItemReq.item:type_name -> item.itemInfo
-	15, // 8: hero.useItemResp.itemInfoList:type_name -> item.itemInfo
+	17, // 7: hero.useItemReq.item:type_name -> item.itemInfo
+	17, // 8: hero.useItemResp.itemInfoList:type_name -> item.itemInfo
 	11, // 9: hero.useItemResp.changeScreenInfo:type_name -> hero.screenInfo
 	10, // 10: hero.useItemResp.hintList:type_name -> hero.hint
 	13, // 11: hero.screenInfo.GridList:type_name -> hero.Grid
 	12, // 12: hero.screenInfo.allGoods:type_name -> hero.goods
-	16, // 13: hero.screenInfo.playerInfoList:type_name -> player.playerInfo
-	16, // 14: hero.RoomSettlementInfo.playerInfo:type_name -> player.playerInfo
-	15, // 15: hero.RoomSettlementInfo.expenses:type_name -> item.itemInfo
-	15, // 16: hero.RoomSettlementInfo.profit:type_name -> item.itemInfo
-	17, // [17:17] is the sub-list for method output_type
-	17, // [17:17] is the sub-list for method input_type
-	17, // [17:17] is the sub-list for extension type_name
-	17, // [17:17] is the sub-list for extension extendee
-	0,  // [0:17] is the sub-list for field type_name
+	18, // 13: hero.screenInfo.playerInfoList:type_name -> player.playerInfo
+	18, // 14: hero.RoomSettlementInfo.playerInfo:type_name -> player.playerInfo
+	17, // 15: hero.RoomSettlementInfo.expenses:type_name -> item.itemInfo
+	17, // 16: hero.RoomSettlementInfo.profit:type_name -> item.itemInfo
+	11, // 17: hero.testRoundInfoPush.changeScreenInfo:type_name -> hero.screenInfo
+	10, // 18: hero.testRoundInfoPush.hintList:type_name -> hero.hint
+	14, // 19: hero.testRoundInfoPush.SettlementInfo:type_name -> hero.RoomSettlementInfo
+	20, // [20:20] is the sub-list for method output_type
+	20, // [20:20] is the sub-list for method input_type
+	20, // [20:20] is the sub-list for extension type_name
+	20, // [20:20] is the sub-list for extension extendee
+	0,  // [0:20] is the sub-list for field type_name
 }
 
 func init() { file_game_proto_init() }
@@ -1041,7 +1186,7 @@ func file_game_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_game_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   15,
+			NumMessages:   17,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
