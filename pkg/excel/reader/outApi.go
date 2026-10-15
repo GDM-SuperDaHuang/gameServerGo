@@ -37,14 +37,6 @@ func (s *SheetSelector) Sheet(sheetName string) *SheetSelector {
 	return s
 }
 
-// Into 映射到结构体切片
-//func (s *SheetSelector) Into(slicePtr interface{}) error {
-//	if s.sheetName == "" {
-//		return fmt.Errorf("必须先调用Sheet()选择工作表")
-//	}
-//	return s.reader.ReadSheetToStruct(s.fileName, s.sheetName, slicePtr)
-//}
-
 // GetRaw 获取原始数据
 func (s *SheetSelector) GetRaw() ([][]string, error) {
 	sheets, err := s.reader.ReadExcel(s.fileName)

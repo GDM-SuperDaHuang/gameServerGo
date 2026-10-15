@@ -8,39 +8,6 @@ import (
 
 // LocalIP returns the non-loopback local IP of the host
 func LocalIP() string {
-	//addrs, err := net.InterfaceAddrs()
-	//if err != nil {
-	//}
-	//inDocker := IsDocker()
-	//
-	//for _, address := range addrs {
-	//	ipnet, ok := address.(*net.IPNet)
-	//	if !ok || ipnet.IP.IsLoopback() || ipnet.IP.To4() == nil {
-	//		continue
-	//	}
-	//	ip := ipnet.IP.String()
-	//
-	//	if inDocker {
-	//		// 容器里，返回 Docker 网络（10.x.x.x）IP
-	//		if strings.HasPrefix(ip, "10.") || strings.HasPrefix(ip, "172.") || strings.HasPrefix(ip, "192.168.") {
-	//			return ip
-	//		}
-	//	} else {
-	//		// 宿主机，排除 Docker 虚拟网卡
-	//		if strings.HasPrefix(ip, "192.168.") && !strings.HasPrefix(ip, "10.") && !strings.HasPrefix(ip, "172.") && !strings.HasPrefix(ip, "docker") {
-	//			return ip
-	//		}
-	//	}
-	//
-	//	//if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
-	//	//	if ipnet.IP.To4() != nil {
-	//	//		return ipnet.IP.String()
-	//	//	}
-	//	//}
-	//}
-	//
-	//return "127.0.0.1"
-
 	ifaces, err := net.Interfaces()
 	if err != nil {
 		return ""

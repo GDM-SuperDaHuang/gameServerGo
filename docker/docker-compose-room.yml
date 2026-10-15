@@ -1,0 +1,18 @@
+services:
+  smash-room-1:
+    image: room2.9:latest
+    container_name: smash-room-1
+    ports:
+      - "7072:7072"
+      - "7082:7082"
+    volumes:
+      - ../config:/app/config
+      - ./logs:/app/logs
+      - ../excels:/app/excels
+    networks:
+      - smash_game_network
+
+networks:
+  smash_game_network:
+    driver: overlay
+    attachable: true

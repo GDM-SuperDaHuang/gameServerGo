@@ -1,18 +1,30 @@
 @echo off
-chcp 65001 >nul
 setlocal
 
-:: protoc.exe 路径
-set "PROTOC_BIN=D:\Program Files\protoc-33.4-win64\bin\protoc.exe"
+:: protoc.exe path
+set "PROTOC_BIN=D:\Program Files\protoc-36.1-win64\bin\protoc.exe"
 
-:: protoc-gen-go 必须在 PATH
-set "PATH=%PATH%;D:\work\bin"
+:: protoc-gen-go must be in PATH
+set "PATH=%PATH%;C:\Users\Administrator\go\bin"
 
-echo 当前路径: %cd%
+echo Current dir: %cd%
 echo.
 
 if not exist "protobuf\proto" (
-    echo ❌ protobuf\proto 不存在
+    echo [ERROR] protobuf\proto not found
+    pause
+    exit /b 1
+)
+
+if not exist "%PROTOC_BIN%" (
+    echo [ERROR] protoc not found: %PROTOC_BIN%
+    pause
+    exit /b 1
+)
+
+where protoc-gen-go >nul 2>nul
+if errorlevel 1 (
+    echo [ERROR] protoc-gen-go not in PATH
     pause
     exit /b 1
 )
@@ -22,17 +34,17 @@ if exist "protobuf\pbGo" (
 )
 mkdir protobuf\pbGo
 
-echo 🚀 生成 Go 文件...
+echo Generating Go files...
 for %%f in (protobuf\proto\*.proto) do (
     "%PROTOC_BIN%" --proto_path=protobuf\proto --go_out=protobuf/pbGo --go_opt=paths=source_relative "%%f"
     if errorlevel 1 (
-        echo ❌ protoc 生成失败: %%f
+        echo [ERROR] protoc failed: %%f
         pause
         exit /b 1
     )
 )
 
-echo ✅ 完成！
+echo Done!
 dir protobuf\pbGo /s /b
 pause
 endlocal

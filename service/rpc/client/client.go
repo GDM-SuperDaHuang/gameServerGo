@@ -16,7 +16,7 @@ type ClientConfig struct {
 	EtcdEndpoints []string
 	// etcd 服务注册基础路径，相当于缓存前缀，避免不同项目使用同一个 etcd 造成混乱，例如 MODOU_LDL
 	BasePath string
-	// 服务名称，例如 gate, game, battle
+	// 服务名称，例如 gate, game, battle 没用上
 	ServiceName string
 	// 服务对象名称，例如 Forward，Gate
 	ServicePath string

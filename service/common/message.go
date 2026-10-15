@@ -2,6 +2,20 @@ package common
 
 import "gameServer/pkg/bytes"
 
+const (
+	MessageHeadSize = 12 // Len(2) + Flag(2) + SN(4) + Code(2) + Protocol(2)
+
+	// Flag 标记位定义
+	// 00000000 00000001 表示压缩
+	// 00000000 00000010 表示加密
+	// 00000000 00000011 表示压缩+加密(先压缩后加密; 解密时先解密再解压缩)
+	FlagNone            uint16 = 0
+	FlagCompressed      uint16 = 1
+	FlagEncrypted       uint16 = 2
+	FlagCompressEncrypt uint16 = 3
+	CompressThreshold   int    = 128 // body >= 1024 才触发压缩/解压判断
+)
+
 type MessageHead struct {
 	// Len 消息体Body的长度
 	Len uint16 //2

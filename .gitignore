@@ -43,6 +43,7 @@ go.work.sum
 *.dylib
 *.test
 *.out
+*.xml
 
 # Go workspace
 go.work
@@ -56,11 +57,19 @@ vendor/
 /dist/
 /build/
 /release/
+/logs
+/docker/storage/redis
+/docker/storage/mongodb_config
+/docker/storage/mongodb
 
+/docker/dev/etcd1-data
+/docker/dev/etcd2-data
+/docker/dev/etcd3-data
 # ==========================================
 # GoLand / IntelliJ IDEA
 # ==========================================
-.idea/
+
+.idea
 *.iml
 *.iws
 .idea_modules/
@@ -160,5 +169,5 @@ docs/swagger.json
 docs/swagger.yaml
 
 # Proto 生成文件（可选）
-*.pb.go
+#*.pb.go
 *.pb.validate.go

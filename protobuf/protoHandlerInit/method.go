@@ -2,6 +2,8 @@ package protoHandlerInit
 
 // 必须大写
 var ProtoIdToMethodMap = map[uint16]string{
+	100: "UpdateConfigHandler",
+
 	1000: "TestHandler", //协议id -- 处理方法
 	// 房间游戏
 	1001: "StartMatchHandler", //开始匹配
@@ -16,8 +18,16 @@ var ProtoIdToMethodMap = map[uint16]string{
 	2003: "BuyHeroHandler",
 	2004: "ReceiveAwardHandler",
 	2005: "RankInfoHandler",
+	2006: "AwardInfoHandler",
+	2007: "RecordHandler",
+	2008: "SignInInfoHandler",
+	2009: "SignInHandler",
 
 	1099: "TestMaxHandler",
+
+	//3001: "HeroConfigHandler",
+	//3002: "ItemConfigHandler",
+	//3003: "AwardConfigHandler",
 }
 
 // 推送信息 协议id

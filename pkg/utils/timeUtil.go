@@ -19,3 +19,17 @@ func IsToday(timestamp int64) bool {
 	// 判断时间戳是否在今天的时间范围内 [今天0点, 明天0点)
 	return t.After(todayStart) || t.Equal(todayStart) && t.Before(tomorrowStart)
 }
+
+// 秒
+func IsInterval(t1, t2 int64) bool {
+	if t1 > t2 {
+		if t1-t2 > 1 {
+			return true
+		}
+	} else {
+		if t2-t1 > 1 {
+			return true
+		}
+	}
+	return false
+}

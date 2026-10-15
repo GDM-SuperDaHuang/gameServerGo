@@ -1,23 +1,61 @@
 syntax = "proto3";
 package login;
 option go_package = "gameServer/protobuf/pbGo";
-import "item.proto";
-import "hero.proto";
+
 
 // 协议: 4 登录
 message LoginReq {
   string code = 1; //  第三方登录凭证
-  int32 loginType = 2; // 登录类型，1：抖音登录
+  int32 loginType = 2; // 登录类型，0游客登陆,1：抖音登录
+  string avatarUrl  = 3; //  用户第三方图片
+  string nickName   = 4; //  用户第三方名称
+  string accessToken = 5; //  快速登陆凭证
 }
 message LoginResp {
-  uint64 userId = 1;//自身id
-  repeated awardInfo awardInfoList = 3;//奖励信息集合
-  repeated item.itemInfo itemList = 7;//道具集合
-  repeated hero.heroInfo heroList = 8;//人物集合
+  int64 Uid = 1;//自身id
+  string accessToken = 2; //  快速登陆凭证
+  //  repeated awardInfo awardInfoList = 3;//奖励信息集合
+//  repeated item.itemInfo itemList = 7;//道具集合
+//  repeated hero.heroInfo heroList = 8;//人物集合
 }
 
-// 奖励信息
-message awardInfo {
-  uint32 id = 1; //  奖励id
-  bool isReceived  = 2; // 是否已经领取,true已经领取
+// 客户端发起密钥交换 2
+message KeyExchangeReq
+{
+  // X25519 public key
+  // 32 bytes
+  bytes client_public_key = 1;
+  // 随机数
+  bytes client_random = 2;
+}
+// 服务端返回
+message KeyExchangeResp
+{
+  // X25519 public key
+  bytes server_public_key = 1;
+  // 随机数
+  bytes server_random = 2;
+}
+
+// 客户端确认 3
+message KeyVerificationReq
+{
+  // HMAC-SHA256
+  bytes confirm_mac = 1;
+}
+message KeyVerificationResp
+{
+  bytes confirm_mac = 1;
+}
+
+
+// 密钥测试 5
+message KeyTestReq
+{
+  // HMAC-SHA256
+  string TestReq = 1;
+}
+message KeyTestResp
+{
+  string TestResp = 1;
 }

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"gameServer/pkg/logger/log2"
+	"os"
 	"strconv"
 	"strings"
 
@@ -33,19 +34,6 @@ var globalConfig *Config
 // Get 获取全局配置
 func Get() *Config {
 	return globalConfig
-}
-
-// InitTest 初始化测试用例使用的配置
-//
-// - nodeName: 节点名字，eg: gate-1, gate-2, robot-1
-// - serviceName: 服务名称，eg: gate, robot, role
-func InitTest(nodeName, serviceName, filePath string) error {
-	err := Init(nodeName, serviceName, filePath, "config.dev", "toml")
-	if err != nil {
-		return err
-	}
-	globalConfig.isTest = true
-	return nil
 }
 
 // Init 初始化全局配置
@@ -156,77 +144,102 @@ func (c *Config) check(viper *viper.Viper, fields ...string) error {
 
 /////////////////////
 
-// IsTest 是否处于测试用例模式
-func (c *Config) IsTest() bool {
-	return c.isTest
-}
-
-// ID 本专服 id
-func (c *Config) ID() int {
-	return c.common.GetInt("id")
-}
-
 // Name 本专服名称
-func (c *Config) Name() string {
-	return c.common.GetString("name")
-}
+func (c *Config) GateMap() map[int]string {
+	var mapInfo map[int]string
+	getString := c.common.GetString("gateMap")
+	gouldData := strings.Split(getString, ";")
+	for _, str := range gouldData {
+		kv := strings.Split(str, "-")
+		if len(kv) == 2 {
+			k, err := strconv.ParseInt(kv[0], 10, 32)
+			if err != nil {
+				return nil
+			}
+			v := kv[1]
 
-// Secret 本专服秘钥
-func (c *Config) Secret() string {
-	return c.common.GetString("secret")
-}
-
-// IsDevelop 是否为开发模式
-func (c *Config) IsDevelop() bool {
-	if c != nil && c.common != nil {
-		return c.common.GetBool("isdevelop")
+			if mapInfo == nil {
+				mapInfo = make(map[int]string)
+			}
+			mapInfo[int(k)] = v
+		}
 	}
-
-	return false
+	return mapInfo
 }
 
 // =======================================================redis=================================================================
-// CachePrefix 缓存公共前缀
-func (c *Config) CachePrefix() string {
-	return c.common.GetString("cacheprefix")
-}
 
-// CacheAddress 缓存地址
-func (c *Config) CacheAddress() string {
-	return c.common.GetString("cacheaddress")
-}
-
-// CacheAddress 缓存地址
+// RedisAddress 缓存地址
 func (c *Config) RedisAddress() string {
+	// 环境变量优先(方便 swarm/k8s 下同一镜像跑多环境, infra 不进 swarm 时指向宿主机)
+	if v := strings.TrimSpace(os.Getenv("REDIS_ADDR")); v != "" {
+		return v
+	}
 	return c.common.GetString("redisAddr")
 }
 
-// CacheDB 缓存数据库，redis 0-15
-func (c *Config) CacheDB() int {
-	return c.common.GetInt("cachedb")
+// RedisPassword 缓存密码
+func (c *Config) RedisPassword() string {
+	return c.common.GetString("redisPassword")
 }
 
-// CachePassword 缓存密码
-func (c *Config) CachePassword() string {
-	return c.common.GetString("cachepassword")
+// RedisMinIdle 缓存最小空闲连接数
+func (c *Config) RedisMinIdle() int {
+	return c.common.GetInt("redisMinidle")
 }
 
-// CacheMinIdle 缓存最小空闲连接数
-func (c *Config) CacheMinIdle() int {
-	return c.common.GetInt("cacheminidle")
-}
-
-// CacheMaxActive 最大激活连接数
-func (c *Config) CacheMaxActive() int {
-	return c.common.GetInt("cachemaxactive")
-}
-
-// JaegerAddress jaeger agent 地址，udp
-func (c *Config) JaegerAddress() string {
-	return c.common.GetString("jaegeraddress")
+// RedisMaxActive 最大激活连接数
+func (c *Config) RedisMaxActive() int {
+	return c.common.GetInt("redisMaxactive")
 }
 
 //=======================================================redis=================================================================
+
+// =======================================================MongoDB=================================================================
+// MongoURI MongoDB 连接地址
+func (c *Config) MongoURI() string {
+	if v := strings.TrimSpace(os.Getenv("MONGO_URI")); v != "" {
+		return v
+	}
+	return c.common.GetString("mongodb.uri")
+}
+
+// MongoDatabase MongoDB 默认数据库名
+func (c *Config) MongoDatabase() string {
+	return c.common.GetString("mongodb.database")
+}
+
+// MongoAuthSource MongoDB 认证库
+func (c *Config) MongoAuthSource() string {
+	return c.common.GetString("mongodb.authSource")
+}
+
+// MongoConnectTimeoutSec MongoDB 连接超时，单位秒
+func (c *Config) MongoConnectTimeoutSec() int {
+	return c.common.GetInt("mongodb.connectTimeoutSec")
+}
+
+// MongoPingTimeoutSec MongoDB ping 超时，单位秒
+func (c *Config) MongoPingTimeoutSec() int {
+	return c.common.GetInt("mongodb.pingTimeoutSec")
+}
+
+// MongoMaxPoolSize MongoDB 连接池最大连接数
+func (c *Config) MongoMaxPoolSize() uint64 {
+	return c.common.GetUint64("mongodb.maxPoolSize")
+}
+
+// MongoMinPoolSize MongoDB 连接池最小连接数
+func (c *Config) MongoMinPoolSize() uint64 {
+	return c.common.GetUint64("mongodb.minPoolSize")
+}
+
+// address 缓存地址
+func (c *Config) Address() string {
+	return c.common.GetString("address")
+}
+
+// =======================================================MongoDB=================================================================
 
 // =======================================================etcd=================================================================
 // EtcdAddress etcd 地址
@@ -240,7 +253,6 @@ func (c *Config) EtcdAddress() []string {
 func (c *Config) EtcdPrefix() string {
 	v := c.common.GetString("etcdprefix")
 	if len(v) == 0 {
-		//var ErrInvalidPBMessage =
 		err := errors.New("etcdprefix is empty")
 		panic(err)
 	}
@@ -288,40 +300,3 @@ func (c *Config) PProfAddress() string {
 func (c *Config) GameConfigFilePath() string {
 	return c.common.GetString("gameconfigpath")
 }
-
-// =======================================================ssdb=================================================================
-// ssdb 游戏配置文件路径
-func (c *Config) GameSSDBHost() string {
-	return c.common.GetString("ssdbHost")
-}
-
-func (c *Config) GameSSDBPort() int {
-	str := c.common.GetString("ssdbPost")
-	if str == "" {
-		panic(errors.New("ssdbPost is empty"))
-		return 0
-	}
-	v, err := strconv.Atoi(str)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-func (c *Config) GameSSDBMaxPoolSize() int {
-	str := c.common.GetString("ssdbMaxPoolSize")
-	if str == "" {
-		panic(errors.New("ssdbPost is empty"))
-		return 0
-	}
-	v, err := strconv.Atoi(str)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-func (c *Config) GameSSDBPassword() string {
-	return c.common.GetString("ssdbPassword")
-}
-
-// =======================================================ssdb=================================================================

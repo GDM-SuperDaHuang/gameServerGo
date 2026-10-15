@@ -16,19 +16,17 @@ import (
 )
 
 var (
-	//typeOfResult   = reflect.TypeOf((*common.Resp)(nil)).Elem()
 	typeOfContext  = reflect.TypeOf((*context.Context)(nil)).Elem()
 	typeOfProtoMsg = reflect.TypeOf((*proto.Message)(nil)).Elem()
 	typeOfResult   = reflect.TypeOf((*common.ErrorInfo)(nil)).Elem()
-
-	//typeOfCallback = reflect.TypeOf((*Callback)(nil)).Elem()
-	// typeOfPollerData = reflect.TypeOf((*poller.PollerData)(nil)).Elem()
 )
 
 // Forward 消息转发
 type Forward struct {
 	allModules []interface{}
 	protocoles map[uint16]*ProtocolMethod
+	// 按玩家串行的分片执行器：同一玩家串行，玩家之间并发
+	dispatcher *playerDispatcher
 }
 
 // ProtocolMethod 远程调用后, 协议对应的函数
@@ -53,6 +51,7 @@ type ProtocolMethod struct {
 func NewForward() *Forward {
 	return &Forward{
 		protocoles: make(map[uint16]*ProtocolMethod),
+		dispatcher: newPlayerDispatcher(playerShardCount, playerQueueLen),
 	}
 }
 
@@ -98,30 +97,6 @@ func (f *Forward) register() error {
 * resp 响应
 */
 func (pm *ProtocolMethod) Call(ctx context.Context, p any, req *common.RpcMessage, resp *common.Resp) error {
-	//var callback Callback
-
-	//defer func() {
-	//	if r := recover(); r != nil {
-	//		buf := make([]byte, 4096)
-	//		n := runtime.Stack(buf, false)
-	//		buf = buf[:n]
-	//
-	//		logger.Get().Error(
-	//			"[rpc.protocolMethod.Call] exception",
-	//			zap.String("module", pm.moduleName),
-	//			zap.String("method", pm.methodName),
-	//			zap.Any("req", req),
-	//			zap.Any("err", r),
-	//			zap.ByteString("stack", buf),
-	//		)
-	//	}
-	//
-	//	// 执行回调函数
-	//	if callback != nil {
-	//		callback()
-	//	}
-	//}()
-
 	reqParam := req.Data.Body //protobuf
 	// 对象池获取
 	protocolReq := bytes.Types().Get(pm.reqTyp).(proto.Message)
@@ -150,61 +125,6 @@ func (pm *ProtocolMethod) Call(ctx context.Context, p any, req *common.RpcMessag
 			}
 		}
 	}
-	// 4. 返回值处理
-	//c := config.Get()
-	//switch len(results) {
-	//case 1:
-	//	// 单返回值模式: error
-	//	if !results[0].IsNil() {
-	//		// 仅在开发模式下判断
-	//		//if c.IsDevelop() {
-	//		//	if !results[0].IsNil() && !results[0].Type().Implements(typeOfResult) {
-	//		//		common.Types().Put(pm.respTyp, protocolResp)
-	//		//		return fmt.Errorf("single return value must be typeOfResult type, request: %s", pm.Name())
-	//		//	}
-	//		//}
-	//
-	//		if errResult := results[0].Interface().(Result); errResult != nil {
-	//			resp.Code = errResult.Code()
-	//			resp.Devmsg = errResult.Devmsg()
-	//
-	//			ResultRelease(errResult)
-	//		}
-	//	}
-	//
-	//case 2:
-	//	// 双返回值模式: Callback, result
-	//
-	//	if !results[0].IsNil() {
-	//		// 仅在开发模式下判断
-	//		if c.IsDevelop() && results[0].Type() != typeOfCallback {
-	//			bytes.Types().Put(pm.respTyp, protocolResp)
-	//			return fmt.Errorf("first return value must be Callback type, request: %s", pm.Name())
-	//		}
-	//
-	//		callback = results[0].Interface().(Callback)
-	//	}
-	//
-	//	if !results[1].IsNil() {
-	//		// 仅在开发模式下判断
-	//		if c.IsDevelop() && !results[1].Type().Implements(typeOfResult) {
-	//			bytes.Types().Put(pm.respTyp, protocolResp)
-	//			return fmt.Errorf("second return value must be typeOfResult type, request: %s", pm.Name())
-	//		}
-	//
-	//		if errResult := results[1].Interface().(Result); errResult != nil {
-	//			resp.Code = errResult.Code()
-	//			resp.Devmsg = errResult.Devmsg()
-	//
-	//			ResultRelease(errResult)
-	//		}
-	//	}
-	//
-	//default:
-	//	common.Types().Put(pm.respTyp, protocolResp)
-	//	return fmt.Errorf("protocol function must have 1 or 2 return values, request: %s", pm.Name())
-	//}
-
 	// 4.2 协议返回值写入远程调用的返回值中
 	respData, err := proto.Marshal(protocolResp)
 	bytes.Types().Put(pm.respTyp, protocolResp)
@@ -292,12 +212,6 @@ func parsedProtocolMethod(rcvr any) (map[uint16]*ProtocolMethod, error) {
 				return nil, fmt.Errorf("first parameter of protocol function must be context.Context, please check %s.%s", moduleName, methodName)
 			}
 
-			//4.2 第二个参数必须为 uint64 类型或实现了 PollerData 接口
-			//paramType := methodType.In(2)
-			//if paramType.Kind() != reflect.Uint64 && !paramType.Implements(typeOfPollerData) {
-			//	panic(fmt.Sprintf("second parameter of protocol function must be uint64 or implement PollerData interface, got %s, please check %s.%s", paramType.String(), moduleName, methodName))
-			//}
-
 			// 4.3 第三个参数
 			// req
 			reqTyp := methodType.In(3)
@@ -312,19 +226,10 @@ func parsedProtocolMethod(rcvr any) (map[uint16]*ProtocolMethod, error) {
 				return nil, fmt.Errorf("third parameter %s, please check %s.%s", err.Error(), moduleName, methodName)
 			}
 
-			// 5. 函数返回值检查
-			//if numOut := methodType.NumOut(); numOut != 1 && numOut != 2 {
-			//	return nil, fmt.Errorf("protocol function must have 1 or 2 return values, please check %s.%s", moduleName, methodName)
-			//}
-
 			if methodType.NumOut() == 1 && !methodType.Out(0).AssignableTo(typeOfResult) && !methodType.Out(0).AssignableTo(reflect.PtrTo(typeOfResult)) {
 				// 处理错误
 				return nil, fmt.Errorf("single return value must be Result type, please check %s.%s", moduleName, methodName)
 			}
-			//// 5.1 如果返回值为 1 个, 必须为 typeOfResult 类型
-			//if methodType.NumOut() == 1 && !methodType.Out(0).Implements(typeOfResult) {
-			//	return nil, fmt.Errorf("single return value must be Result type, please check %s.%s", moduleName, methodName)
-			//}
 
 			out[protoId] = &ProtocolMethod{
 				method:     method,
@@ -364,14 +269,7 @@ func checkReqParam(t reflect.Type, protocol int32) error {
 	if err := checkInParam(t); err != nil {
 		return err
 	}
-
-	// 请求参数的名称 = 协议名 + Req
-	//protocolName := pb_protocol.MessageID_name[protocol]
-	//requiredName := protocolName + "Req"
-	//name := t.Elem().Name()
-	//if name != requiredName {
-	//	return fmt.Errorf("请求对象请命名为: %s", requiredName)
-	//}
+	_ = protocol
 
 	return nil
 }
@@ -380,14 +278,7 @@ func checkRespParam(t reflect.Type, protocol int32) error {
 	if err := checkInParam(t); err != nil {
 		return err
 	}
-
-	// 请求参数的名称 = 协议名 + Resp
-	//protocolName := pb_protocol.MessageID_name[protocol]
-	//requiredName := protocolName + "Resp"
-	//name := t.Elem().Name()
-	//if name != requiredName {
-	//	return fmt.Errorf("响应对象请命名为: %s", requiredName)
-	//}
+	_ = protocol
 
 	return nil
 }

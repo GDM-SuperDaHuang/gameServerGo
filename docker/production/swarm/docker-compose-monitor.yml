@@ -1,0 +1,60 @@
+# ============================================================================
+# Swarm 全集群监控: 部署在管理节点(manager), 监控所有加入 swarm 的节点
+#
+# 原理: 只有 manager 的 dockerd 有全集群视图 (/nodes /services /tasks),
+# worker 只能看到本机容器, 所以监控必须约束到 manager, 单副本即可。
+#
+# 部署:
+#   docker stack deploy -c docker-compose-monitor.yml swarm-monitor
+# 查看:
+#   docker service ls
+#   docker service logs swarm-monitor_monitor -f
+# 卸载:
+#   docker stack rm swarm-monitor
+#
+# 环境变量说明 (可在 deploy 前 export, 或写进 .env):
+#   MONITOR_IMAGE    监控镜像, 默认 monitor:latest (本地先 docker build)
+#   FEISHU_WEBHOOK   飞书机器人 webhook
+#   FEISHU_SECRET    飞书加签密钥
+#   POLL_INTERVAL    全量轮询间隔, 默认 30s
+#   ALERT_COOLDOWN   同一问题重复告警冷却, 默认 10m
+#   MONITOR_INCLUDE  仅监控名字包含该子串的服务, 为空=监控全部 (推荐为空)
+# ============================================================================
+
+services:
+  monitor:
+    image: monitor1.0:latest
+    networks:
+      - smash_game_network
+    environment:
+      FEISHU_WEBHOOK: ${FEISHU_WEBHOOK:-https://open.feishu.cn/open-apis/bot/v2/hook/408051b8-7007-42c5-ba7c-35e630a34a99}
+      FEISHU_SECRET: ${FEISHU_SECRET:-pFRIDCPGsx3EWKTqfLoWWc}
+      POLL_INTERVAL: ${POLL_INTERVAL:-30s}
+      ALERT_COOLDOWN: ${ALERT_COOLDOWN:-10m}
+      MONITOR_INCLUDE: ${MONITOR_INCLUDE:-}
+    volumes:
+      # 关键: 挂载 manager 的 docker.sock 才能拿到全集群视图
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 30s
+      placement:
+        constraints:
+          # 只跑在管理节点
+          - node.role == manager
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 256M
+        reservations:
+          cpus: "0.10"
+          memory: 64M
+
+networks:
+  smash_game_network:
+    external: true

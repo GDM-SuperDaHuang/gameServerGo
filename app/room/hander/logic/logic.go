@@ -3,8 +3,6 @@ package logic
 import (
 	"context"
 	"gameServer/app/room/hander/config"
-	"gameServer/common/constValue"
-	"gameServer/common/db/items"
 	"gameServer/common/errorCode"
 	"gameServer/pkg/logger/log2"
 	"gameServer/protobuf/pbGo"
@@ -18,7 +16,7 @@ var (
 )
 
 func StartMatch(player *PlayerInfo, roomConfig *config.Room) {
-	uid := player.Player.UserId
+	uid := player.Player.Uid
 
 	roomManager.mu.Lock()
 	// 取消旧的
@@ -30,17 +28,13 @@ func StartMatch(player *PlayerInfo, roomConfig *config.Room) {
 
 	roomManager.playerCancel[uid] = cancel
 	room := roomManager.playerRoom[uid]
-	//if room == nil {
-	//	log2.Get().Warn("")
-	//}
 	if room != nil {
 		room.Leave(uid)
 	}
-	roomManager.playerState[uid] = StateMatching
 
 	roomManager.mu.Unlock()
 
-	// ✅ 丢进队列（关键变化）
+	// 丢进队列
 	roomManager.matchQueue <- &MatchRequest{
 		player:         player,
 		roomConfig:     roomConfig,
@@ -49,43 +43,49 @@ func StartMatch(player *PlayerInfo, roomConfig *config.Room) {
 	}
 }
 
-func BetOp(userId uint64, count int64) uint16 {
-	room := roomManager.FindRoomByUserId(userId)
+func BetOp(Uid int64, count int64, op int8) uint16 {
+	room := roomManager.FindRoomByUid(Uid)
 	if room == nil {
 		return errorCode.ErrorCode_NotJoinRoom
 	}
+
 	roomConfig := config.GetRoomConfigByRoomId(room.roomType)
-	if roomConfig == nil {
-		return errorCode.ErrorCode_GetConfigFailed
-	}
+	//if roomConfig == nil {
+	//	return errorCode.ErrorCode_GetConfigFailed
+	//}
+	//
+	//if op == 0 {
+	//	op = PlayerOpBet
+	//	if count == 0 {
+	//		return errorCode.ErrorCode_BetZero
+	//	}
+	//} else if op == 1 {
+	//	op = PlayerOpAbstain
+	//}
 
 	//2. 检查是否满足条件
-	ok := items.VerifyItem(userId, map[int]int64{
-		constValue.GoldItemId: count,
-	})
-	if !ok {
-		return errorCode.ErrorCode_ItemNotEnough
-	}
-
+	//ok := items.VerifyItem(Uid, map[int]int64{int(constValue.GoldItemId): count})
+	//if !ok {
+	//	return errorCode.ErrorCode_ItemNotEnough
+	//}
 	resp := room.Action(roomConfig, &Operation{
-		userId:    userId,
-		operation: PlayerOpBet,
-		isBet:     true,
+		Uid:       Uid,
+		operation: op,
 		goldValue: count,
 	})
 	if resp == nil {
-		log2.Get().Error("[UserItem] room.Action of resp is null ", zap.Any("UserId", userId))
+		log2.Get().Error("[UserItem] room.Action of resp is null ", zap.Any("Uid", Uid))
 		return errorCode.ErrorCode_GetConfigFailed
 	}
 	return resp.Code
 }
 
-func UserItem(userId uint64, itemId int, count int64) (*pbGo.UseItemResp, uint16) {
-	if count != 1 {
-		return nil, errorCode.ErrorCode_UseItemNumErr
-	}
+func UserItem(Uid int64, itemId int, count int64) (*pbGo.UseItemResp, uint16) {
+	//if count != 1 {
+	//	return nil, errorCode.ErrorCode_UseItemNumErr
+	//}
 
-	room := roomManager.FindRoomByUserId(userId)
+	room := roomManager.FindRoomByUid(Uid)
 	if room == nil {
 		return nil, errorCode.ErrorCode_NotJoinRoom
 	}
@@ -95,32 +95,27 @@ func UserItem(userId uint64, itemId int, count int64) (*pbGo.UseItemResp, uint16
 	}
 
 	resp := room.Action(roomConfig, &Operation{
-		userId:    userId,
+		Uid:       Uid,
 		operation: PlayerOpUseItem,
 		itemId:    itemId,
 	})
 	if resp == nil {
-		log2.Get().Error("[UserItem] room.Action of resp is null ", zap.Any("UserId", userId))
+		log2.Get().Error("[UserItem] room.Action of resp is null ", zap.Any("Uid", Uid))
 		return nil, errorCode.ErrorCode_GetConfigFailed
 	}
 	return resp.Data, resp.Code
 }
 
-func CancelMatch(userId uint64) {
+func CancelMatch(Uid int64) {
 	roomManager.mu.Lock()
 	defer roomManager.mu.Unlock()
 
-	if cancel, ok := roomManager.playerCancel[userId]; ok {
+	if cancel, ok := roomManager.playerCancel[Uid]; ok {
 		cancel() // ✅ 触发取消
-		delete(roomManager.playerCancel, userId)
+		delete(roomManager.playerCancel, Uid)
 	}
-	room := roomManager.playerRoom[userId]
+	room := roomManager.playerRoom[Uid]
 	if room != nil {
-		room.Leave(userId)
+		room.Leave(Uid)
 	}
-
-	if roomManager.playerState[userId] == StateMatching {
-		roomManager.playerState[userId] = StateIdle
-	}
-
 }

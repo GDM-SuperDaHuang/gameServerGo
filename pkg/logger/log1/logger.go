@@ -42,7 +42,6 @@ func New(level zapcore.Level, name, filePath string, isJSONStyle bool) *zap.Logg
 	return zap.New(core, options...)
 }
 
-// todo
 func getEncoderConfig() zapcore.EncoderConfig {
 	return zapcore.EncoderConfig{
 		TimeKey:        "time",

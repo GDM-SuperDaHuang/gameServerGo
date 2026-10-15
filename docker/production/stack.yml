@@ -1,0 +1,239 @@
+# ============================================================================
+# production 业务栈: gate / room / home (swarm)
+# infra(etcd 3 节点集群/redis/mongo) 不在 swarm 里, 在宿主机上用 infra.yml 起,
+# 这里的 task 经 host.docker.internal 访问宿主机端口.
+#
+# 前置(只需一次):
+#   docker network create --driver overlay --attachable game-overlay
+#
+# 部署:
+#   docker stack deploy --with-registry-auth -c stack.yml gameprod
+# 查看:
+#   docker service ls
+#   docker stack services gameprod
+# 卸载:
+#   docker stack rm gameprod
+#
+# 注意 swarm 忽略 build / container_name / depends_on, 不用写.
+# toml 用 swarm configs 下发(多节点无需同步文件); excels 已烘进镜像;
+# 日志走容器 stdout(json-file), 不挂载 bind volume.
+# 生产建议: 给服务加 placement 约束, 把 gate 与 room/home 分散到不同节点,
+# 例: deploy.placement.constraints: [node.role == worker].
+# ============================================================================
+
+configs:
+  gate_toml:
+    file: ./config/gate.toml
+  room_toml:
+    file: ./config/room.toml
+  home_toml:
+    file: ./config/home.toml
+
+networks:
+  game-overlay:
+    external: true
+    name: ${OVERLAY_NETWORK:-game-overlay}
+
+x-etcd-cluster: &etcd-cluster "http://host.docker.internal:12379;http://host.docker.internal:22379;http://host.docker.internal:32379"
+
+x-game-defaults: &game-defaults
+  networks:
+    - game-overlay
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+  deploy:
+    update_config:
+      parallelism: 1
+      delay: 15s
+      failure_action: rollback
+      order: start-first
+    restart_policy:
+      condition: on-failure
+      delay: 5s
+      max_attempts: 5
+    resources:
+      limits:
+        cpus: "4.0"
+        memory: 4G
+      reservations:
+        cpus: "0.5"
+        memory: 512M
+
+services:
+  gate-1:
+    <<: *game-defaults
+    image: ${GATE_IMAGE:-gate:prod}
+    hostname: "gate-1"
+    environment:
+      NODE_NAME: gate-1
+      ETCD_ADDRESS: *etcd-cluster
+      REDIS_ADDR: "host.docker.internal:6379"
+      MONGO_URI: "mongodb://root:123456@host.docker.internal:27017"
+    configs:
+      - source: gate_toml
+        target: /app/config/gate.toml
+    ports:
+      - target: 7001
+        published: 7001
+        protocol: tcp
+        mode: ingress
+      - target: 7051
+        published: 7051
+        protocol: tcp
+        mode: ingress
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 15s
+        failure_action: rollback
+        order: start-first
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
+
+  gate-2:
+    <<: *game-defaults
+    image: ${GATE_IMAGE:-gate:prod}
+    hostname: "gate-2"
+    environment:
+      NODE_NAME: gate-2
+      ETCD_ADDRESS: *etcd-cluster
+      REDIS_ADDR: "host.docker.internal:6379"
+      MONGO_URI: "mongodb://root:123456@host.docker.internal:27017"
+    configs:
+      - source: gate_toml
+        target: /app/config/gate.toml
+    ports:
+      - target: 7002
+        published: 7002
+        protocol: tcp
+        mode: ingress
+      - target: 7052
+        published: 7052
+        protocol: tcp
+        mode: ingress
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 15s
+        failure_action: rollback
+        order: start-first
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
+
+  room-1:
+    <<: *game-defaults
+    image: ${ROOM_IMAGE:-room:prod}
+    hostname: "room-1"
+    environment:
+      NODE_NAME: room-1
+      ETCD_ADDRESS: *etcd-cluster
+      REDIS_ADDR: "host.docker.internal:6379"
+    configs:
+      - source: room_toml
+        target: /app/config/room.toml
+    ports:
+      - target: 7081
+        published: 7081
+        protocol: tcp
+        mode: ingress
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 15s
+        failure_action: rollback
+        order: start-first
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
+
+  room-2:
+    <<: *game-defaults
+    image: ${ROOM_IMAGE:-room:prod}
+    hostname: "room-2"
+    environment:
+      NODE_NAME: room-2
+      ETCD_ADDRESS: *etcd-cluster
+      REDIS_ADDR: "host.docker.internal:6379"
+    configs:
+      - source: room_toml
+        target: /app/config/room.toml
+    ports:
+      - target: 7082
+        published: 7082
+        protocol: tcp
+        mode: ingress
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 15s
+        failure_action: rollback
+        order: start-first
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
+
+  home-1:
+    <<: *game-defaults
+    image: ${HOME_IMAGE:-home:prod}
+    hostname: "home-1"
+    environment:
+      NODE_NAME: home-1
+      ETCD_ADDRESS: *etcd-cluster
+      REDIS_ADDR: "host.docker.internal:6379"
+    configs:
+      - source: home_toml
+        target: /app/config/home.toml
+    ports:
+      - target: 7061
+        published: 7061
+        protocol: tcp
+        mode: ingress
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 15s
+        failure_action: rollback
+        order: start-first
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
+
+  home-2:
+    <<: *game-defaults
+    image: ${HOME_IMAGE:-home:prod}
+    hostname: "home-2"
+    environment:
+      NODE_NAME: home-2
+      ETCD_ADDRESS: *etcd-cluster
+      REDIS_ADDR: "host.docker.internal:6379"
+    configs:
+      - source: home_toml
+        target: /app/config/home.toml
+    ports:
+      - target: 7063
+        published: 7063
+        protocol: tcp
+        mode: ingress
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 15s
+        failure_action: rollback
+        order: start-first
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5

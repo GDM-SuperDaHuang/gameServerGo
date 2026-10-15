@@ -1,0 +1,42 @@
+services:
+  room:
+    image: home1.9:latest
+
+    volumes:
+      - /home/game/smash/home/config:/app/config:ro
+      - /home/game/smash/home/logs:/app/logs
+      - /home/game/smash/home/excels:/app/excels
+
+    ports:
+      - target: 7072
+        published: 7072
+        protocol: tcp
+        mode: host
+
+      - target: 7082
+        published: 7082
+        protocol: tcp
+        mode: host
+
+    networks:
+      - smash_game_network
+
+    environment:
+      NODE_NAME: "home-1"
+
+    deploy:
+      replicas: 1
+
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 30s
+
+      placement:
+        constraints:
+          - node.labels.game_role == smash_home
+
+networks:
+  smash_game_network:
+    external: true

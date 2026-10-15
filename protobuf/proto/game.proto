@@ -1,109 +1,72 @@
 syntax = "proto3";
-package hero;
+package game;
 option go_package = "gameServer/protobuf/pbGo";
-import "player.proto";
-import "item.proto";
+import "skill.proto";
 
-// 匹配请求 1001
-message startMatchReq{
-  uint32 roomType = 1; // 房间类型,对应配置表roomId
-  uint32 heroId = 2; // 选择的人物
-  repeated item.itemInfo itemInfoList = 3;//选择的道具
+// 开始游戏 2005
+message StartGameReq{
 }
-message startMatchResp {
+message StartGameResp {
+  int64 roundId   = 1; // 局id
 }
 
-// 匹配信息推送 1002
-message MatchInfoPush{
-  uint32 roomType = 1; // 对应配置表id
-  repeated player.playerInfo playerInfoList = 2;
+// 死亡请求
+message DeathReq{
+  int64 roundId   = 1; // 局id
+  repeated uint32 MonsterId = 2; // 怪物类型id 列表
+}
+message DeathResp {
+  repeated itemInfo itemList=1;//死亡爆率东西
 }
 
-// 取消匹配 1003
-message cancelMatchReq{
-}
-message cancelMatchResp {
-}
-
-// 竞拍请求 1004
-message betReq {
-  repeated item.itemInfo betInfo = 1;
-  int32 operation = 2; // 操作类型，0:竞拍，1弃权
-}
-message betResp {
-  player.playerInfo playerInfo = 1;
+// 游戏结束请求
+message GameOverReq{
+  int64 roundId   = 1; // 局id
+  int32 precision  = 2; // 精准度
+  repeated uint32 MonsterIdList=3;//死亡怪物id列表
 }
 
-// 轮数信息推送 1005
-message  roundInfoPush {
-  int64 endTimeOut = 1;//本局结束倒计时，时间戳毫秒
-  uint32 roundIndex = 2;//第几轮
-  bool isFinish = 3;//是否结束
-  screenInfo changeScreenInfo = 4;//屏幕的信息
-  repeated hint hintList = 6;// 提示信息,包含词条，人物的
-  RoomSettlementInfo SettlementInfo = 7;//结算信息，如果 isFinish=true 时有值
-
-//  int32 roomId = 8;//test
+message GameOverResp {
+  int32 precisionExtraGold   = 1; // 命中精准度额外金币
+  repeated itemInfo itemInfoList = 2;//奖励信息,里面可能包含收藏品
+  BillInfo billInfo = 3;//账单信息
+  MonsterInfo UnlockMonsterInfo =5;//待解锁怪物
 }
 
-// 使用道具请求 1006
-message useItemReq{
-  item.itemInfo item = 1;//使用的道具
+// 查询自身信息 2001
+message playerInfoReq {
 }
-message useItemResp {
-  repeated item.itemInfo itemInfoList = 1;//剩余的道具
-  screenInfo changeScreenInfo = 2;//新变化的信息
-  repeated hint hintList = 3;// 提示信息,包含词条，人物的
-}
-
-
-// 提示信息
-message  hint {
-  uint32 id = 1; // 提示id,对应 ability的id
-  uint32 hintType = 2; // 0：人物提示，1：词条提示
-  uint64 value = 3;//总价值,平均价值,的值等,已经扩大1000分比
-  uint32 valueType = 4;//0：没有值，1：总价值,2:平均价值等,的值等，已经扩大1000分比
+message playerInfoResp {
+  repeated itemInfo itemList=1;
+  repeated MonsterInfo MonsterInfoList=2;
+  repeated skill.skillInfo skillInfo = 3;
 }
 
-
-// 屏幕信息
-message  screenInfo {
-  repeated Grid GridList = 1;//品质变化
-  repeated goods allGoods = 2;
-  repeated player.playerInfo playerInfoList = 3;//玩家竞拍信息
+// 购买道具 2002
+message buyItemRep {
+  itemInfo item = 1;
+}
+message buyItemResp {
 }
 
-// 物品信息
-message  goods {
-  uint32 itemId = 1; // 产品id
-  uint32 index = 2; // 位置
-  uint32 showAll = 3;//图片是否全显示效果，0:隐藏，回合数index，等于当前回合数则是当前局变化的，小于则是之前局变化的,0代表不显示，回合:1~5,
-  uint32 showContour = 4;//轮廓是否显示效果，0:隐藏回合数index，等于当前回合数则是当前局变化的，小于则是之前局变化的,0代表不显示，回合:1~5,
+// 账单信息
+message BillInfo{
+  uint32 allBonus = 1 ;// 总计算
+  uint32 UnpaidRatio  = 2;//未支付分成比例，四舍五入 todo
+  uint32 youBonus = 4;//你的奖励
 }
 
-// 一个格子信息
-message  Grid {
-  uint32 indexId = 1; // 位置
-  uint32 showQuality = 2;//品质是否显示效果，回合数index，等于当前回合数则是当前局变化的，小于则是之前局变化的,0代表不显示，回合:1~5,
-  uint32 qualityType = 3;//品质是否显示效果，回合数index，等于当前回合数则是当前局变化的，小于则是之前局变化的,0代表不显示，回合:1~5,
+// 怪物信息
+message MonsterInfo {
+  uint32 id=1;//怪物类型id
+  uint32 level=2;//怪物等级
+  uint32 UnlockProgress = 3;//解锁进度
 }
 
-// 房间结算信息
-message RoomSettlementInfo{
-  player.playerInfo playerInfo = 1;//结算玩家
-  item.itemInfo expenses = 2;//花费
-  item.itemInfo profit = 3;//利润
+// 道具信息
+message itemInfo {
+  uint64 itemId = 1; // 道具id,
+  int64 count = 2;  //道具数量
 }
 
-message  testRoundInfoReq {
-}
-message  testRoundInfoPush {
-  int64 endTimeOut = 1;//本局结束倒计时，时间戳毫秒
-  uint32 roundIndex = 2;//第几轮
-  bool isFinish = 3;//是否结束
-  screenInfo changeScreenInfo = 4;//上局的所有的信息
-  repeated hint hintList = 6;// 提示信息,包含词条，人物的
-  RoomSettlementInfo SettlementInfo = 7;//结算信息，如果 isFinish=true 时有值
 
-  //  int32 roomId = 8;//test
-}

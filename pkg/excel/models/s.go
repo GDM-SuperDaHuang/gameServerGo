@@ -12,7 +12,7 @@ type Product struct {
 
 // User 用户模型示例
 type User struct {
-	UserID   int64       `excel:"userID"`
+	Uid      int64       `excel:"Uid"`
 	UserName string      `excel:"userName"`
 	Age      int         `excel:"age"`
 	Emails   []string    `excel:"emails"` // 多个邮箱逗号分隔

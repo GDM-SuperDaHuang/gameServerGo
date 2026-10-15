@@ -20,9 +20,6 @@ func NewClient(config *ClientConfig) (*Client, error) {
 		config: config,
 	}
 
-	// 创建服务发现
-	//gate: node/Forward
-	//node: node/Gate
 	discovery, err := etcdClient.NewEtcdV3Discovery(
 		config.BasePath,    //基本路径 node
 		config.ServicePath, //具体分支路径的服务对象
@@ -115,15 +112,6 @@ func (c *Client) Name() string {
 func (c *Client) GetSelector() xclient.Selector {
 	return c.config.Selector
 }
-
-//// WrapClient 指定额外参数调用
-//type WrapClient interface {
-//	// Call 同步调用
-//	Call(ctx context.Context, serviceMethod string, args any, reply any) error
-//
-//	// Go 异步调用
-//	Go(ctx context.Context, serviceMethod string, args any, reply any, done chan *xclient.Call) (*xclient.Call, error)
-//}
 
 type wrapClient struct {
 	c          *Client

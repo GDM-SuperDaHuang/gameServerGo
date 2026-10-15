@@ -1,0 +1,28 @@
+services:
+  # 前端服务
+  frontend:
+    build:
+      context: ./app/background/frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - background
+    networks:
+      - game-network
+
+  background-1:
+    image: background1.0
+    container_name: background-1
+    ports:
+      - "17890:17890"
+    volumes:
+      - ./config:/app/config
+      - ./logs:/app/logs
+      - ./excels:/app/excels
+    networks:
+      - ldl_network
+
+networks:
+  ldl_network:
+    external: true

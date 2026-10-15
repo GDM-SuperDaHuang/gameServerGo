@@ -2,10 +2,15 @@ package logic
 
 import (
 	"gameServer/app/room/hander/config"
+	"gameServer/common/constValue"
 	"gameServer/pkg/random/snowflake"
 	"gameServer/service/common"
 	"math/rand"
 	"time"
+)
+
+const (
+	baseValue int64 = 10000
 )
 
 var (
@@ -13,43 +18,25 @@ var (
 )
 
 type Robot struct {
-	UserId    uint64
+	Uid       uint64
 	robotType uint8
 	roomType  uint32
 }
 
-func (rm *RoomManager) createRobots(n int, roomConfig *config.Room) []*MatchRequest {
-	robots := make([]*PlayerInfo, 0, n)
-	for i := 0; i < n; i++ {
-		robot := &PlayerInfo{
-			Player: &common.Player{
-				UserId: robotGenerate.Generate(),
-			},
-			HeroId:     3005,
-			playerType: 1,
-		}
-		robots = append(robots, robot)
-	}
-
-	requests := make([]*MatchRequest, 0, n)
-
-	for _, ro := range robots {
-		requests = append(requests, &MatchRequest{
-			player:     ro,
-			roomConfig: roomConfig,
-		})
-	}
-	return requests
-}
-
 func createOneRobot(roomConfig *config.Room, robotConfig *config.Robot) *MatchRequest {
+	heroId := 3005
+	l := len(robotConfig.CharacterList)
+	if l > 0 {
+		heroId = robotConfig.CharacterList[rand.Intn(l)]
+	}
 	robot := &PlayerInfo{
 		Player: &common.Player{
-			UserId: robotGenerate.Generate(),
+			Uid: robotGenerate.Generate(),
 		},
-		HeroId:      3005,
-		playerType:  1,
+		HeroId:      heroId,
+		playerType:  robotConfig.RobotType,
 		robotConfig: robotConfig,
+		UserItemMap: make(map[int]int8),
 	}
 
 	return &MatchRequest{
@@ -60,6 +47,7 @@ func createOneRobot(roomConfig *config.Room, robotConfig *config.Robot) *MatchRe
 
 // 游戏开始时调用
 func (r *Room) startRobotActions(roomConfig *config.Room) {
+	// 压测测试
 	ticker := time.NewTicker(2 * time.Second)
 	for {
 		select {
@@ -70,16 +58,28 @@ func (r *Room) startRobotActions(roomConfig *config.Room) {
 				return
 			}
 
-			if r.roomStatus == RoomStatusClose {
+			if r.roomStatus == RoomStatusClose { //并发
 				ticker.Stop()
 				return
 			}
 
-			round := r.getCurrentRound()
-			for _, p := range r.playerInfos {
+			data := r.FindData()
+			if data == nil {
+				return
+			}
+			round := data.curRound
+
+			if data.curRound == nil { // todo 为什么可能是null
+				return
+			}
+			ps := data.playerInfos
+			if ps == nil {
+				return
+			}
+			for uid, p := range ps {
 				if p.playerType > 0 {
-					timeLen := rand.Intn(p.robotConfig.ThinkTimes[1]-p.robotConfig.ThinkTimes[0]) + p.robotConfig.ThinkTimes[1] //10~15
-					r.robotRoutine(p, roomConfig, round, int64(timeLen))
+					timeLen := round.ThinkTimeMap[uid]
+					r.robotRoutine(p, roomConfig, round, timeLen)
 				}
 			}
 		}
@@ -88,49 +88,142 @@ func (r *Room) startRobotActions(roomConfig *config.Room) {
 }
 
 func (r *Room) robotRoutine(robot *PlayerInfo, roomConfig *config.Room, curRound *Round, timeLen int64) {
-	op := curRound.Op[robot.Player.UserId]
-	if op != nil {
+	// 如果没有准备好
+	if curRound.RoUid == 0 {
 		return
 	}
-
-	//log2.Get().Info("robot robot start", zap.Int("startTime", startTime))
 	now := time.Now().Unix()
 	if curRound.creatTime+timeLen > now { //未来 > now
 		return
 	}
+	goldValue := int64(0)
+	if robot.Player.Uid == curRound.RoUid {
+		goldValue = curRound.MK
+	} else {
+		v := rand.Int63n(7) + 1 //1~7
+		goldValue = int64(float64(curRound.MK*v) / float64(10))
+	}
 
-	robotOp := &Operation{
-		userId:    robot.Player.UserId,
-		goldValue: rand.Int63n(20000),
-		isBet:     true,
-		operation: PlayerOpBet,
+	// 可能弃牌
+	pUid := curRound.PUid
+	isAbstain := false
+	if pUid > 0 {
+		if int64(r.playerInfos[pUid].robotBetConfig.AbstainRate) > rand.Int63n(baseValue) {
+			isAbstain = true
+		}
+	}
+	var robotOp *Operation
+	if isAbstain {
+		robotOp = &Operation{
+			Uid:       robot.Player.Uid,
+			goldValue: goldValue,
+			operation: PlayerOpAbstain,
+		}
+	} else {
+		robotOp = &Operation{
+			Uid:       robot.Player.Uid,
+			goldValue: goldValue,
+			operation: PlayerOpBet,
+		}
 	}
 	r.Action(roomConfig, robotOp)
+
+	// 使用道具
+	itemId := r.roItemMap[robot.Player.Uid][int(curRound.RoundIndex)]
+	if itemId > 0 {
+		robotOp2 := &Operation{
+			Uid:       robot.Player.Uid,
+			itemId:    itemId,
+			operation: PlayerOpUseItem,
+		}
+		r.Action(roomConfig, robotOp2)
+	}
 }
 
-//func (r *Room) robotOp(roomConfig *config.Room) {
-//	round := r.getCurrentRound()
-//
-//	var robotOp *Operation
-//	for userId, info := range r.playerInfos {
-//		if info.playerType == 0 {
-//			continue
-//		}
-//		op := round.Op[userId]
-//		if op != nil {
-//			continue
-//		}
-//		robotOp = &Operation{
-//			userId:    userId,
-//			goldValue: rand.Int63n(20000),
-//			isBet:     true,
-//			operation: PlayerOpBet,
-//		}
-//	}
-//	if robotOp == nil {
-//		return
-//	}
-//
-//	// 执行操作
-//	r.Action(roomConfig, robotOp)
-//}
+// 第一回合
+func (r *Room) getGoldValue(value int64, targetUid int64) int64 {
+	targetValue := int64(0)
+	value2 := (r.SumPrice * constValue.RoomValue1) / constValue.BaseValue10
+	if value2 >= value {
+		targetValue = value
+	} else {
+		targetValue = value2
+	}
+	robotBetConfig := r.playerInfos[targetUid].robotBetConfig
+	k := robotBetConfig.KList[0]
+	// 10000,12000
+	vibration := rand.Int63n(k.Upper-k.Lower) + k.Lower //10000~12000
+	goldValue := targetValue * vibration / baseValue
+	return goldValue
+}
+
+// 之后回合
+func (r *Room) getGoldValue2(lastRound *Round, timeout int) (int64, int64, map[int64]int64) {
+	//获取上盘最大的值
+	maxGoldValue := int64(0)
+	targetUid := int64(0)
+
+	thinkTimeMap := make(map[int64]int64) //机器人思考时间
+	//
+	playerSum := int64(0)
+	sumBetTime := int64(0)
+	creatTime := lastRound.creatTime * 1000
+	for uid, p := range r.playerInfos {
+		if p.playerType > 0 {
+			thinkTimeMap[uid] = 0
+			continue
+		}
+		op := lastRound.Op[uid]
+		if op == nil {
+			continue
+		}
+		if lastRound.Op[uid].operation == PlayerOpBet {
+			playerSum++
+			sumBetTime += op.isBet - creatTime
+		}
+		g := op.goldValue
+		if g >= maxGoldValue {
+			maxGoldValue = g
+			targetUid = uid
+		}
+	}
+
+	// 秒
+	averageTime := int64(0)
+	if playerSum > 0 {
+		averageTime = sumBetTime / (1000 * playerSum)
+	}
+
+	for uid, _ := range thinkTimeMap {
+		timeValue := int64(float64(averageTime) * (float64(rand.Int63n(constValue.ThinkTime2-constValue.ThinkTime1) + constValue.ThinkTime1)) / float64(constValue.BaseValue10)) //0.7~1.3
+		if timeValue >= int64(timeout) {
+			timeValue = timeValue - 5
+		}
+		thinkTimeMap[uid] = timeValue
+	}
+
+	if targetUid == 0 { //没有离开，弃牌的时候
+		return 0, 0, thinkTimeMap
+	}
+	//取最大值
+	value := (r.SumPrice * constValue.RoomValue2) / constValue.BaseValue10
+	if value > maxGoldValue {
+		maxGoldValue = value
+	}
+
+	// 选择一个策略
+	robotBetConfig := r.playerInfos[targetUid].robotBetConfig
+	index := int(lastRound.RoundIndex - 1)
+	i := len(robotBetConfig.KList) - 1
+	if index < 0 {
+		return rand.Int63n(10000) + 20000, targetUid, thinkTimeMap
+	} else if index > i {
+		index = i
+	}
+	k := robotBetConfig.KList[index]
+
+	// 10000,12000
+	vibration := rand.Int63n(k.Upper-k.Lower) + k.Lower //10000~12000
+	goldValue := maxGoldValue * vibration / baseValue
+	return goldValue, targetUid, thinkTimeMap
+}

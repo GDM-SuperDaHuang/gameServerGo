@@ -1,82 +1,134 @@
 package weight
 
 import (
-	"sort"
+	"time"
 
 	"golang.org/x/exp/rand"
 )
 
-type WeightPicker struct {
-	ids    []int
-	prefix []int64
-	total  int64
+// WeightedRandom 按权重随机选择
+type WeightedRandom struct {
+	r *rand.Rand
 }
 
-func NewWeightPicker(m map[int]int64) *WeightPicker {
-	wp := &WeightPicker{
-		ids:    make([]int, 0, len(m)),
-		prefix: make([]int64, 0, len(m)),
+// NewWeightedRandom 创建新的权重随机选择器
+func NewWeightedRandom() *WeightedRandom {
+	return &WeightedRandom{
+		r: rand.New(rand.NewSource(uint64(time.Now().UnixNano()))),
+	}
+}
+
+// SelectByWeight 根据权重选择 n 个 ID（可重复）
+// weights: map[id]weight，weight 越大被选中的概率越高
+// n: 需要选择的数量
+// 返回: 选中的 ID 集合
+func (wr *WeightedRandom) SelectByWeight(weights map[int]int, n int) []int {
+	if n <= 0 || len(weights) == 0 {
+		return []int{}
 	}
 
-	var sum int64 = 0
-	for id, w := range m {
-		if w <= 0 {
-			continue
+	// 计算总权重
+	totalWeight := 0
+	for _, w := range weights {
+		if w > 0 {
+			totalWeight += w
 		}
-		sum += w
-		wp.ids = append(wp.ids, id)
-		wp.prefix = append(wp.prefix, sum)
 	}
 
-	wp.total = sum
-	return wp
-}
-
-// 抽1个
-func (wp *WeightPicker) PickOne() int {
-	if wp.total == 0 {
-		return -1
+	if totalWeight == 0 {
+		return []int{}
 	}
 
-	r := rand.Int63n(wp.total) + 1
+	result := make([]int, 0, n)
 
-	// 二分查找
-	idx := sort.Search(len(wp.prefix), func(i int) bool {
-		return wp.prefix[i] >= r
-	})
-
-	return wp.ids[idx]
-}
-
-// 抽n个（可重复）
-func (wp *WeightPicker) PickN(n int) []int {
-	res := make([]int, 0, n)
 	for i := 0; i < n; i++ {
-		res = append(res, wp.PickOne())
+		// 生成 [0, totalWeight) 的随机数
+		r := wr.r.Intn(totalWeight)
+
+		// 根据权重选择
+		cumulative := 0
+		for id, weight := range weights {
+			if weight <= 0 {
+				continue
+			}
+			cumulative += weight
+			if r < cumulative {
+				result = append(result, id)
+				break
+			}
+		}
 	}
-	return res
+
+	return result
 }
 
-// 不重复抽取（无放回）
-func PickNNoRepeat(m map[int]int64, n int) []int {
-	res := make([]int, 0, n)
-
-	// 拷贝一份
-	tmp := make(map[int]int64)
-	for k, v := range m {
-		tmp[k] = v
+// SelectByWeightUnique 根据权重选择 n 个不重复的 ID
+// 如果 n > 可用ID数量，返回所有可用ID
+func (wr *WeightedRandom) SelectByWeightUnique(weights map[int]int, n int) []int {
+	if n <= 0 || len(weights) == 0 {
+		return []int{}
 	}
 
-	for i := 0; i < n && len(tmp) > 0; i++ {
-		wp := NewWeightPicker(tmp)
-		id := wp.PickOne()
-		if id == -1 {
-			break
+	// 过滤有效权重并排序（便于确定性结果）
+	type item struct {
+		id     int
+		weight int
+	}
+
+	var items []item
+	totalWeight := 0
+
+	for id, w := range weights {
+		if w > 0 {
+			items = append(items, item{id: id, weight: w})
+			totalWeight += w
 		}
-
-		res = append(res, id)
-		delete(tmp, id)
 	}
 
-	return res
+	if len(items) == 0 {
+		return []int{}
+	}
+
+	// 如果请求数量超过可用数量，调整n
+	if n > len(items) {
+		n = len(items)
+	}
+
+	result := make([]int, 0, n)
+	remaining := make([]item, len(items))
+	copy(remaining, items)
+	remainingTotal := totalWeight
+
+	for len(result) < n && remainingTotal > 0 {
+		// 在剩余项中按权重选择
+		r := wr.r.Intn(remainingTotal)
+		cumulative := 0
+
+		for i, it := range remaining {
+			cumulative += it.weight
+			if r < cumulative {
+				result = append(result, it.id)
+
+				// 移除已选中的项
+				remainingTotal -= it.weight
+				remaining = append(remaining[:i], remaining[i+1:]...)
+				break
+			}
+		}
+	}
+
+	return result
+}
+
+// SelectByWeightWithRecord 按权重选择，并返回每个ID被选中的次数统计
+func (wr *WeightedRandom) SelectByWeightWithRecord(weights map[int]int, n int) ([]int, map[int]int) {
+	result := wr.SelectByWeight(weights, n)
+
+	// 统计次数
+	counts := make(map[int]int)
+	for _, id := range result {
+		counts[id]++
+	}
+
+	return result, counts
 }

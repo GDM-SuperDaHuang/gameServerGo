@@ -7,20 +7,36 @@ import (
 	"gameServer/common/constValue"
 	"gameServer/pkg/logger/log2"
 	"gameServer/protobuf/pbGo"
-	"gameServer/protobuf/protoHandlerInit"
-	"gameServer/service/services/node"
 	"time"
 
-	"go.uber.org/zap"
 	"golang.org/x/exp/rand"
 	"golang.org/x/tools/container/intsets"
 )
 
+const (
+	roomHint = 1
+	heroHint = 0
+	itemHint = 2
+
+	receiveAwardId = 2000
+)
+
 type Hint struct {
-	id        uint32 // 提示id
-	HintType  uint32 // 0：人物提示，1：词条提示
-	Value     int64  //总价值,平均价值,的值等
-	ValueType uint32 //0：没有值，1：总价值,2:平均价值等,的值等
+	HintType uint32  // 0：人物提示，1：词条提示
+	Value    float64 //总价值,平均价值,的值等
+}
+
+type ElkOp struct {
+	Uid       int64
+	GoldValue int64 // 消耗的钱的值
+	Operation int64 // 玩家操作， 0：等待玩家操作  1:发牌,2：弃权
+	ItemId    int64 //使用道具,道具id
+
+}
+
+type ElkGoods struct {
+	Uid  int64
+	Good []*pbGo.Goods
 }
 
 var (
@@ -30,7 +46,6 @@ var (
 func TestInit222() {
 
 	// 按房间类型分桶
-	//buckets := make(map[uint32][]*MatchRequest) //房间类型-匹配请求
 	for {
 		select {
 		// 定时撮合
@@ -41,27 +56,39 @@ func TestInit222() {
 	}
 }
 
-// 应用能力
-func (room *Room) applyAbility(info *config.Ability, userId uint64, hintType uint32) *Hint {
+func (room *Room) ApplyAbilityTest(info *config.Ability, Uid int64, hintType uint32) *Hint {
 	gridInfo := room.gridInfo
-	curRound := room.getCurrentRound()
 	var h = &Hint{}
 
 	// 标志
 	gInfo := *gridInfo
+
+	count := 0
+	qualityCount := 0
+	for _, in := range gInfo {
+		if in.Item.ItemType == 8 {
+			count++
+		}
+		if in.Item.Quality == 4 {
+			qualityCount++
+		}
+	}
+
 	flag := map[int]struct{}{}
 	for _, g := range gInfo {
 		flag[g.Uid] = struct{}{}
 	}
 	// 条件类：
 	// 前提条件过滤
-	cPrePQ(gridInfo, flag, info.CPrePQ, userId)
+	cPrePQ(gridInfo, flag, info.CPrePQ, Uid)
 	//面积过滤
 	flag = cArea(gridInfo, flag, info.CArea)
 	// 品质过滤
 	flag = cQualityType(gridInfo, flag, info.CQualityType)
 	// 道具类型过滤
 	flag = cItemType(gridInfo, flag, info.CItemType)
+	// 道具或关系 类型过滤
+	flag = cItemTypeOr(gridInfo, flag, info.CItemTypeOr)
 	// 道具类型数量过滤
 	flag = cItemTypeCount(gridInfo, flag, info.CItemTypeCount)
 	// 道具的价值过滤
@@ -69,55 +96,186 @@ func (room *Room) applyAbility(info *config.Ability, userId uint64, hintType uin
 
 	//显示类
 	// 显示数量过滤
-	flag = showItemCount(flag, info.ShowItemCount)
-	// todo 以后会不会叠加？？
-	showPrice(gridInfo, flag, uint32(info.ShowPrice), h)
+	flag = showItemCount(Uid, gridInfo, flag, info.ShowItemCount, 1, info.ShowQuality, info.ShowContour, info.ShowAll)
+	showPrice(gridInfo, flag, uint32(info.ShowValue), h)
 	showGridCount(gridInfo, flag, uint32(info.ShowGridCount), h)
-	showQCA(gridInfo, flag, info.ShowQuality, info.ShowContour, info.ShowAll, userId, curRound.RoundIndex)
 	h.HintType = hintType
-	h.id = info.Id
+	//h.id = info.Id
 	return h
 }
 
 // 过滤器
 // 显示数量
 // 0:所有
-// n:具体shul
-func showItemCount(flag map[int]struct{}, showSum int8) map[int]struct{} {
-
-	if showSum == 0 {
+func showItemCount(Uid int64, gridInfo *[]*maxRects.Placement, flag map[int]struct{}, showSum int8, curRoundIndex int8, q, c, a bool) map[int]struct{} {
+	maxLen := int8(len(flag))
+	if maxLen == 0 {
 		return flag
 	}
 
-	maxLen := int8(len(flag))
-	if maxLen < showSum {
+	if showSum == 0 { //不限制
+		showSum = maxLen
+	} else if maxLen < showSum {
 		showSum = maxLen
 	}
-	var (
-		areaTypeList = make([]int, 0, maxLen) // 具体面积
-		repeatFlag   = make(map[int]struct{}, showSum)
-	)
-	for uid := range flag {
-		areaTypeList = append(areaTypeList, uid)
-	}
-	flag = make(map[int]struct{}, showSum)
 
-	// 不重复
+	// 收集所有的可能
+	qLs := make([]int, 0, showSum)
+	cLs := make([]int, 0, showSum)
+	aLs := make([]int, 0, showSum)
+
+	// 可选择的Q,C,A
+	info := *gridInfo
+	for _, p := range info {
+		if p.ShowInfoMap == nil {
+			p.ShowInfoMap = make(map[int64]*maxRects.ShowInfo)
+		}
+
+		showInfo := p.ShowInfoMap[Uid]
+		if showInfo == nil {
+			showInfo = &maxRects.ShowInfo{}
+			p.ShowInfoMap[Uid] = showInfo
+		}
+
+		if _, ok := flag[p.Uid]; !ok {
+			continue
+		}
+
+		// 收集
+		if showInfo.Quality == nil {
+			qLs = append(qLs, p.Uid)
+		}
+		if showInfo.Contour == 0 {
+			cLs = append(cLs, p.Uid)
+		}
+		if showInfo.All == 0 {
+			aLs = append(aLs, p.Uid)
+		}
+
+	}
+
+	// 在进行随机选择
+	qFlag := getFlag(qLs, showSum)
+	cFlag := getFlag(cLs, showSum)
+	aFlag := getFlag(aLs, showSum)
+	qcFlag := flagUFlag(qFlag, cFlag, showSum)
+	// 填充颜色
+
+	if q && c {
+		for _, p := range info {
+			if _, ok := qcFlag[p.Uid]; !ok {
+				continue
+			}
+			showInfo := p.ShowInfoMap[Uid]
+			if showInfo.Quality == nil {
+				index := randIndexByXY(p.StartX, p.EndX, p.StartY, p.EndY)
+				showInfo.Quality = &maxRects.Quality{
+					Index:       index,
+					RoundIndex:  curRoundIndex,
+					QualityType: p.Item.Quality,
+				}
+			}
+			//c
+			showInfo.Contour = curRoundIndex
+		}
+		return qcFlag
+	} else if q {
+		for _, p := range info {
+			if _, ok := qFlag[p.Uid]; !ok {
+				continue
+			}
+
+			showInfo := p.ShowInfoMap[Uid]
+			if showInfo.Quality == nil {
+				index := randIndexByXY(p.StartX, p.EndX, p.StartY, p.EndY)
+				showInfo.Quality = &maxRects.Quality{
+					Index:       index,
+					RoundIndex:  curRoundIndex,
+					QualityType: p.Item.Quality,
+				}
+			}
+			p.ShowInfoMap[Uid] = showInfo
+
+		}
+		return qFlag
+
+	} else if c {
+		for _, p := range info {
+			if _, ok := cFlag[p.Uid]; !ok {
+				continue
+			}
+			showInfo := p.ShowInfoMap[Uid]
+			showInfo.Contour = curRoundIndex
+			p.ShowInfoMap[Uid] = showInfo
+		}
+		return cFlag
+	} else if a {
+		for _, p := range info {
+			if _, ok := aFlag[p.Uid]; !ok {
+				continue
+			}
+			showInfo := p.ShowInfoMap[Uid]
+			showInfo.All = curRoundIndex
+			p.ShowInfoMap[Uid] = showInfo
+
+		}
+		return aFlag
+	}
+
+	return flag
+}
+
+func getFlag(ls []int, showSum int8) map[int]struct{} {
+	flag := make(map[int]struct{}, showSum)
+	maxLen := len(ls)
+	if maxLen == 0 {
+		return flag
+	}
+	forCount := 1000
+	repeatFlag := make(map[int]struct{}, showSum)
 	for i := int8(0); i < showSum; i++ {
 		for {
+			forCount--
+			index := rand.Intn(maxLen)
 
-			index := rand.Intn(int(maxLen))
 			if _, ok := repeatFlag[index]; !ok {
 				repeatFlag[index] = struct{}{}
-				uid := areaTypeList[index]
+				uid := ls[index]
 				flag[uid] = struct{}{}
+				break
+			}
+			if len(flag) >= maxLen { //满了
+				break
+			}
+			if forCount < 0 {
+				log2.Get().Error("***可能无限循环***")
+				break
+			}
+		}
+	}
+	return flag
+}
+
+func flagUFlag(f1, f2 map[int]struct{}, showSum int8) map[int]struct{} {
+	flag := make(map[int]struct{}, len(f1))
+	for k, v := range f1 {
+		flag[k] = v
+	}
+	for k, v := range f2 {
+		flag[k] = v
+	}
+	delCount := int8(len(flag)) - showSum
+	if delCount > 0 {
+		for k, _ := range flag {
+			delete(flag, k)
+			delCount--
+			if delCount <= 0 {
 				break
 			}
 		}
 	}
 
 	return flag
-
 }
 
 // 0：不显示价值
@@ -127,7 +285,7 @@ func showPrice(gridInfo *[]*maxRects.Placement, flag map[int]struct{}, showType 
 	if showType == 0 {
 		return
 	}
-	h.ValueType = showType
+	//h.ValueType = showType
 	info := *gridInfo
 
 	sumValue := int64(0)
@@ -136,22 +294,15 @@ func showPrice(gridInfo *[]*maxRects.Placement, flag map[int]struct{}, showType 
 		if !ok {
 			continue
 		}
-		item := config.GetItemConfigById(p.Item.Id)
-		if item == nil {
-			log2.Get().Error("GetItemConfigById failed ", zap.Any("itemId", p.Item.Id))
-			continue
-		}
-		if item.Price == nil {
-			log2.Get().Error("Item Price is null ", zap.Any("itemId", p.Item.Id))
-			continue
-		}
-		price := item.Price[constValue.GoldItemId]
+		price := p.Item.Price
 		sumValue += price
 	}
 	if showType == 1 {
-		h.Value = sumValue * int64(10000)
+		h.Value = float64(sumValue)
 	} else if showType == 2 {
-		h.Value = int64(1000 * (float64(len(info)) / float64(len(info))))
+		h.Value = float64(sumValue) / float64(len(info))
+	} else if showType == 3 {
+		h.Value = float64(len(info))
 	}
 }
 
@@ -162,7 +313,7 @@ func showGridCount(gridInfo *[]*maxRects.Placement, flag map[int]struct{}, showT
 	if showType == 0 {
 		return
 	}
-	h.ValueType = showType
+	//h.ValueType = showType
 	info := *gridInfo
 
 	sumValue := int64(0)
@@ -175,55 +326,9 @@ func showGridCount(gridInfo *[]*maxRects.Placement, flag map[int]struct{}, showT
 	}
 
 	if showType == 2 {
-		h.Value = sumValue * 1000
+		h.Value = float64(sumValue)
 	} else if showType == 1 {
-		h.Value = int64(1000 * (float64(len(info)) / float64(len(info))))
-	}
-}
-
-// 是否显示：品质,轮廓,全显示
-func showQCA(gridInfo *[]*maxRects.Placement, flag map[int]struct{}, q, c, a bool, userId uint64, curRoundIndex int8) {
-	info := *gridInfo
-	for _, p := range info {
-		if _, ok := flag[p.Uid]; !ok {
-			continue
-		}
-
-		if p.ShowInfoMap == nil {
-			p.ShowInfoMap = make(map[uint64]*maxRects.ShowInfo)
-		}
-		showInfo := p.ShowInfoMap[userId]
-		if showInfo == nil {
-			showInfo = &maxRects.ShowInfo{}
-			p.ShowInfoMap[userId] = showInfo
-		}
-		if q {
-			if showInfo.Quality == nil {
-				showInfo.Quality = make(map[uint32]*maxRects.Quality)
-			}
-			for {
-				index := randIndexByXY(p.StartX, p.EndX, p.StartY, p.EndY)
-				_, ok := showInfo.Quality[index]
-				if !ok {
-					itemConfig := config.GetItemConfigById(p.Item.Id)
-					if itemConfig == nil {
-						log2.Get().Error("GetItemConfig failed ", zap.Any("itemId", p.Item.Id))
-						continue
-					}
-					showInfo.Quality[index] = &maxRects.Quality{
-						RoundIndex:  curRoundIndex,
-						QualityType: itemConfig.Quality,
-					}
-					break
-				}
-			}
-		}
-		if c {
-			showInfo.Contour = curRoundIndex
-		}
-		if a {
-			showInfo.All = curRoundIndex
-		}
+		h.Value = float64(sumValue) / float64(len(info))
 	}
 }
 
@@ -242,16 +347,16 @@ func cArea(gridInfo *[]*maxRects.Placement, flag map[int]struct{}, areaValue int
 		if _, ok := flag[p.Uid]; !ok {
 			continue
 		}
-		tempArea := int8((p.EndX - p.StartX) * (p.EndY - p.StartY))
+		tempArea := getAreaByXY(p.StartX, p.EndX, p.StartY, p.EndY)
 		ls, ok := areaTypeMap[tempArea]
 		if !ok {
-			areaTypeMap[tempArea] = make([]int, 0)
+			ls = make([]int, 0)
 		}
 		ls = append(ls, p.Uid)
 		areaTypeMap[tempArea] = ls
 	}
-	//重置
 
+	//重置
 	if areaValue == -1 { //最大格子
 		maxArea := int8(0)
 		for area, _ := range areaTypeMap {
@@ -264,7 +369,7 @@ func cArea(gridInfo *[]*maxRects.Placement, flag map[int]struct{}, areaValue int
 		for _, uid := range ls {
 			flag[uid] = struct{}{}
 		}
-	} else {
+	} else { // 指定大小
 		ls, ok := areaTypeMap[areaValue]
 		if !ok {
 			return nil
@@ -289,6 +394,7 @@ func cQualityType(gridInfo *[]*maxRects.Placement, flag map[int]struct{}, qualit
 	var (
 		typeMap map[int8][]int // 品质-info
 	)
+
 	if qualityType == 0 {
 		return flag
 	}
@@ -298,20 +404,20 @@ func cQualityType(gridInfo *[]*maxRects.Placement, flag map[int]struct{}, qualit
 		if !ok {
 			continue
 		}
+		if p.Item.Quality != qualityType {
+			continue
+		}
 
-		item := config.GetItemConfigById(p.Item.Id)
-		if item == nil {
-			log2.Get().Error("GetItemConfigById failed ", zap.Any("constValue", p.Item.Id))
-			continue
-		}
-		if item.Quality != qualityType {
-			continue
-		}
-		ls, ok := typeMap[item.ItemType]
-		if !ok {
+		if typeMap == nil {
 			typeMap = make(map[int8][]int)
 		}
+
+		ls, ok := typeMap[p.Item.Quality]
+		if !ok {
+			ls = make([]int, 0)
+		}
 		ls = append(ls, p.Uid)
+		typeMap[p.Item.Quality] = ls
 	}
 	if typeMap == nil {
 		return nil
@@ -319,6 +425,55 @@ func cQualityType(gridInfo *[]*maxRects.Placement, flag map[int]struct{}, qualit
 
 	flag = make(map[int]struct{}, len(typeMap))
 	for _, uid := range typeMap[qualityType] {
+		flag[uid] = struct{}{}
+	}
+
+	return flag
+}
+
+// 品质
+// -1：最高品质
+// 0:随机品质
+// 1：白色
+// 2：绿色
+func cQualityType1(gridInfo *[]*maxRects.Placement, flag map[int]struct{}, qualityTypeLs []int8) map[int]struct{} {
+	info := *gridInfo
+	var (
+		typeLs []int // 品质-info
+	)
+
+	if qualityTypeLs == nil {
+		return flag
+	}
+
+	qualityTypeFlag := make(map[int8]struct{}, len(qualityTypeLs))
+	for _, q := range qualityTypeLs {
+		qualityTypeFlag[q] = struct{}{}
+	}
+
+	for _, p := range info {
+		_, ok := flag[p.Uid]
+		if !ok {
+			continue
+		}
+
+		quality := p.Item.Quality
+		if _, ok = qualityTypeFlag[quality]; !ok {
+			continue
+		}
+
+		if typeLs == nil {
+			typeLs = make([]int, 0)
+		}
+		typeLs = append(typeLs, p.Uid)
+	}
+
+	if typeLs == nil {
+		return nil
+	}
+
+	flag = make(map[int]struct{}, len(typeLs))
+	for _, uid := range typeLs {
 		flag[uid] = struct{}{}
 	}
 
@@ -342,20 +497,19 @@ func cItemType(gridInfo *[]*maxRects.Placement, flag map[int]struct{}, itemType 
 		if !ok {
 			continue
 		}
-		item := config.GetItemConfigById(p.Item.Id)
-		if item == nil {
-			log2.Get().Error("GetItemConfigById failed ", zap.Any("constValue", p.Item.Id))
+		if p.Item.ItemType != itemType {
 			continue
 		}
-		if item.ItemType != itemType {
-			continue
-		}
-		ls, ok := typeMap[item.ItemType]
-		if !ok {
+		if typeMap == nil {
 			typeMap = make(map[int8][]int)
 		}
+
+		ls, ok := typeMap[p.Item.ItemType]
+		if !ok {
+			ls = make([]int, 0)
+		}
 		ls = append(ls, p.Uid)
-		typeMap[item.ItemType] = ls
+		typeMap[p.Item.ItemType] = ls
 	}
 
 	if typeMap == nil {
@@ -370,15 +524,12 @@ func cItemType(gridInfo *[]*maxRects.Placement, flag map[int]struct{}, itemType 
 	return flag
 }
 
-// 道具类型的数量
-// -1：数量最少的，
-// 0：随机类型，
-func cItemTypeCount(gridInfo *[]*maxRects.Placement, flag map[int]struct{}, itemType int8) map[int]struct{} {
+func cItemTypeOr(gridInfo *[]*maxRects.Placement, flag map[int]struct{}, itemType []int8) map[int]struct{} {
 	info := *gridInfo
 	var (
 		typeMap map[int8][]int // 类型-info
 	)
-	if itemType == 0 {
+	if len(itemType) == 0 {
 		return flag
 	}
 
@@ -388,20 +539,68 @@ func cItemTypeCount(gridInfo *[]*maxRects.Placement, flag map[int]struct{}, item
 			continue
 		}
 
-		item := config.GetItemConfigById(p.Item.Id)
-		if item == nil {
-			log2.Get().Error("GetItemConfigById failed ", zap.Any("constValue", p.Item.Id))
+		f := false
+		for _, t := range itemType {
+			if p.Item.ItemType == t {
+				f = true
+				break
+			}
+		}
+		if !f {
 			continue
 		}
-		if item.ItemType != itemType {
-			continue
-		}
-		ls, ok := typeMap[item.ItemType]
-		if !ok {
+
+		if typeMap == nil {
 			typeMap = make(map[int8][]int)
 		}
+
+		ls, ok := typeMap[p.Item.ItemType]
+		if !ok {
+			ls = make([]int, 0)
+		}
 		ls = append(ls, p.Uid)
-		typeMap[item.ItemType] = ls
+		typeMap[p.Item.ItemType] = ls
+	}
+
+	if typeMap == nil {
+		return nil
+	}
+
+	flag = make(map[int]struct{}, len(typeMap))
+
+	for _, ls := range typeMap {
+		for _, uid := range ls {
+			flag[uid] = struct{}{}
+		}
+	}
+
+	return flag
+}
+
+// 道具类型 的 数量
+// -1：数量最少的，
+// 0：随机类型，
+func cItemTypeCount(gridInfo *[]*maxRects.Placement, flag map[int]struct{}, itemType int8) map[int]struct{} {
+	info := *gridInfo
+	typeMap := make(map[int8][]int) // 类型-info
+	if itemType == 0 {
+		return flag
+	}
+
+	for _, p := range info {
+		_, ok := flag[p.Uid]
+		if !ok {
+			continue
+		}
+		if itemType != -1 && p.Item.ItemType != itemType {
+			continue
+		}
+		ls, ok := typeMap[p.Item.ItemType]
+		if !ok {
+			ls = make([]int, 0)
+		}
+		ls = append(ls, p.Uid)
+		typeMap[p.Item.ItemType] = ls
 	}
 
 	if itemType == -1 {
@@ -439,18 +638,8 @@ func cPrice(gridInfo *[]*maxRects.Placement, flag map[int]struct{}, itemType int
 		if !ok {
 			continue
 		}
-
-		item := config.GetItemConfigById(p.Item.Id)
-		if item == nil {
-			log2.Get().Error("GetItemConfigById failed ", zap.Any("itemId", p.Item.Id))
-			continue
-		}
-		if item.Price == nil {
-			log2.Get().Error("Item Price is null ", zap.Any("itemId", p.Item.Id))
-			continue
-		}
-		price := item.Price[constValue.GoldItemId]
-		if typeMap[price] == nil {
+		price := p.Item.Price
+		if typeMap[p.Item.Price] == nil {
 			typeMap[price] = make([]int, 0, 1)
 		}
 
@@ -473,18 +662,17 @@ func cPrice(gridInfo *[]*maxRects.Placement, flag map[int]struct{}, itemType int
 
 // 前提条件
 // 0：不限制 1:已经暴露品质的条件下 ,2:已经暴露轮廓的条件下
-func cPrePQ(gridInfo *[]*maxRects.Placement, flag map[int]struct{}, prePQType int8, userId uint64) {
+func cPrePQ(gridInfo *[]*maxRects.Placement, flag map[int]struct{}, prePQType int8, Uid int64) {
 	if prePQType == 0 {
 		return
 	}
-	//pList := make([]*maxRects.Placement, 0)
 	info := *gridInfo
 	for _, p := range info {
-		showInfo := p.ShowInfoMap[userId]
+		showInfo := p.ShowInfoMap[Uid]
 		if showInfo == nil {
 			showInfo = &maxRects.ShowInfo{}
 		}
-		if prePQType == 1 && len(showInfo.Quality) > 0 {
+		if prePQType == 1 && showInfo.Quality != nil {
 			flag[p.Uid] = struct{}{}
 		} else if prePQType == 2 && showInfo.Contour > 0 {
 			flag[p.Uid] = struct{}{}
@@ -492,159 +680,156 @@ func cPrePQ(gridInfo *[]*maxRects.Placement, flag map[int]struct{}, prePQType in
 	}
 }
 
-func buildChangeScreenInfo(changeScreenInfo *pbGo.ScreenInfo, gridInfo []*maxRects.Placement, userId uint64) {
-	changeScreenInfo.GridList = make([]*pbGo.Grid, 0)
-	changeScreenInfo.AllGoods = make([]*pbGo.Goods, 0)
-
-	for _, p := range gridInfo {
-		showInfo := p.ShowInfoMap[userId]
-		if showInfo == nil {
-			continue
-		}
-		// 品质变化
-		for index, qInfo := range showInfo.Quality {
-			changeScreenInfo.GridList = append(changeScreenInfo.GridList, &pbGo.Grid{
-				IndexId:     index,
-				ShowQuality: uint32(qInfo.RoundIndex),
-				QualityType: uint32(qInfo.QualityType),
-			})
-		}
-		// 轮廓
-		changeScreenInfo.AllGoods = append(changeScreenInfo.AllGoods, &pbGo.Goods{
-			ItemId:      uint32(p.Item.Id),
-			Index:       getIndexByXY(p.StartX, p.StartY),
-			ShowAll:     uint32(showInfo.All),
-			ShowContour: uint32(showInfo.Contour),
-		})
-	}
-}
-
 // 推送信息
 func (room *Room) pushRoundInfo(roomConfig *config.Room, roomSettlementInfo *pbGo.RoomSettlementInfo) {
-	curRound := room.getCurrentRound()
-	// 发送消息
-	for userId, info := range room.playerInfos {
-		if info.playerType > 0 { // 机器人
-			continue
-		}
-		log2.Get().Info("[pushRoundInfo Start  ]", zap.Uint64("userId：", userId), zap.Int32("roomId：", room.roomId))
-		if info.status == PlayerStatusLeave { // 离开的人
-			continue
-		}
-
-		var (
-			changeScreenInfo = &pbGo.ScreenInfo{}
-			hintList         []*pbGo.Hint // todo
-		)
-
-		// last
-
-		//词条能力
-		for _, index := range roomConfig.EntryRound {
-			if curRound.RoundIndex == index {
-				hintList = make([]*pbGo.Hint, 0, 2)
-				if len(roomConfig.EntryList) == 0 {
-					continue
-				}
-				// 需要排重
-				entryAbilityId := uint32(roomConfig.EntryList[rand.Intn(len(roomConfig.EntryList))])
-				//词条能力
-				entryAbility := config.GetAbilityConfigById(entryAbilityId)
-				if entryAbility == nil {
-					log2.Get().Error("GetAbilityConfigById failed ", zap.Any("entryAbility", entryAbilityId))
-					continue
-				}
-				hint := room.applyAbility(entryAbility, userId, 1)
-				hintList = append(hintList, &pbGo.Hint{
-					Id:        entryAbilityId,
-					HintType:  hint.HintType,
-					Value:     uint64(hint.Value),
-					ValueType: hint.ValueType,
-				})
-
-				break
-			}
-		}
-
-		// 人物的能力
-		abilityList := make([]*config.Ability, 0)
-		hero := config.GetHeroConfigById(info.HeroId)
-		if hero == nil {
-			log2.Get().Error("GetHeroConfigById failed, hero is null ", zap.Any("HeroId", info.HeroId))
-		} else {
-			abList, _ := hero.RAsMap[curRound.RoundIndex]
-			for _, id := range abList {
-				ability := config.GetAbilityConfigById(id)
-				if ability == nil {
-					log2.Get().Error("GetAbilityConfigById failed ", zap.Any("abilityId", id))
-					continue
-				}
-				abilityList = append(abilityList, ability)
-			}
-		}
-
-		// 当前回合生效的能力，计算一个玩家,一个玩家一回合可能有多个能力
-		for _, oneA := range abilityList {
-			// 提示
-			hint := room.applyAbility(oneA, userId, 0)
-			hintList = append(hintList, &pbGo.Hint{
-				Id:        oneA.Id,
-				HintType:  hint.HintType,
-				Value:     uint64(hint.Value),
-				ValueType: hint.ValueType,
-			})
-		}
-
-		var (
-			g        = room.gridInfo
-			gridInfo = *g //所有物品
-		)
-		buildChangeScreenInfo(changeScreenInfo, gridInfo, userId)
-
-		//
-
-		// 填充上回合的玩家信息
-		// 竞拍金额
-		var betInfo []*pbGo.ItemInfo
-		lastRound := room.getLastRound()
-		if lastRound != nil {
-
-			for oneUserId, pInfo := range lastRound.Op {
-				betInfo = make([]*pbGo.ItemInfo, 0, 2)
-				betInfo = append(betInfo, &pbGo.ItemInfo{
-					ItemId: uint64(constValue.GoldItemId),
-					Count:  pInfo.goldValue,
-				})
-				if pInfo.itemId > 0 {
-					betInfo = append(betInfo, &pbGo.ItemInfo{
-						ItemId: uint64(pInfo.itemId),
-						Count:  1,
-					})
-				}
-				// 玩家信息
-				heroId := room.playerInfos[oneUserId].HeroId
-				changeScreenInfo.PlayerInfoList = append(changeScreenInfo.PlayerInfoList, &pbGo.PlayerInfo{
-					UserId:  userId,
-					HeroId:  uint32(heroId),
-					BetInfo: betInfo,
-				})
-			}
-		}
-
-		endTime22 = curRound.creatTime + int64(roomConfig.Timeout)
-
-		log2.Get().Info("[pushRoundInfo End ]", zap.Uint64("userId：", userId), zap.Int32("roomId：", room.roomId))
-		node.Push(info.Player, protoHandlerInit.RoundInfoPush, &pbGo.RoundInfoPush{
-			EndTimeOut:       curRound.creatTime + int64(roomConfig.Timeout),
-			RoundIndex:       uint32(curRound.RoundIndex),
-			IsFinish:         roomSettlementInfo != nil,
-			ChangeScreenInfo: changeScreenInfo,
-			HintList:         hintList,
-			SettlementInfo:   roomSettlementInfo,
-			//RoomId:           room.roomId,
-		})
-	}
-
+	//curRound := room.getCurrentRound()
+	//// 发送消息
+	//var elkGoods []*ElkGoods
+	//
+	//uidList := make([]int64, 0)
+	//for Uid, info := range room.playerInfos {
+	//	uidList = append(uidList, Uid)
+	//	if info.playerType > 0 { // 机器人
+	//		continue
+	//	}
+	//	if info.status == PlayerStatusLeave { // 离开的人
+	//		continue
+	//	}
+	//
+	//	var (
+	//		changeScreenInfo = &pbGo.ScreenInfo{}
+	//		hintList         []*pbGo.Hint // todo
+	//	)
+	//
+	//	//
+	//
+	//	//词条能力
+	//	entryAbilityId, ok := room.entryMap[curRound.RoundIndex]
+	//	if ok {
+	//		entryAbility := config.GetAbilityConfigById(uint32(entryAbilityId))
+	//		if entryAbility == nil {
+	//			log2.Get().Error("GetAbilityConfigById failed ", zap.Any("entryAbility", entryAbilityId))
+	//		} else {
+	//			hint := room.applyAbility(entryAbility, Uid, roomHint)
+	//			hintList = append(hintList, &pbGo.Hint{
+	//				HintType: hint.HintType,
+	//				Desc:     desc.GetDesc(entryAbility.Desc, hint.Value),
+	//			})
+	//		}
+	//	}
+	//
+	//	// 人物的能力
+	//	abilityList := make([]*config.Ability, 0)
+	//	hero := config.GetHeroConfigById(info.HeroId)
+	//	if hero == nil {
+	//		log2.Get().Error("GetHeroConfigById failed, hero is null ", zap.Any("HeroId", info.HeroId))
+	//	} else {
+	//		abList, _ := hero.RAsMap[curRound.RoundIndex]
+	//		for _, id := range abList {
+	//			ability := config.GetAbilityConfigById(id)
+	//			if ability == nil {
+	//				log2.Get().Error("GetAbilityConfigById failed ", zap.Any("abilityId", id))
+	//				continue
+	//			}
+	//			abilityList = append(abilityList, ability)
+	//		}
+	//	}
+	//
+	//	// 当前回合生效的能力，计算一个玩家,一个玩家一回合可能有多个能力
+	//	for _, oneA := range abilityList {
+	//		// 提示
+	//		hint := room.applyAbility(oneA, Uid, heroHint)
+	//		hintList = append(hintList, &pbGo.Hint{
+	//			HintType: hint.HintType,
+	//			Desc:     desc.GetDesc(oneA.Desc, hint.Value),
+	//		})
+	//	}
+	//
+	//	var (
+	//		g        = room.gridInfo
+	//		gridInfo = *g //所有物品
+	//	)
+	//
+	//	//
+	//
+	//	// 填充上回合的玩家信息
+	//	// 竞拍金额
+	//	var betInfo []*pbGo.ItemInfo
+	//	lastRound := room.getLastRound()
+	//	if lastRound != nil {
+	//
+	//		for oneUid, pInfo := range lastRound.Op {
+	//			betInfo = make([]*pbGo.ItemInfo, 0, 2)
+	//			betInfo = append(betInfo, &pbGo.ItemInfo{
+	//				ItemId: uint64(constValue.GoldItemId),
+	//				Count:  pInfo.goldValue,
+	//			})
+	//			if pInfo.itemId > 0 {
+	//				betInfo = append(betInfo, &pbGo.ItemInfo{
+	//					ItemId: uint64(pInfo.itemId),
+	//					Count:  1,
+	//				})
+	//			}
+	//			// 玩家信息
+	//			heroId := room.playerInfos[oneUid].HeroId
+	//			changeScreenInfo.PlayerInfoList = append(changeScreenInfo.PlayerInfoList, &pbGo.PlayerInfo{
+	//				Uid:  oneUid,
+	//				HeroId:  uint32(heroId),
+	//				BetInfo: betInfo,
+	//			})
+	//		}
+	//	}
+	//
+	//	elkGoods = append(elkGoods, &ElkGoods{Uid: Uid, Good: changeScreenInfo.AllGoods})
+	//	go node.Push(info.Player, protoHandlerInit.RoundInfoPush, &pbGo.RoundInfoPush{
+	//		EndTimeOut:       curRound.creatTime + int64(roomConfig.Timeout),
+	//		RoundIndex:       uint32(curRound.RoundIndex),
+	//		IsFinish:         roomSettlementInfo != nil,
+	//		ChangeScreenInfo: changeScreenInfo,
+	//		HintList:         hintList,
+	//		SettlementInfo:   roomSettlementInfo,
+	//	})
+	//	// 记录
+	//	//go roomOneRecord(Uid)
+	//	// 重置
+	//	go reward.ResetReward(Uid, receiveAwardId)
+	//}
+	//round := make([]ElkOp, 0)
+	//for uid, operation := range curRound.Op {
+	//	round = append(round, ElkOp{
+	//		Uid:    uid,
+	//		GoldValue: operation.goldValue,
+	//		Operation: int64(operation.operation),
+	//		ItemId:    int64(operation.itemId),
+	//	})
+	//}
+	//if roomSettlementInfo != nil {
+	//	go func() {
+	//		err := statistics.SaveRoomSettlementFromResult(
+	//			context.Background(),
+	//			room.roomId,
+	//			room.roomType,
+	//			curRound.RoundIndex,
+	//			room.SumPrice,
+	//			uidList,
+	//			roomSettlementInfo,
+	//			time.Now().Unix(),
+	//		)
+	//		if err != nil {
+	//			log2.Get().Error("SaveRoomSettlementFromResult failed", zap.Int32("roomId", room.roomId), zap.Error(err))
+	//		}
+	//	}()
+	//}
+	//
+	//elastic.Upload("Settlement", map[string]any{
+	//	"roundIndex": curRound.RoundIndex,
+	//	"uidList":    uidList,
+	//	"roomType":   room.roomType,
+	//	"round":      round,
+	//
+	//	"roomSettlementInfo": roomSettlementInfo,
+	//	"goods":              elkGoods,
+	//})
 }
 
 // 索引
@@ -658,10 +843,12 @@ func getXYByIndex(index uint32) (x, y uint32) {
 }
 
 // 随机一个位置
-// 2~6
-// 4~5
 func randIndexByXY(sx, ex, sy, ey uint32) uint32 {
-	x := uint32(rand.Intn(int(ex-sx)+1) + int(sx)) //sx ~ ex
-	y := uint32(rand.Intn(int(ey-sy)+1) + int(sy))
+	x := uint32(rand.Intn(int(ex-sx)) + int(sx)) //sx ~ ex
+	y := uint32(rand.Intn(int(ey-sy)) + int(sy)) //0~2
 	return getIndexByXY(x, y)
+}
+
+func getAreaByXY(sx, ex, sy, ey uint32) int8 {
+	return int8((ex - sx) * (ey - sy))
 }

@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"gameServer/pkg/config"
 	"gameServer/pkg/logger/log2"
 	utils2 "gameServer/pkg/utils"
 	"gameServer/service/rpc"
@@ -79,7 +80,7 @@ func (s *Server) Start() error {
 	log2.Get().Info("etcd Register==", zap.String("address=", address), zap.Strings("etcd =", config.EtcdEndpoints))
 
 	r := &serverplugin.EtcdV3RegisterPlugin{
-		BasePath:       s.publicServicePath(), //根目录， eg：node/Forward,xxx/Forward
+		BasePath:       s.publicServicePath(), //根目录node， 和路径组合为 eg：node/Forward,xxx/Forward
 		ServiceAddress: address,
 		EtcdServers:    config.EtcdEndpoints,  //往etcd注册地址
 		UpdateInterval: config.UpdateInterval, //信息更新间隔
@@ -132,10 +133,8 @@ func (s *Server) Register(rcvr any) error {
 	// 节点自身数据集
 	metadata := s.buildMetadata()
 
-	// 服务对象名称，例如 node的Forward gaet的Gaet，最终：/node/Forward/tcp@127.0.0.1:8972
-	// Gate: node/Gate
-	// node: node/Forward
-	servicePath := reflect.Indirect(reflect.ValueOf(rcvr)).Type().Name()
+	// 服务对象名称，例如 node 的 Forward，最终类似 /node/Forward/tcp@127.0.0.1:8972
+	servicePath := reflect.Indirect(reflect.ValueOf(rcvr)).Type().Name() // Gate /Forward
 
 	return s.server.RegisterName(servicePath, rcvr, metadata)
 }
@@ -147,8 +146,6 @@ func (s *Server) serve() error {
 	ip := utils2.LocalIP()
 
 	address := fmt.Sprintf("%s:%d", ip, 0)
-	// 随机获取可用的ip和端口
-	//address := ":0" // 或 "0.0.0.0:0"
 
 	if err := s.server.Serve("tcp", address); err != nil {
 		fmt.Errorf("server: %s, serve failed: %v", s.Output(), err)
@@ -161,17 +158,21 @@ func (s *Server) serve() error {
 func (s *Server) buildMetadata() string {
 	serverId := s.config.ID
 	gouldId := utils2.GetGroupIdByServerId(serverId) // (1~999):1 （1000~1999):2 (2000~2999):3
+	portStr := config.Get().Node().GetString("address")
+	port := utils2.ToInt64(portStr[1:])
+	if port == 0 {
+		panic("invalid server port id")
+	}
 	metadata := strings.Join([]string{
 		fmt.Sprintf("id=%d", serverId),
 		fmt.Sprintf("version=%d", s.config.Version),
 		fmt.Sprintf("groupId=%d", gouldId),
+		fmt.Sprintf("port=%d", port),
 	}, "&")
 
 	return metadata
 }
 
 func (s *Server) publicServicePath() string {
-	return fmt.Sprintf("%s", s.config.BasePath)
-
-	//return fmt.Sprintf("%s/%s", s.config.BasePath, s.config.ServiceName)
+	return fmt.Sprintf("%s", s.config.BasePath) //node
 }

@@ -1,10 +1,9 @@
 #
 # STAGE 1: prepare
 #
-# 获取基础环境，不包含任何业务逻辑
+# 依赖缓存层：只在 go.mod/go.sum 变化时失效
 #
-# FROM 192.168.1.4:8003/mirror/golang:1.24-alpine AS prepare
-FROM golang:1.24-alpine AS prepare
+FROM golang:1.25-alpine AS prepare
 
 WORKDIR /app
 
@@ -12,51 +11,39 @@ ENV GO111MODULE=on
 ENV GOPROXY=https://goproxy.cn,direct
 ENV CGO_ENABLED=0
 ENV GOOS=linux
-ENV GOARCH=amd64
 
-ADD go.mod .
-ADD go.sum .
-RUN go mod download && go mod tidy && go mod verify && go mod vendor
+COPY go.mod .
+COPY go.sum .
+RUN go mod download
 
 #
 # STAGE 2: build
 #
-# 编译源码
+# 编译源码（构建上下文必须是仓库根目录，
+# 如：docker build -f app/gate/Dockerfile .）
 #
 FROM prepare AS builder
 
+ARG VERSION=dev
+ARG TARGETARCH=amd64
+
 COPY . .
-# 在指定文件夹./cmd/app/node，输出文件名testNode，testNode.exe（Windows）， testNode（Linux）
-# -s 去掉符号表（symbol table），-w 去掉调试信息（debug info）
-RUN go build -ldflags="-s -w" -o gate ./app/gate
-
-# # 安装压缩工具，golang:1.24 时安装报错，因此替换为 golang:1.24-alpine
-# RUN echo "https://mirrors.aliyun.com/alpine/v3.20/main/" > /etc/apk/repositories \
-#     && echo "https://mirrors.aliyun.com/alpine/v3.20/community/" >> /etc/apk/repositories \
-#     && apk add --no-cache upx
-
-# # 压缩二进制文件然后卸载压缩工具
-# RUN upx -9 account && apk del upx
+# -s 去掉符号表，-w 去掉调试信息，-X 注入版本号（main.Version）
+RUN GOARCH=${TARGETARCH} go build -ldflags="-s -w -X main.Version=${VERSION}" -o gate ./app/gate
 
 #
-# STAGE 3: RUN
+# STAGE 3: run
 #
-# 丢弃以上的编译环境，只使用编译出的二进制文件
+# 只保留二进制文件，丢弃编译环境
 #
-# FROM 192.168.1.4:8003/mirror/alpine:latest
-FROM alpine:latest
+FROM alpine:3.24
 
 WORKDIR /app
-
-# golang:1.24 才有以下配置
-# COPY --from=builder /usr/share/zoneinfo/UTC /etc/localtime
-# COPY --from=builder /etc/timezone /etc/timezone
-
-# golang:1.24-apline 需要手动安装然后删除
-# 将时区设置为 UTC+0
-RUN echo "https://mirrors.aliyun.com/alpine/v3.20/main/" > /etc/apk/repositories \
-    && echo "https://mirrors.aliyun.com/alpine/v3.20/community/" >> /etc/apk/repositories \
-    && apk add --no-cache tzdata \
+# base 与 apk 源版本必须一致（都是 v3.24），否则 apk 解析失败
+RUN echo "https://mirrors.aliyun.com/alpine/v3.24/main/" > /etc/apk/repositories \
+    && echo "https://mirrors.aliyun.com/alpine/v3.24/community/" >> /etc/apk/repositories \
+    # ca-certificates 必须保留：gate 要连 redis/mongo/etcd/微信/抖音，全是 TLS
+    && apk add --no-cache ca-certificates tzdata \
     # UTC+0
     && cp /usr/share/zoneinfo/UTC /etc/localtime \
     && echo UTC > /etc/timezone \
@@ -65,10 +52,12 @@ RUN echo "https://mirrors.aliyun.com/alpine/v3.20/main/" > /etc/apk/repositories
     # && echo Asia/Shanghai > /etc/timezone \
     && apk del tzdata
 
-COPY --from=builder /app/gate  /app/gate
+COPY --from=builder /app/gate /app/gate
 
-RUN mkdir -p  /logs
+# 代码里读的是 ./logs/ 即 /app/logs（compose 挂载的也是 /app/logs），不是 /logs
+RUN mkdir -p /app/logs
 
-# 将来运行阶段
-#CMD ["/app/gate", "--configPath", "/config", "--logPath", "/logs", "--node", "gate-1"]
+# WS 7001 / pprof 7051（见 config/gate.toml [gate-1]，仅文档作用）
+EXPOSE 7001 7051
+
 CMD ["/app/gate"]

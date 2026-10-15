@@ -2,6 +2,7 @@ package redis
 
 import (
 	"context"
+	"gameServer/pkg/config"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -13,16 +14,19 @@ var (
 )
 
 func NewRedisClient(addr string) {
-	op := &redis.Options{
+	c := config.Get()
+	if c == nil {
+		panic("please call config.NewRedisClient first")
+	}
+	redisClient = redis.NewClient(&redis.Options{
 		Addr:         addr,
-		Password:     "123456",
+		Password:     c.RedisPassword(),
 		DB:           0,
 		DialTimeout:  5 * time.Second, // 连接超时
 		ReadTimeout:  3 * time.Second, // 读超时
 		WriteTimeout: 3 * time.Second, // 写超时
-		PoolSize:     10,              // 连接池大小
-	}
-	redisClient = redis.NewClient(op)
+		PoolSize:     50,              // 连接池大小
+	})
 	ping := redisClient.Ping(ctx)
 	if ping.Err() != nil {
 		panic(ping.Err())

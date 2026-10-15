@@ -27,15 +27,10 @@ type serverInfo struct {
 	open       bool
 }
 
-// NewRandomSelector 创建随机选择器
-//func NewDefaultSelector() *DefaultSelector {
-//	return &DefaultSelector{
-//		Servers: make([]*serverInfo, 0),
-//	}
-//}
-
 // Select 随机选择一个服务器，由 rpcx 调用
 func (s *DefaultSelector) Select(ctx context.Context, servicePath, serviceMethod string, _ /** args */ any) string {
+	s.mu.RLock()         // 加读锁
+	defer s.mu.RUnlock() // 方法退出时释放
 
 	if len(s.Servers) == 0 {
 		return ""
@@ -51,14 +46,6 @@ func (s *DefaultSelector) Select(ctx context.Context, servicePath, serviceMethod
 	}
 	address := ""
 	for _, server := range s.Servers {
-		// 假设 game-1 存在两个版本的进程
-		// v1: 线上版本
-		// v2: 新开发功能，发布前测试版本
-		//
-		// 当前登录的账号设置了白名单，必须进入 v2
-		//
-		// 此时，versionMin = 2, versionMax = 2
-		// 就会匹配到 v2 版本
 		if oneServer.Id == 0 { //没有数据,则按平均分配服务器
 			if server.groupId == oneServer.groupId && server.curVersion == server.maxVersion { //没有则返回最大版本
 				serverList := make([]*serverInfo, 0) //相同组的所有版本
@@ -69,15 +56,10 @@ func (s *DefaultSelector) Select(ctx context.Context, servicePath, serviceMethod
 				}
 				// 从 serverList 选择一个
 				targetServer := serverList[rand.Intn(len(serverList))]
-				// 写入返回数据
-				//ctx = context.WithValue(ctx, share.ResMetaDataKey, map[string]string{
-				//	"Id": strconv.Itoa(int(targetServer.Id)),
-				//})
 				return targetServer.Address
 			}
 		} else {
 			if server.Id == oneServer.Id {
-				//log2.Get().Info("version======", zap.Uint32("curVersion:", server.curVersion))
 				return server.Address
 			}
 		}
@@ -126,18 +108,13 @@ func getServerInfo(metadata map[string]string) *serverInfo {
 		id, _         = strconv.Atoi(metadata["id"])
 		curVersion, _ = strconv.Atoi(metadata["curVersion"])
 		groupId, _    = strconv.Atoi(metadata["groupId"])
-
-		//versionMax, _ = strconv.Atoi(metadata["versionMax"])
 		roomStatus, _ = strconv.Atoi(metadata["roomStatus"])
 	)
 
-	// todo 对象池优化
-	//v := clientMetadataPool.Get()
 	return &serverInfo{
 		Id:         uint32(id),
 		curVersion: uint32(curVersion),
 		groupId:    uint32(groupId), //？？？
-		//maxVersion: uint32(versionMax),
 		roomStatus: uint8(roomStatus),
 	}
 }
@@ -157,9 +134,6 @@ func parseServerMetadata(metadata, address string) *serverInfo {
 		case "groupId":
 			t, _ := strconv.Atoi(value)
 			out.groupId = uint32(t)
-		//case "maxVersion":
-		//	t, _ := strconv.Atoi(value)
-		//	out.curVersion = uint32(t)
 		case "version":
 			t, _ := strconv.Atoi(value)
 			out.curVersion = uint32(t)

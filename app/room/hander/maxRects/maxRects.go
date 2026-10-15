@@ -6,9 +6,12 @@ import (
 )
 
 type Item struct {
-	Id     int
-	Length uint32 // 水平尺寸
-	Width  uint32 // 垂直尺寸
+	Id       int
+	Length   uint32 // 水平尺寸
+	Width    uint32 // 垂直尺寸
+	Quality  int8   //品质
+	ItemType int8   //类型
+	Price    int64  //价值
 }
 
 type Placement struct {
@@ -20,7 +23,7 @@ type Placement struct {
 	EndX        uint32
 	EndY        uint32
 	Rotated     bool
-	ShowInfoMap map[uint64]*ShowInfo //显示类型,<userId,显示信息<类型:是否已经提示>> 0:不显示，1:显示品质，2:显示轮廓，3:显示所有
+	ShowInfoMap map[int64]*ShowInfo //显示类型,<Uid,显示信息<类型:是否已经提示>> 0:不显示，1:显示品质，2:显示轮廓，3:显示所有
 
 }
 
@@ -32,14 +35,16 @@ type rect struct {
 }
 
 type ShowInfo struct {
-	Quality map[uint32]*Quality //<位置,所在变化时轮数索引>
-	Contour int8                //0:不显示，发现变化时，所在轮数索引 1~5
-	All     int8                //0:不显示，发现变化时，所在轮数索引 1~5
+	//Quality map[uint32]*Quality //<位置,所在变化时轮数索引>
+	Quality *Quality //<位置,所在变化时轮数索引>
+	Contour int8     //0:不显示，发现变化时，所在轮数索引 1~5
+	All     int8     //0:不显示，发现变化时，所在轮数索引 1~5
 }
 
 type Quality struct {
-	RoundIndex  int8 //<位置,所在变化时轮数索引> 1~5
-	QualityType int8 //类型
+	Index       uint32 //位置
+	RoundIndex  int8   //<位置,所在变化时轮数索引> 1~5
+	QualityType int8   //类型
 }
 
 func Pack(items []Item) []*Placement {
@@ -77,10 +82,6 @@ func Pack(items []Item) []*Placement {
 		}
 
 		tryPlace(item.Length, item.Width, false)
-
-		//if item.Length != item.Width {
-		//	tryPlace(item.Width, item.Length, true)
-		//}
 
 		node := best
 

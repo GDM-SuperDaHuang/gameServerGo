@@ -1,0 +1,42 @@
+services:
+  gate:
+    image: gate2.2:latest
+
+    volumes:
+      - /home/game/smash/gate/config:/app/config:ro
+      - /home/game/smash/gate/logs:/app/logs
+      - /home/game/smash/gate/excels:/app/excels
+  
+    ports:
+      - target: 7001
+        published: 7001
+        protocol: tcp
+        mode: host
+
+      - target: 7051
+        published: 7051
+        protocol: tcp
+        mode: host
+
+    networks:
+      - smash_game_network
+
+    environment:
+      NODE_NAME: "gate-1"
+
+    deploy:
+      replicas: 1
+
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 30s
+
+      placement:
+        constraints:
+          - node.labels.game_role == smash_gate
+
+networks:
+  smash_game_network:
+    external: true

@@ -1,0 +1,17 @@
+services:
+  smash-home-1:
+    image: home1.0
+    container_name: smash-home-1
+    ports:
+      - "7061:7061"
+    volumes:
+      - ./config:/config
+      - ./logs:/logs
+      - ./excels:/excels
+    networks:
+      - smash_game_network
+
+networks:
+  smash_game_network:
+    driver: overlay
+    attachable: true

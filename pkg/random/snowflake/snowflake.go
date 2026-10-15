@@ -35,7 +35,7 @@ func NewNode(workerId uint64) *Node {
 }
 
 // 返回 uint64 RoomType
-func (n *Node) Generate() uint64 {
+func (n *Node) Generate() int64 {
 	n.mu.Lock()
 	defer n.mu.Unlock()
 
@@ -59,5 +59,5 @@ func (n *Node) Generate() uint64 {
 		(n.workerId << workerShift) |
 		n.sequence
 
-	return id
+	return int64(id)
 }

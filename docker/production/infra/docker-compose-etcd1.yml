@@ -1,0 +1,52 @@
+services:
+  etcd1:
+    image: www.youdianqu.top/base/quay.io/coreos/etcd:v3.6.14
+    container_name: prod-etcd1
+
+    restart: unless-stopped
+
+    environment:
+      ETCD_NAME: etcd1
+      ETCD_DATA_DIR: /etcd-data
+
+      # Client
+      ETCD_LISTEN_CLIENT_URLS: http://0.0.0.0:2379
+      ETCD_ADVERTISE_CLIENT_URLS: http://172.16.129.5:2379
+
+      # Peer
+      ETCD_LISTEN_PEER_URLS: http://0.0.0.0:2380
+      ETCD_INITIAL_ADVERTISE_PEER_URLS: http://172.16.129.5:2380
+
+      # Cluster
+      ETCD_INITIAL_CLUSTER: etcd1=http://172.16.129.5:2380,etcd2=http://172.16.129.6:2380,etcd3=http://172.21.185.34:2380
+
+      ETCD_INITIAL_CLUSTER_STATE: new
+      ETCD_INITIAL_CLUSTER_TOKEN: smash-etcd-prod
+
+      # Storage
+      ETCD_AUTO_COMPACTION_MODE: revision
+      ETCD_AUTO_COMPACTION_RETENTION: "1000"
+      ETCD_QUOTA_BACKEND_BYTES: "4294967296"
+      ETCD_SNAPSHOT_COUNT: "50000"
+
+    volumes:
+      - etcd1-data:/etcd-data
+
+    ports:
+      - "2379:2379"
+      - "2380:2380"
+
+    healthcheck:
+      test:
+        - CMD
+        - etcdctl
+        - endpoint
+        - health
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+volumes:
+  etcd1-data:
+    name: smash-etcd1-data

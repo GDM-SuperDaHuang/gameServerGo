@@ -1,7 +1,6 @@
 package reader
 
 import (
-	"errors"
 	"fmt"
 	"path/filepath"
 	"reflect"
@@ -74,21 +73,9 @@ func (r *ExcelReader) ReadExcel(fileName string) (map[string][][]string, error) 
 	return result, nil
 }
 
-func (r *ExcelReader) findType(fileType string) {
-	switch fileType {
-	case "int":
-	case "string":
-	case "list<int>":
-	case "bool":
-	case "map<int,int>":
-	case "map<int,string>":
-	case "time":
-	default:
-	}
-}
-
 // ReadSheetToStruct 读取指定Sheet并映射到结构体切片
 // allData map[string]map[string][][]string --excelName：sheetName：data
+
 func (r *ExcelReader) ReadSheetToStruct(allData map[string]map[string][][]string, slicePtrMap map[string]interface{}) error {
 	// 验证slicePtr是指向切片的指针
 	for sheetName, structs := range slicePtrMap {
@@ -102,136 +89,75 @@ func (r *ExcelReader) ReadSheetToStruct(allData map[string]map[string][][]string
 			elemType = elemType.Elem()
 		}
 
-		for excelName, info := range allData {
+		flag := false
+		excelName := ""
+		for excelNameOne, info := range allData {
 			_, ok := info[sheetName]
-			if !ok {
-				panic(errors.New(fmt.Sprintf("不存在结构 %s", sheetName)))
+			if ok {
+				flag = true
+				excelName = excelNameOne
+				break
 			}
-
-			// 读取Excel数据
-			filePath := filepath.Join(r.basePath, excelName)
-			f, err := excelize.OpenFile(filePath)
-			if err != nil {
-				return fmt.Errorf("打开文件失败: %w", err)
-			}
-
-			defer f.Close()
-
-			rows, err := f.GetRows(sheetName)
-			if err != nil {
-				return fmt.Errorf("读取Sheet失败: %w", err)
-			}
-
-			if len(rows) < 2 {
-				return fmt.Errorf("Sheet数据不足，至少需要表头和一行数据")
-			}
-
-			// 解析表头
-			headers := rows[0]
-			fieldMap := buildFieldMap(elemType)
-
-			// 解析数据行
-			dataRows := rows[1:]
-			resultSlice := reflect.MakeSlice(sliceValue.Elem().Type(), 0, len(dataRows))
-
-			for rowIdx, row := range dataRows {
-				elem := reflect.New(elemType).Elem()
-
-				for colIdx, cellValue := range row {
-					if colIdx >= len(headers) {
-						continue
-					}
-
-					header := strings.TrimSpace(headers[colIdx])
-					if fieldInfo, ok := fieldMap[header]; ok {
-						if err := r.setFieldValue(elem, fieldInfo, cellValue); err != nil {
-							return fmt.Errorf("第%d行,列'%s': %w", rowIdx+2, header, err)
-						}
-					}
-				}
-				// 报错
-				resultSlice = reflect.Append(resultSlice, elem.Addr())
-			}
-			sliceValue.Elem().Set(resultSlice)
-
+		}
+		if !flag {
+			return fmt.Errorf("不存在结构 %s", sheetName)
+		}
+		// 读取Excel数据
+		filePath := filepath.Join(r.basePath, excelName)
+		err2 := r.processSingleSheet(filePath, sheetName, elemType, sliceValue)
+		if err2 != nil {
+			return err2
 		}
 	}
-
 	return nil
 }
 
-//func (r *ExcelReader) ReadSheetToStruct1(allData map[string]map[string][][]string, slicePtrMap map[string]interface{}) error {
-//	// 验证slicePtr是指向切片的指针
-//	for sheetName, value := range slicePtrMap {
-//		sliceValue := reflect.ValueOf(value)
-//		//if sliceValue.Kind() != reflect.Ptr || sliceValue.Elem().Kind() != reflect.Slice {
-//		//	return fmt.Errorf("slicePtr必须是指向切片的指针")
-//		//}
-//		// 获取元素类型
-//		elemType := sliceValue.Elem().Type().Elem()
-//		if elemType.Kind() == reflect.Ptr {
-//			elemType = elemType.Elem()
-//		}
-//
-//		for excelName, info := range allData {
-//			_, ok := info[sheetName]
-//			if !ok {
-//				panic(errors.New(fmt.Sprintf("不存在结构 %s", sheetName)))
-//			}
-//
-//			// 读取Excel数据
-//			filePath := filepath.Join(r.basePath, excelName)
-//			f, err := excelize.OpenFile(filePath)
-//			if err != nil {
-//				return fmt.Errorf("打开文件失败: %w", err)
-//			}
-//
-//			defer f.Close()
-//
-//			rows, err := f.GetRows(sheetName)
-//			if err != nil {
-//				return fmt.Errorf("读取Sheet失败: %w", err)
-//			}
-//
-//			if len(rows) < 2 {
-//				return fmt.Errorf("Sheet数据不足，至少需要表头和一行数据")
-//			}
-//
-//			// 解析表头
-//			headers := rows[0]
-//			fieldMap := buildFieldMap(elemType)
-//
-//			// 解析数据行
-//			dataRows := rows[1:]
-//			resultSlice := reflect.MakeSlice(sliceValue.Elem().Type(), 0, len(dataRows))
-//
-//			for rowIdx, row := range dataRows {
-//				elem := reflect.New(elemType).Elem()
-//
-//				for colIdx, cellValue := range row {
-//					if colIdx >= len(headers) {
-//						continue
-//					}
-//
-//					header := strings.TrimSpace(headers[colIdx])
-//					if fieldInfo, ok := fieldMap[header]; ok {
-//						if err := r.setFieldValue(elem, fieldInfo, cellValue); err != nil {
-//							return fmt.Errorf("第%d行,列'%s': %w", rowIdx+2, header, err)
-//						}
-//					}
-//				}
-//
-//				resultSlice = reflect.Append(resultSlice, elem.Addr())
-//			}
-//
-//			sliceValue.Elem().Set(resultSlice)
-//
-//		}
-//	}
-//
-//	return nil
-//
-//}
+func (r *ExcelReader) processSingleSheet(filePath string, sheetName string, elemType reflect.Type, sliceValue reflect.Value) error {
+	f, err := excelize.OpenFile(filePath)
+	if err != nil {
+		return fmt.Errorf("打开文件失败: %w", err)
+	}
+
+	defer f.Close()
+
+	rows, err := f.GetRows(sheetName)
+	if err != nil {
+		return fmt.Errorf("读取Sheet失败: %w", err)
+	}
+
+	if len(rows) < 2 {
+		return fmt.Errorf("Sheet数据不足，至少需要表头和一行数据")
+	}
+
+	// 解析表头
+	headers := rows[0]
+	fieldMap := buildFieldMap(elemType)
+
+	// 解析数据行
+	dataRows := rows[1:]
+	resultSlice := reflect.MakeSlice(sliceValue.Elem().Type(), 0, len(dataRows))
+
+	for rowIdx, row := range dataRows {
+		elem := reflect.New(elemType).Elem()
+
+		for colIdx, cellValue := range row {
+			if colIdx >= len(headers) {
+				continue
+			}
+
+			header := strings.TrimSpace(headers[colIdx])
+			if fieldInfo, ok := fieldMap[header]; ok {
+				if err := r.setFieldValue(elem, fieldInfo, cellValue); err != nil {
+					return fmt.Errorf("第%d行,列'%s': %w", rowIdx+2, header, err)
+				}
+			}
+		}
+		// 报错
+		resultSlice = reflect.Append(resultSlice, elem.Addr())
+	}
+	sliceValue.Elem().Set(resultSlice)
+	return nil
+}
 
 // fieldInfo 字段信息
 type fieldInfo struct {

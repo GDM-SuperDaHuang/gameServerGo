@@ -52,7 +52,7 @@ func (p *TypeParser) Parse(value string, targetType reflect.Type) (interface{}, 
 		if value == "" {
 			return reflect.Zero(targetType).Interface(), nil
 		}
-		v, err := strconv.ParseUint(value, 10, 64)
+		v, err := strconv.ParseInt(value, 10, 64)
 		if err != nil {
 			return nil, err
 		}
@@ -117,8 +117,6 @@ func (p *TypeParser) parseSlice(value string, targetType reflect.Type) (interfac
 		return result.Interface(), nil
 	}
 
-	// 整数切片
-	//if elemType.Kind() >= reflect.Int && elemType.Kind() <= reflect.Int64 {
 	if elemType.Kind() >= reflect.Bool && elemType.Kind() <= reflect.Uint64 {
 		if value == "" {
 			return reflect.MakeSlice(targetType, 0, 0).Interface(), nil
@@ -144,95 +142,17 @@ func (p *TypeParser) parseSlice(value string, targetType reflect.Type) (interfac
 	return nil, fmt.Errorf("不支持的切片元素类型: %v", elemType)
 }
 
-// parseMap 解析Map类型
-// 现在支持格式: key1:value1; key2:value2; key3:value3
-// 需要增加支持格式2: key1:value1,value2,value3; key2:value4,value5; key3:value3
-//func (p *TypeParser) parseMap(value string, targetType reflect.Type) (interface{}, error) {
-//	keyType := targetType.Key()
-//	elemType := targetType.Elem()
-//
-//	result := reflect.MakeMap(targetType)
-//
-//	if value == "" {
-//		return result.Interface(), nil
-//	}
-//
-//	// 现在支持格式: key1:value1; key2:value2; key3:value3
-//	pairs := strings.Split(value, ";")
-//
-//	for _, pair := range pairs {
-//		pair = strings.TrimSpace(pair)
-//		if pair == "" {
-//			continue
-//		}
-//
-//		kv := strings.SplitN(pair, ":", 2)
-//		if len(kv) != 2 {
-//			continue // 跳过格式错误的
-//		}
-//
-//		keyStr := strings.TrimSpace(kv[0])
-//		valStr := strings.TrimSpace(kv[1])
-//
-//		// 解析key
-//		var key reflect.Value
-//		switch keyType.Kind() {
-//		case reflect.String:
-//			key = reflect.ValueOf(keyStr)
-//		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-//			k, err := strconv.ParseInt(keyStr, 10, 64)
-//			if err != nil {
-//				return nil, fmt.Errorf("map key解析失败: %s", keyStr)
-//			}
-//			key = reflect.ValueOf(k).Convert(keyType)
-//		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-//			k, err := strconv.ParseUint(keyStr, 10, 64)
-//			if err != nil {
-//				return nil, fmt.Errorf("map key解析失败: %s", keyStr)
-//			}
-//			key = reflect.ValueOf(k).Convert(keyType)
-//		default:
-//			return nil, fmt.Errorf("不支持的map key类型: %v", keyType)
-//		}
-//
-//		// 解析value
-//		var val reflect.Value
-//		switch elemType.Kind() {
-//		case reflect.String:
-//			val = reflect.ValueOf(valStr)
-//		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-//			v, err := strconv.ParseInt(valStr, 10, 64)
-//			if err != nil {
-//				return nil, fmt.Errorf("map value解析失败: %s", valStr)
-//			}
-//			val = reflect.ValueOf(v).Convert(elemType)
-//		case reflect.Float32, reflect.Float64:
-//			v, err := strconv.ParseFloat(valStr, 64)
-//			if err != nil {
-//				return nil, fmt.Errorf("map value解析失败: %s", valStr)
-//			}
-//			val = reflect.ValueOf(v).Convert(elemType)
-//		default:
-//			return nil, fmt.Errorf("不支持的map value类型: %v", elemType)
-//		}
-//
-//		result.SetMapIndex(key, val)
-//	}
-//
-//	return result.Interface(), nil
-//}
-
 func (p *TypeParser) parseMap(value string, targetType reflect.Type) (interface{}, error) {
 	keyType := targetType.Key()
 	elemType := targetType.Elem()
 
 	result := reflect.MakeMap(targetType)
 
+	// 空值
 	if value == "" {
 		return result.Interface(), nil
 	}
 
-	// key:value;key:value
 	pairs := strings.Split(value, ";")
 
 	for _, pair := range pairs {
@@ -244,7 +164,7 @@ func (p *TypeParser) parseMap(value string, targetType reflect.Type) (interface{
 
 		kv := strings.SplitN(pair, ":", 2)
 		if len(kv) != 2 {
-			continue
+			return nil, fmt.Errorf("map key解析失败: %s", kv)
 		}
 
 		keyStr := strings.TrimSpace(kv[0])

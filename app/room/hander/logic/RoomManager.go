@@ -3,7 +3,9 @@ package logic
 import (
 	"context"
 	"gameServer/app/room/hander/config"
+	"gameServer/common/constValue"
 	"gameServer/pkg/logger/log2"
+	"gameServer/pkg/recoverSafe"
 	"sync"
 	"time"
 
@@ -11,22 +13,13 @@ import (
 	"golang.org/x/exp/rand"
 )
 
-const (
-	StateIdle     = 0
-	StateMatching = 1
-	StateInRoom   = 2
-)
-
 type RoomManager struct {
 	mu         sync.RWMutex
 	rooms      map[int32]*Room
-	playerRoom map[uint64]*Room //玩家房间,目前加入的房间,有可能是旧的，有可能正在玩的
-	nextRoomId int32            //自增的房间id
+	playerRoom map[int64]*Room //玩家房间,目前加入的房间,有可能是旧的，有可能正在玩的
+	nextRoomId int32           //自增的房间id
 
-	playerCancel map[uint64]context.CancelFunc
-
-	// ✅ 状态（强烈建议）
-	playerState map[uint64]int
+	playerCancel map[int64]context.CancelFunc
 
 	// ✅ 匹配队列（核心）
 	matchQueue chan *MatchRequest
@@ -40,68 +33,58 @@ type MatchRequest struct {
 	ctx        context.Context
 
 	matchStartTime int64 //开始匹配的时间秒
-	//ver        int64 // ✅ 关键字段
 }
 
-func (rm *RoomManager) FindRoomByUserId(userId uint64) *Room {
+func (rm *RoomManager) FindRoomByUid(Uid int64) *Room {
 	rm.mu.RLock()
 	defer rm.mu.RUnlock()
-	return rm.playerRoom[userId]
+	return rm.playerRoom[Uid]
 }
 
-//	func (rm *RoomManager) updatePlayerRoom(userId uint64, room *Room) {
-//		rm.mu.Lock()
-//		defer rm.mu.Unlock()
-//		rm.playerRoom[userId] = room
-//	}
-func (rm *RoomManager) delPlayerRoom(userId uint64) {
+func (rm *RoomManager) delPlayerRoom(Uid int64) {
 	rm.mu.Lock()
 	defer rm.mu.Unlock()
-	delete(rm.playerRoom, userId)
+	delete(rm.playerRoom, Uid)
 }
 
 func NewRoomManager() *RoomManager {
 	rm := &RoomManager{
 		rooms:        make(map[int32]*Room),
-		playerRoom:   make(map[uint64]*Room),
-		playerCancel: make(map[uint64]context.CancelFunc),
-		playerState:  make(map[uint64]int),
+		playerRoom:   make(map[int64]*Room),
+		playerCancel: make(map[int64]context.CancelFunc),
 		matchQueue:   make(chan *MatchRequest, 10000), // 高并发缓冲
-		roomCloseCh:  make(chan int32, 1000),
+		roomCloseCh:  make(chan int32, 10000),
 	}
-	//
-	go rm.matchWorker()
-	go rm.roomRecycleWorker()
+
+	recoverSafe.GoWorker("matchWorker", rm.matchWorker, recoverSafe.DefaultWorkerOpt)
+	recoverSafe.GoWorker("roomRecycleWorker", rm.roomRecycleWorker, recoverSafe.DefaultWorkerOpt)
 	return rm
 }
 
 // 房间销毁
-func (rm *RoomManager) roomRecycleWorker() {
+func (rm *RoomManager) roomRecycleWorker() error {
 	for roomId := range rm.roomCloseCh {
 		room := rm.FindRoom(roomId)
 		if room != nil {
-			for userId := range room.playerInfos {
-				pRoom := rm.FindRoomByUserId(userId)
+			for Uid := range room.playerInfos {
+				pRoom := rm.FindRoomByUid(Uid)
 				if pRoom == nil {
 					continue
 				}
 				if pRoom.roomId == room.roomId {
-					rm.delPlayerRoom(userId)
+					rm.delPlayerRoom(Uid)
 				}
 			}
 		}
 		rm.DeleteRoom(roomId)
 	}
+	return nil
 }
 
-func (rm *RoomManager) matchWorker() {
+func (rm *RoomManager) matchWorker() error {
+	buckets := make(map[uint32]map[int64]*MatchRequest) //房间类型-玩家Uid-匹配请求
 
-	// 按房间类型分桶
-	//buckets := make(map[uint32][]*MatchRequest) //房间类型-匹配请求
-
-	buckets := make(map[uint32]map[uint64]*MatchRequest) //房间类型-玩家userId-匹配请求
-
-	ticker := time.NewTicker(50 * time.Millisecond)
+	ticker := time.NewTicker(10 * time.Millisecond)
 
 	for {
 		select {
@@ -116,16 +99,15 @@ func (rm *RoomManager) matchWorker() {
 			default:
 			}
 			rt := req.roomConfig.RoomType
-			//buckets[rt] = append(buckets[rt], req)
 			if buckets[rt] == nil {
-				buckets[rt] = make(map[uint64]*MatchRequest)
+				buckets[rt] = make(map[int64]*MatchRequest)
 			}
-			buckets[rt][req.player.Player.UserId] = req
+			buckets[rt][req.player.Player.Uid] = req
 
 		// 定时撮合
 		case <-ticker.C:
 			var players []*MatchRequest
-			for roomType, ms := range buckets {
+			for roomType, ms := range buckets { //1,2,3,
 				if len(ms) == 0 {
 					continue
 				}
@@ -147,8 +129,10 @@ func (rm *RoomManager) matchWorker() {
 							minTime = info.matchStartTime
 						}
 					}
+
+					// 压测测试
 					// 至少10s 匹配机器人
-					if now-minTime < rand.Int63n(5)+8 { //随机 8~12 s
+					if now-minTime < rand.Int63n(constValue.MatchTime2-constValue.MatchTime1)+constValue.MatchTime1 { //随机 8~12 s
 						continue
 					}
 					lack := need - len(ms)
@@ -170,72 +154,110 @@ func (rm *RoomManager) matchWorker() {
 					}
 				}
 
+				flagFull := 0
 				players = make([]*MatchRequest, 0, need)
 				for _, req := range ms {
 					players = append(players, req)
+					flagFull++
+					if flagFull >= need {
+						break
+					}
 				}
-				for _, ro := range robots {
-					players = append(players, ro)
+				if flagFull < need {
+					for _, ro := range robots {
+						players = append(players, ro)
+						flagFull++
+						if flagFull >= need {
+							break
+						}
+					}
 				}
-
-				// 取一桌人
-				//players := list[:need]
-				//buckets[roomType] = list[need:]
-				if len(players) < need {
+				if flagFull < need {
 					continue
 				}
-
-				rm.createRoomWithPlayers(roomConfig, players)
+				cancelUidList := rm.createRoomWithPlayers(roomConfig, players)
+				if cancelUidList == nil {
+					// 删除
+					for _, info := range players {
+						delete(buckets[roomType], info.player.Player.Uid)
+					}
+				} else {
+					for _, uid := range cancelUidList {
+						delete(buckets[roomType], uid)
+					}
+				}
 			}
-			// 删除
-			for _, info := range players {
-				roomConfig := info.roomConfig
-				delete(buckets[roomConfig.RoomType], info.player.Player.UserId)
-			}
-
 		}
 	}
+	return nil
 }
 
-func (rm *RoomManager) createRoomWithPlayers(cfg *config.Room, reqs []*MatchRequest) {
+func (rm *RoomManager) createRoomWithPlayers(cfg *config.Room, reqs []*MatchRequest) []int64 {
+	flag := false
+	var cancelUidList []int64
 
-	room := rm.CreateRoom(cfg)
-
+	//检查是否有取消的
 	for _, req := range reqs {
-
-		uid := req.player.Player.UserId
-
+		uid := req.player.Player.Uid
 		if req.player.playerType == 0 {
 			// ❗ 再次检查 cancel（非常关键）
 			select {
 			case <-req.ctx.Done():
 				rm.cleanPlayer(uid) // 玩家可能取消
+				flag = true
+				if cancelUidList == nil {
+					cancelUidList = make([]int64, 0)
+				}
+				cancelUidList = append(cancelUidList, uid)
 				continue
 			default:
 			}
 		}
+	}
 
-		err := room.Join(req.player, cfg) // 必定加成功的
-		if err != nil {
-			rm.cleanPlayer(uid)
-			continue
+	if !flag {
+		room := rm.CreateRoom(cfg)
+		if room == nil {
+			cancelUidList = make([]int64, 0)
+			log2.Get().Error("CreateRoom err")
+			for _, req := range reqs {
+				uid := req.player.Player.Uid
+				cancelUidList = append(cancelUidList, uid)
+			}
+			return cancelUidList
 		}
 
-		rm.mu.Lock()
-		rm.playerRoom[uid] = room
-		rm.playerState[uid] = StateInRoom
-		delete(rm.playerCancel, uid)
-		rm.mu.Unlock()
+		for _, req := range reqs {
+			uid := req.player.Player.Uid
+			err := room.Join(req.player, cfg) // 必定加成功的
+			if err != nil {
+				if cancelUidList == nil {
+					cancelUidList = make([]int64, 0)
+				}
+				rm.cleanPlayer(uid)
+				flag = true
+				cancelUidList = append(cancelUidList, uid)
+				continue
+			}
+			rm.mu.Lock()
+			rm.playerRoom[uid] = room
+			delete(rm.playerCancel, uid)
+			rm.mu.Unlock()
+		}
+		if flag {
+			room.cmdChan <- &stop{}
+			return cancelUidList
+		}
+		log2.Get().Info("[createRoomWithPlayers]:create Room ", zap.Int32("roomId= ", room.roomId))
 	}
-	log2.Get().Info("[createRoomWithPlayers]:create Room ", zap.Int32("roomId= ", room.roomId))
+	return cancelUidList
 }
 
-func (rm *RoomManager) cleanPlayer(uid uint64) {
+func (rm *RoomManager) cleanPlayer(uid int64) {
 	rm.mu.Lock()
 	defer rm.mu.Unlock()
 
 	delete(rm.playerCancel, uid)
-	rm.playerState[uid] = StateIdle
 }
 
 func (rm *RoomManager) CreateRoom(cfg *config.Room) *Room {

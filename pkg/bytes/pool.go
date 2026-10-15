@@ -148,13 +148,6 @@ type Pool[T Reset] struct {
 // Put 将一个值放入池中
 // puts a value into the pool
 func (c *Pool[T]) Put(v T) {
-	//if config.Get().IsDevelop() {
-	//	_, file, line, _ := runtime.Caller(1)
-	//	key := fmt.Sprintf("%s:%d", file, line)
-	//	count, _ := c.putLocations.LoadOrStore(key, new(int64))
-	//	atomic.AddInt64(count.(*int64), 1)
-	//}
-
 	c.countLock.Lock()
 	c.putCount++
 	c.countLock.Unlock()
@@ -163,13 +156,6 @@ func (c *Pool[T]) Put(v T) {
 }
 
 func (c *Pool[T]) Get() T {
-	//if config.Get().IsDevelop() {
-	//	_, file, line, _ := runtime.Caller(1)
-	//	key := fmt.Sprintf("%s:%d", file, line)
-	//	count, _ := c.getLocations.LoadOrStore(key, new(int64))
-	//	atomic.AddInt64(count.(*int64), 1)
-	//}
-
 	c.countLock.Lock()
 	c.getCount++
 	c.countLock.Unlock()
@@ -369,27 +355,24 @@ func (c *Pool[T]) LogStats() {
 	logStatus("Pool", c.name, getCount, putCount)
 
 	if getCount != putCount {
-		//if config.Get().IsDevelop() { // 开发模式
-		if true { // 开发模式
-			c.getLocations.Range(func(key, getVal any) bool {
-				log.Warn("未释放对象追踪",
-					zap.String("name", c.name),
-					zap.Int64("获取次数", *getVal.(*int64)),
-					zap.String("调用位置", key.(string)),
-					zap.String("POOL_STATUS", "OK"),
-				)
-				return true
-			})
-			c.putLocations.Range(func(key, putVal any) bool {
-				log.Warn("未释放对象追踪",
-					zap.String("name", c.name),
-					zap.Int64("释放次数", *putVal.(*int64)),
-					zap.String("调用位置", key.(string)),
-					zap.String("POOL_STATUS", "OK"),
-				)
-				return true
-			})
-		}
+		c.getLocations.Range(func(key, getVal any) bool {
+			log.Warn("未释放对象追踪",
+				zap.String("name", c.name),
+				zap.Int64("获取次数", *getVal.(*int64)),
+				zap.String("调用位置", key.(string)),
+				zap.String("POOL_STATUS", "OK"),
+			)
+			return true
+		})
+		c.putLocations.Range(func(key, putVal any) bool {
+			log.Warn("未释放对象追踪",
+				zap.String("name", c.name),
+				zap.Int64("释放次数", *putVal.(*int64)),
+				zap.String("调用位置", key.(string)),
+				zap.String("POOL_STATUS", "OK"),
+			)
+			return true
+		})
 	}
 }
 
