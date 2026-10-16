@@ -1,0 +1,22 @@
+syntax = "proto3";
+package skill;
+option go_package = "gameServer/protobuf/pbGo";
+
+// 技能信息请求 2004
+message skillInfoReq{
+}
+message skillInfoResp {
+  repeated skillInfo skillInfoList = 1;//技能列表
+}
+message skillInfo{
+  uint32 skillId = 1; // 技能id
+  bool lock = 2; // 是否解锁
+}
+
+// 重置技能
+message resetSkillsReq{
+}
+message resetSkillsResp{
+  uint32 gold =1;//剩余的钱
+}
+

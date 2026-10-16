@@ -1,0 +1,60 @@
+syntax = "proto3";
+package config;
+option go_package = "gameServer/protobuf/pbGo";
+//import "item.proto";
+//import "hero.proto";
+
+// 人物信息 3001
+message heroConfigRep {
+}
+message heroConfigResp {
+  repeated heroConfig heroConfigList = 1;
+}
+message heroConfig {
+  uint32 id = 1;//人物id
+  bool lock = 2;//默认状态
+  string desc1 = 3;//技能描述
+  string desc2 = 8;//描述信息
+}
+
+
+// 道具信息 3002
+message itemConfigRep {
+}
+message itemConfigResp {
+  repeated itemConfig itemConfigList = 1;
+}
+message itemConfig {
+  uint32 id = 1;
+  uint32 itemType = 2;//1:金币,2:道具,3:家具物品,4:医疗药品,5:时尚潮流,6:武器装备,7:珠宝矿藏,8:文物古董,9:数码娱乐,10:能源交通,11:饮食珍馐,12:书画古籍
+  uint32 quality = 3;//1:灰色,2:绿色,3:蓝色,4:紫色,5:橙色,6:红色
+  repeated uint32 area = 4;//[0]长：水平长度,[1]宽：垂直长度
+//  repeated item.itemInfo price = 5;//代价
+  string itemName = 6;//名字
+}
+
+
+// 奖励信息 3003
+message awardConfigRep {
+}
+// 奖励信息
+message awardConfigResp {
+  repeated awardConfig awardConfigList = 1;
+}
+message awardConfig {
+  uint32 id = 1;
+//  repeated item.itemInfo reward = 2;//奖励信息
+  uint32 remainingNumber = 3;//剩余次数
+}
+
+
+///////////////////////////////////////// 后台使用 ////////////////////////////////////////////////////////////////
+
+// 远程调用更新配置请求
+message UpdateConfigRep {
+  int32 id = 1;
+  int32 groupId = 2;
+  int32 extraData = 3;//额外标志
+}
+message UpdateConfigResp {
+}
