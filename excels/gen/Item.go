@@ -13,8 +13,7 @@ import "errors"
 type Item struct {
 	Id              int32
 	Name            string
-	Desc            string
-	Price           int32
+	Price           *map_int_int
 	UpgradeToItemId int32
 	ExpireTime      *int64
 	BatchUseable    bool
@@ -50,19 +49,14 @@ func NewItem(_buf map[string]interface{}) (_v *Item, err error) {
 	}
 	{
 		var _ok_ bool
-		if _v.Desc, _ok_ = _buf["desc"].(string); !_ok_ {
-			err = errors.New("desc error")
-			return
-		}
-	}
-	{
-		var _ok_ bool
-		var _tempNum_ float64
-		if _tempNum_, _ok_ = _buf["price"].(float64); !_ok_ {
+		var _x_ map[string]interface{}
+		if _x_, _ok_ = _buf["price"].(map[string]interface{}); !_ok_ {
 			err = errors.New("price error")
 			return
 		}
-		_v.Price = int32(_tempNum_)
+		if _v.Price, err = Newmap_int_int(_x_); err != nil {
+			return
+		}
 	}
 	{
 		var _ok_ bool
